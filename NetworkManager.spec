@@ -1,6 +1,7 @@
 # todo:
 # - PLD backend (now redhat used)
 Summary:	Network Manager for GNOME
+Summary(pl):	Zarz±dca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.3.1
 Release:	0.1
@@ -14,11 +15,15 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %description
 Network Manager for GNOME.
 
+%description -l pl
+Zarz±dca sieci dla GNOME.
+
 %prep
 %setup -q
 
 %build
-%configure --with-distro=redhat
+%configure \
+	--with-distro=redhat
 %{__make}
 
 %install
