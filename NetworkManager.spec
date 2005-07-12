@@ -1,18 +1,24 @@
+#
+# TODO:
+# - add a working(!) pld backend...
+# - many files are not packaged (including init.d)
+# 
 Summary:	Network Manager for GNOME
 Summary(pl):	Zarz±dca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.4
-Release:	0.20050520.1
+Release:	0.20050713.1
 License:	GPL v2
 Group:		X11/Applications
 #Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.3/%{name}-%{version}.tar.bz2
-Source0:	%{name}-%{version}.tar.gz
-# Source0-md5:	eea94f34fb8a5b2e662d78131c11f91d
+Source0:	%{name}-%{version}.tar.bz2
+# Source0-md5:	12cc2cf25c6ac22f04538823b722412c
 Patch0:		%{name}-pld.patch
 BuildRequires:	dbus-glib-devel >= 0.33
+BuildRequires:	gnome-panel-devel
 BuildRequires:	hal-devel >= 0.5.2
 BuildRequires:	libiw-devel
-Requires:		dhcdbd
+Requires:	dhcdbd
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
