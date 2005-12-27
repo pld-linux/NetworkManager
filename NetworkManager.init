@@ -41,10 +41,10 @@ RETVAL=0
 case "$1" in
   start)
 	# Check if the service is already running?
-	if [ ! -f /var/lock/subsys/smb ]; then
+	if [ ! -f /var/lock/subsys/NetworkManager ]; then
 		msg_starting NetworkManager
 		sysctl -e -p /etc/sysctl.conf >/dev/null 2>&1
-		daemon --check $servicename $processname
+		daemon $processname
 		RETVAL=$?
 		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/$servicename
 		[ $RETVAL -eq 0 ] && echo `/sbin/pidof $processname` > $pidfile
@@ -54,7 +54,7 @@ case "$1" in
 	;;
   stop)
 	# Stop daemons.
-	if [ -f /var/lock/subsys/smb ]; then
+	if [ -f /var/lock/subsys/NetworkManager ]; then
 		msg_stopping NetworkManager
 		killproc $servicename
 		rm -f /var/lock/subsys/$servicename >/dev/null 2>&1
