@@ -18,7 +18,7 @@ BuildRequires:	dbus-glib-devel >= 0.33
 BuildRequires:	dhcdbd
 BuildRequires:	gnome-panel-devel
 BuildRequires:	hal-devel >= 0.5.2
-BuildRequires:	libiw-devel
+BuildRequires:	libiw-devel >= 28
 Requires:	dhcdbd
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
