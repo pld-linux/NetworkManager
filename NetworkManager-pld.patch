@@ -225,7 +225,7 @@ diff -Nur NetworkManager-0.5.1/src/backends/NetworkManagerPLD.c NetworkManager-0
 + */
 +void nm_system_kill_all_dhcp_daemons (void)
 +{
-+	nm_spawn_process ("/usr/bin/killall -q dhcpcd");
++	nm_spawn_process ("/bin/killall -q dhcpcd");
 +}
 +
 +/*
