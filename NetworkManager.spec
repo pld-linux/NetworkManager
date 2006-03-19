@@ -1,8 +1,7 @@
-#
 # TODO:
 # - add a working(!) pld backend...
 # - many files are not packaged (including init.d)
-# 
+#
 Summary:	Network Manager for GNOME
 Summary(pl):	Zarz±dca sieci dla GNOME
 Name:		NetworkManager
@@ -19,7 +18,11 @@ BuildRequires:	dhcdbd
 BuildRequires:	gnome-panel-devel
 BuildRequires:	hal-devel >= 0.5.2
 BuildRequires:	libiw-devel >= 28
+BuildRequires:	rpmbuild(macros) >= 1.268
+Requires(post):	/sbin/ldconfig
+Requires(post,preun):	/sbin/chkconfig
 Requires:	dhcdbd
+Requires:	rc-scripts
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -56,22 +59,15 @@ rm -rf $RPM_BUILD_ROOT
 /sbin/ldconfig
 %gconf_schema_install
 /sbin/chkconfig --add NetworkManager
-if [ -f /var/lock/subsys/NetworkManager ]; then
-	/etc/rc.d/init.d/dhcdbd restart 1>&2
-else
-	echo "Run \"/etc/rc.d/init.d/NetworkManager start\" to start NetworkManager daemon."
-fi
+%service NetworkManager restart "NetworkManager daemon"
 
 %preun
 if [ "$1" = "0" ]; then
-	if [ -f /var/lock/subsys/NetworkManager ]; then
-		/etc/rc.d/init.d/NetworkManager stop 1>&2
-	fi
-	[ ! -x /sbin/chkconfig ] || /sbin/chkconfig --del NetworkManager
+	%service NetworkManager stop
+	/sbin/chkconfig --del NetworkManager
 fi
 
-%postun
-/sbin/ldconfig
+%postun -p /sbin/ldconfig
 
 %files -f %{name}.lang
 %defattr(644,root,root,755)
