@@ -1,6 +1,6 @@
-<diff -Nur NetworkManager-0.4.orig/configure.in NetworkManager-0.4/configure.in
---- NetworkManager-0.4.orig/configure.in	2005-05-19 21:58:50.000000000 +0100
-+++ NetworkManager-0.4/configure.in	2005-05-20 23:22:23.000000000 +0100
+diff -urN NetworkManager-0.6.2-o/configure.in NetworkManager-0.6.2/configure.in
+--- NetworkManager-0.6.2-o/configure.in	2006-03-27 09:05:17.000000000 -0700
++++ NetworkManager-0.6.2/configure.in	2006-04-03 13:39:20.000000000 -0600
 @@ -60,7 +60,7 @@
  	exit 1
  else
@@ -10,18 +10,18 @@
  		*)
  			echo "Your distribution (${with_distro}) is not yet supported!  (patches welcome)"
  			exit 1
-@@ -68,6 +68,7 @@
+@@ -72,6 +72,7 @@
+ AM_CONDITIONAL(TARGET_GENTOO, test x"$with_distro" = xgentoo)
  AM_CONDITIONAL(TARGET_DEBIAN, test x"$with_distro" = xdebian)
- AM_CONDITIONAL(TARGET_MANDRAKE, test x"$with_distro" = xmandrake)
  AM_CONDITIONAL(TARGET_SLACKWARE, test x"$with_distro" = xslackware)
 +AM_CONDITIONAL(TARGET_PLD, test x"$with_distro" = xpld)
  
- AC_CHECK_HEADER(iwlib.h, [],
- 			[AC_MSG_ERROR(iwlib.h not found. Install wireless-tools.)], [])
-diff -Nur NetworkManager-0.4.orig/src/backends/Makefile.am NetworkManager-0.4/src/backends/Makefile.am
---- NetworkManager-0.4.orig/src/backends/Makefile.am	2005-05-16 19:35:20.000000000 +0100
-+++ NetworkManager-0.4/src/backends/Makefile.am	2005-05-20 23:23:16.000000000 +0100
-@@ -24,6 +24,10 @@
+ AC_MSG_CHECKING([for wireless-tools >= 28pre9])
+ AC_TRY_COMPILE([#include <iwlib.h>],
+diff -urN NetworkManager-0.6.2-o/src/backends/Makefile.am NetworkManager-0.6.2/src/backends/Makefile.am
+--- NetworkManager-0.6.2-o/src/backends/Makefile.am	2006-03-09 13:52:16.000000000 -0700
++++ NetworkManager-0.6.2/src/backends/Makefile.am	2006-04-03 13:39:20.000000000 -0600
+@@ -38,6 +38,10 @@
  libnmbackend_la_SOURCES +=	NetworkManagerSlackware.c
  endif
  
@@ -32,10 +32,10 @@ diff -Nur NetworkManager-0.4.orig/src/backends/Makefile.am NetworkManager-0.4/sr
  libnmbackend_la_LIBADD = $(DBUS_LIBS) $(GTHREAD_LIBS)
  libnmbackend_la_CPPFLAGS =	$(DBUS_CFLAGS)				\
  					$(GTHREAD_CFLAGS)				\
-diff -Nur NetworkManager-0.5.1/src/backends/NetworkManagerPLD.c NetworkManager-0.5.1-patrys/src/backends/NetworkManagerPLD.c
---- NetworkManager-0.5.1/src/backends/NetworkManagerPLD.c	1970-01-01 01:00:00.000000000 +0100
-+++ NetworkManager-0.5.1-patrys/src/backends/NetworkManagerPLD.c	2005-12-27 12:58:21.682174250 +0100
-@@ -0,0 +1,356 @@
+diff -urN NetworkManager-0.6.2-o/src/backends/NetworkManagerPLD.c NetworkManager-0.6.2/src/backends/NetworkManagerPLD.c
+--- NetworkManager-0.6.2-o/src/backends/NetworkManagerPLD.c	1969-12-31 17:00:00.000000000 -0700
++++ NetworkManager-0.6.2/src/backends/NetworkManagerPLD.c	2006-04-03 13:39:45.000000000 -0600
+@@ -0,0 +1,430 @@
 +/* NetworkManager -- Network link manager
 + *
 + * Narayan Newton <narayan_newton@yahoo.com>
@@ -65,7 +65,10 @@ diff -Nur NetworkManager-0.5.1/src/backends/NetworkManagerPLD.c NetworkManager-0
 +#include <signal.h>
 +#include "NetworkManagerSystem.h"
 +#include "NetworkManagerUtils.h"
-+#include "NetworkManagerDevice.h"
++#include "nm-device.h"
++#include "nm-device-802-3-ethernet.h"
++#include "nm-device-802-11-wireless.h"
++#include "nm-utils.h"
 +
 +/*
 + *	PLD specific backend based on Slackware backend.
@@ -177,7 +180,7 @@ diff -Nur NetworkManager-0.5.1/src/backends/NetworkManagerPLD.c NetworkManager-0
 + * info before setting stuff too.
 + *
 + */
-+void *nm_system_device_get_system_config (NMDevice *dev)
++void *nm_system_device_get_system_config (NMDevice *dev, struct NMData *data)
 +{
 +	return NULL;
 +}
@@ -264,7 +267,10 @@ diff -Nur NetworkManager-0.5.1/src/backends/NetworkManagerPLD.c NetworkManager-0
 +	struct ether_addr hw_addr;
 +	unsigned char eui[8];
 +
-+	nm_device_get_hw_address (dev, &hw_addr);
++	if (nm_device_is_802_3_ethernet (dev))
++		nm_device_802_3_ethernet_get_address (NM_DEVICE_802_3_ETHERNET (dev), &hw_addr);
++	else if (nm_device_is_802_11_wireless (dev))
++		nm_device_802_11_wireless_get_address (NM_DEVICE_802_11_WIRELESS (dev), &hw_addr);
 +
 +	memcpy (eui, &(hw_addr.ether_addr_octet), sizeof (hw_addr.ether_addr_octet));
 +	memmove (eui+5, eui+3, 3);
@@ -361,6 +367,11 @@ diff -Nur NetworkManager-0.5.1/src/backends/NetworkManagerPLD.c NetworkManager-0
 +{
 +}
 +
++gboolean nm_system_deactivate_dialup (GSList *list, const char *dialup)
++{
++	return FALSE;
++}
++
 +gboolean nm_system_activate_dialup (GSList *list, const char *dialup)
 +{
 +	return FALSE;
@@ -392,3 +403,66 @@ diff -Nur NetworkManager-0.5.1/src/backends/NetworkManagerPLD.c NetworkManager-0
 +	        return TRUE;
 +}
 +
++/*
++ * nm_system_device_get_disabled
++ *
++ * Return whether the distro-specific system config tells us to use
++ * dhcp for this device.
++ *
++ */
++gboolean nm_system_device_get_disabled (NMDevice *dev)
++{
++	return FALSE;
++}
++
++/*
++ * nm_system_activate_nis
++ *
++ * set up the nis domain and write a yp.conf
++ *
++ */
++void nm_system_activate_nis (NMIP4Config *config)
++{
++}
++
++/*
++ * nm_system_shutdown_nis
++ *
++ * shutdown ypbind
++ *
++ */
++void nm_system_shutdown_nis (void)
++{
++}
++
++/*
++ * nm_system_set_hostname
++ *
++ * set the hostname
++ *
++ */
++void nm_system_set_hostname (NMIP4Config *config)
++{
++}
++
++/*
++ * nm_system_should_modify_resolv_conf
++ *
++ * Can NM update resolv.conf, or is it locked down?
++ */
++gboolean nm_system_should_modify_resolv_conf (void)
++{
++	return TRUE;
++}
++
++
++/*
++ * nm_system_get_mtu
++ *
++ * Return a user-provided or system-mandated MTU for this device or zero if
++ * no such MTU is provided.
++ */
++unsigned int nm_system_get_mtu (NMDevice *dev)
++{
++	return 0;
++}
