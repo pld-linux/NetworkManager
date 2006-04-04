@@ -77,7 +77,7 @@ fi
 %attr(755,root,root) %{_sbindir}/*
 %attr(755,root,root) %{_datadir}/nm-applet
 %attr(755,root,root) %{_datadir}/gnome-vpn-properties
-%attr(755,root,root) %{_libdir}/lib*so.*
+%attr(755,root,root) %{_libdir}/lib*.so.*.*.*
 %attr(755,root,root) %{_libdir}/nm-crash-logger
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
 %dir %{_datadir}/%{name}
@@ -88,23 +88,17 @@ fi
 %{_iconsdir}/*/*/apps/*.png
 
 %if 0
-/usr/include/NetworkManager/NetworkManager.h
-/usr/include/NetworkManager/NetworkManagerVPN.h
-/usr/include/NetworkManager/cipher-wep-ascii.h
-/usr/include/NetworkManager/cipher-wep-hex.h
-/usr/include/NetworkManager/cipher-wep-passphrase.h
-/usr/include/NetworkManager/cipher-wpa-psk-hex.h
-/usr/include/NetworkManager/cipher-wpa-psk-passphrase.h
-/usr/include/NetworkManager/cipher.h
-/usr/include/NetworkManager/dbus-helpers.h
-/usr/include/NetworkManager/dbus-method-dispatcher.h
-/usr/include/NetworkManager/libnm_glib.h
-/usr/include/NetworkManager/nm-vpn-ui-interface.h
-/usr/lib/libnm-util.a
-/usr/lib/libnm-util.la
-/usr/lib/libnm_glib.a
-/usr/lib/libnm_glib.la
-/usr/lib/pkgconfig/NetworkManager.pc
-/usr/lib/pkgconfig/libnm-util.pc
-/usr/lib/pkgconfig/libnm_glib.pc
+# -devel?
+%attr(755,root,root) %{_libdir}/libnm-util.so
+%attr(755,root,root) %{_libdir}/libnm_glib.so
+%{_libdir}/libnm-util.la
+%{_libdir}/libnm_glib.la
+%{_includedir}/NetworkManager
+%{_pkgconfigdir}/NetworkManager.pc
+%{_pkgconfigdir}/libnm-util.pc
+%{_pkgconfigdir}/libnm_glib.pc
+
+# -static?
+%{_libdir}/libnm-util.a
+%{_libdir}/libnm_glib.a
 %endif
