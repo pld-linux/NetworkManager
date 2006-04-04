@@ -20,6 +20,7 @@ BuildRequires:	hal-devel >= 0.5.2
 BuildRequires:	libiw-devel >= 28
 BuildRequires:	libnl-devel >= 1.0
 BuildRequires:	rpmbuild(macros) >= 1.268
+BuildRequires:	wpa_supplicant
 Requires(post):	/sbin/ldconfig
 Requires(post,preun):	/sbin/chkconfig
 Requires:	dhcdbd
