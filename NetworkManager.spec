@@ -13,12 +13,18 @@ Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.6/%{name}-%{ver
 # Source0-md5:	1254609e7d6a8de72677d63908bb4bd8
 Source1:	%{name}.init
 Patch0:		%{name}-pld.patch
-BuildRequires:	dbus-glib-devel >= 0.6.3
-BuildRequires:	dhcdbd
-BuildRequires:	gnome-panel-devel
+BuildRequires:	GConf2-devel >= 2.0
+BuildRequires:	dbus-glib-devel >= 0.60
+BuildRequires:	gtk+2-devel >= 2.0
+BuildRequires:	gnome-keyring-devel
+BuildRequires:	gnome-panel-devel >= 2.0
 BuildRequires:	hal-devel >= 0.5.2
+BuildRequires:	libgcrypt-devel
+BuildRequires:	libglade2-devel >= 2.0
 BuildRequires:	libiw-devel >= 28
 BuildRequires:	libnl-devel >= 1.0
+BuildRequires:	libnotify-devel >= 0.3.0
+BuildRequires:	pkgconfig
 BuildRequires:	rpmbuild(macros) >= 1.268
 Requires(post):	/sbin/ldconfig
 Requires(post,preun):	/sbin/chkconfig
@@ -39,7 +45,9 @@ Zarz±dca sieci dla GNOME.
 %build
 autoreconf
 %configure \
-	--with-distro=pld
+	--with-distro=pld \
+	--with-dhcdbd=/usr/sbin/dhcdbd \
+	--with-wpa_supplicant=/usr/sbin/wpa_supplicant
 %{__make}
 
 %install
