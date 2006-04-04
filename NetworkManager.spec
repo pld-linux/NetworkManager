@@ -13,7 +13,7 @@ Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.6/%{name}-%{ver
 # Source0-md5:	1254609e7d6a8de72677d63908bb4bd8
 Source1:	%{name}.init
 Patch0:		%{name}-pld.patch
-BuildRequires:	dbus-glib-devel >= 0.33
+BuildRequires:	dbus-glib-devel >= 0.6.3
 BuildRequires:	dhcdbd
 BuildRequires:	gnome-panel-devel
 BuildRequires:	hal-devel >= 0.5.2
