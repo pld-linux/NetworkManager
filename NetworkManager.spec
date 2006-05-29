@@ -30,6 +30,7 @@ Requires(post):	/sbin/ldconfig
 Requires(post,preun):	/sbin/chkconfig
 Requires:	dhcdbd
 Requires:	rc-scripts
+Requires:	wpa_supplicant
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
