@@ -6,7 +6,7 @@ Summary:	Network Manager for GNOME
 Summary(pl):	Zarz±dca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.6.2
-Release:	0.1
+Release:	0.2
 License:	GPL v2
 Group:		X11/Applications
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.6/%{name}-%{version}.tar.bz2
@@ -53,7 +53,7 @@ autoreconf
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
+install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name}}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -90,6 +90,7 @@ fi
 %attr(755,root,root) %{_libdir}/nm-crash-logger
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
 %dir %{_datadir}/%{name}
+%dir /var/run/%{name}
 %{_datadir}/%{name}/gdb-cmd
 %{_datadir}/gnome/autostart/*.desktop
 %{_mandir}/man1/*
