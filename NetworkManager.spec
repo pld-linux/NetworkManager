@@ -1,6 +1,7 @@
 # TODO:
 # - add a working(!) pld backend...
 # - many files are not packaged (including init.d)
+# - add requires for devel (if any)
 #
 Summary:	Network Manager for GNOME
 Summary(pl):	Zarz±dca sieci dla GNOME
@@ -15,9 +16,9 @@ Source1:	%{name}.init
 Patch0:		%{name}-pld.patch
 BuildRequires:	GConf2-devel >= 2.0
 BuildRequires:	dbus-glib-devel >= 0.60
-BuildRequires:	gtk+2-devel >= 2.0
 BuildRequires:	gnome-keyring-devel
 BuildRequires:	gnome-panel-devel >= 2.0
+BuildRequires:	gtk+2-devel >= 2.0
 BuildRequires:	hal-devel >= 0.5.2
 BuildRequires:	libgcrypt-devel
 BuildRequires:	libglade2-devel >= 2.0
@@ -39,6 +40,28 @@ Network Manager for GNOME.
 %description -l pl
 Zarz±dca sieci dla GNOME.
 
+%package devel
+Summary:	Network Manager includes and more
+Summary(pl):	Pliki nag³ówkowe Network Managera
+Group:		X11/Development/Libraries
+
+%description devel
+Network Manager includes and more
+
+%description devel -l pl
+Pliki nag³ówkowe Network Manager
+
+%package static
+Summary:	Network Manager static libraries
+Summary(pl):	Statyczne biblioteki Network Managera
+Group:		X11/Development/Libraries
+
+%description static
+Network Manager static libraries
+
+%description static -l pl
+Statyczne biblioteki Network Managera
+
 %prep
 %setup -q
 %patch0 -p1
@@ -47,8 +70,8 @@ Zarz±dca sieci dla GNOME.
 autoreconf
 %configure \
 	--with-distro=pld \
-	--with-dhcdbd=/usr/sbin/dhcdbd \
-	--with-wpa_supplicant=/usr/sbin/wpa_supplicant
+--with-dhcdbd=%{_sbindir}/dhcdbd \
+--with-wpa_supplicant=%{_sbindir}/wpa_supplicant
 %{__make}
 
 %install
@@ -97,8 +120,8 @@ fi
 %{_sysconfdir}/dbus-1/system.d/*
 %{_iconsdir}/*/*/apps/*.png
 
-%if 0
-# -devel?
+%files devel
+%defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libnm-util.so
 %attr(755,root,root) %{_libdir}/libnm_glib.so
 %{_libdir}/libnm-util.la
@@ -108,7 +131,7 @@ fi
 %{_pkgconfigdir}/libnm-util.pc
 %{_pkgconfigdir}/libnm_glib.pc
 
-# -static?
+%files static
+%defattr(644,root,root,755)
 %{_libdir}/libnm-util.a
 %{_libdir}/libnm_glib.a
-%endif
