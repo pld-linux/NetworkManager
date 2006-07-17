@@ -44,23 +44,25 @@ Zarz±dca sieci dla GNOME.
 Summary:	Network Manager includes and more
 Summary(pl):	Pliki nag³ówkowe Network Managera
 Group:		X11/Development/Libraries
+Requires:	%{name} = %{version}-%{release}
 
 %description devel
-Network Manager includes and more
+Network Manager includes and more.
 
 %description devel -l pl
-Pliki nag³ówkowe Network Manager
+Pliki nag³ówkowe Network Manager.
 
 %package static
 Summary:	Network Manager static libraries
 Summary(pl):	Statyczne biblioteki Network Managera
 Group:		X11/Development/Libraries
+Requires:	%{name}-devel = %{version}-%{release}
 
 %description static
-Network Manager static libraries
+Network Manager static libraries.
 
 %description static -l pl
-Statyczne biblioteki Network Managera
+Statyczne biblioteki Network Managera.
 
 %prep
 %setup -q
@@ -70,8 +72,8 @@ Statyczne biblioteki Network Managera
 autoreconf
 %configure \
 	--with-distro=pld \
---with-dhcdbd=%{_sbindir}/dhcdbd \
---with-wpa_supplicant=%{_sbindir}/wpa_supplicant
+	--with-dhcdbd=%{_sbindir}/dhcdbd \
+	--with-wpa_supplicant=%{_sbindir}/wpa_supplicant
 %{__make}
 
 %install
