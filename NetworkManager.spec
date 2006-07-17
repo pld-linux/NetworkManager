@@ -45,6 +45,8 @@ Summary:	Network Manager includes and more
 Summary(pl):	Pliki nag³ówkowe Network Managera
 Group:		X11/Development/Libraries
 Requires:	%{name} = %{version}-%{release}
+Requires:	dbus-glib-devel >= 0.60
+Requires:	libgcrypt-devel
 
 %description devel
 Network Manager includes and more.
