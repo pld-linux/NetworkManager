@@ -6,14 +6,15 @@
 Summary:	Network Manager for GNOME
 Summary(pl):	Zarz±dca sieci dla GNOME
 Name:		NetworkManager
-Version:	0.6.2
-Release:	0.2
+Version:	0.6.4
+Release:	0.1
 License:	GPL v2
 Group:		X11/Applications
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.6/%{name}-%{version}.tar.bz2
-# Source0-md5:	1254609e7d6a8de72677d63908bb4bd8
+# Source0-md5:	7d22b8df56d65d7c966cb28e0772d305
 Source1:	%{name}.init
 Patch0:		%{name}-pld.patch
+Patch1:		%{name}-dbus.patch
 BuildRequires:	GConf2-devel >= 2.0
 BuildRequires:	dbus-glib-devel >= 0.60
 BuildRequires:	gnome-keyring-devel
@@ -69,6 +70,7 @@ Statyczne biblioteki Network Managera.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
 autoreconf
