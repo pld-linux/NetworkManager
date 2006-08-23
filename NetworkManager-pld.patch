@@ -5,15 +5,15 @@ diff -urN NetworkManager-0.6.2-o/configure.in NetworkManager-0.6.2/configure.in
  	exit 1
  else
  	case $with_distro in
--		redhat|suse|gentoo|debian|slackware) ;;
-+		redhat|suse|gentoo|debian|slackware|pld) ;;
+-		redhat|suse|gentoo|debian|slackware|arch) ;;
++		redhat|suse|gentoo|debian|slackware|arch|pld) ;;
  		*)
  			echo "Your distribution (${with_distro}) is not yet supported!  (patches welcome)"
  			exit 1
 @@ -72,6 +72,7 @@
- AM_CONDITIONAL(TARGET_GENTOO, test x"$with_distro" = xgentoo)
  AM_CONDITIONAL(TARGET_DEBIAN, test x"$with_distro" = xdebian)
  AM_CONDITIONAL(TARGET_SLACKWARE, test x"$with_distro" = xslackware)
+ AM_CONDITIONAL(TARGET_ARCH, test x"$with_distro" = xarch)
 +AM_CONDITIONAL(TARGET_PLD, test x"$with_distro" = xpld)
  
  AC_MSG_CHECKING([for wireless-tools >= 28pre9])
