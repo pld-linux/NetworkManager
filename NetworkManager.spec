@@ -7,7 +7,7 @@ Summary:	Network Manager for GNOME
 Summary(pl):	Zarz±dca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.6.4
-Release:	0.1
+Release:	0.2
 License:	GPL v2
 Group:		X11/Applications
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.6/%{name}-%{version}.tar.bz2
@@ -60,6 +60,7 @@ Pliki nag³ówkowe Network Manager.
 Summary:	Network Manager shared libraries
 Summary(pl):	Biblioteki dzielone Network Managera
 Group:		X11/Libraries
+Conflicts:	NetworkManager < 0.6.4-0.2
 
 %description libs
 Network Manager shared libraries
