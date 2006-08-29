@@ -30,6 +30,7 @@ BuildRequires:	pkgconfig
 BuildRequires:	rpmbuild(macros) >= 1.268
 Requires(post):	/sbin/ldconfig
 Requires(post,preun):	/sbin/chkconfig
+Requires:	%{name}-libs = %{version}-%{release}
 Requires:	dhcdbd
 Requires:	rc-scripts
 Requires:	wpa_supplicant
@@ -45,7 +46,7 @@ Zarz±dca sieci dla GNOME.
 Summary:	Network Manager includes and more
 Summary(pl):	Pliki nag³ówkowe Network Managera
 Group:		X11/Development/Libraries
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{name}-libs = %{version}-%{release}
 Requires:	dbus-glib-devel >= 0.60
 Requires:	libgcrypt-devel
 
@@ -54,6 +55,17 @@ Network Manager includes and more.
 
 %description devel -l pl
 Pliki nag³ówkowe Network Manager.
+
+%package libs
+Summary:	Network Manager shared libraries
+Summary(pl):	Biblioteki dzielone Network Managera
+Group:		X11/Libraries
+
+%description libs
+Network Manager shared libraries
+
+%description libs -l pl
+Biblioteki dzielone Network Managera
 
 %package static
 Summary:	Network Manager static libraries
@@ -95,7 +107,6 @@ install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/NetworkManager
 rm -rf $RPM_BUILD_ROOT
 
 %post
-/sbin/ldconfig
 %gconf_schema_install
 /sbin/chkconfig --add NetworkManager
 %service NetworkManager restart "NetworkManager daemon"
@@ -106,7 +117,8 @@ if [ "$1" = "0" ]; then
 	/sbin/chkconfig --del NetworkManager
 fi
 
-%postun -p /sbin/ldconfig
+%post	libs -p /sbin/ldconfig
+%postun	libs -p /sbin/ldconfig
 
 %files -f %{name}.lang
 %defattr(644,root,root,755)
@@ -115,7 +127,6 @@ fi
 %attr(755,root,root) %{_sbindir}/*
 %attr(755,root,root) %{_datadir}/nm-applet
 %attr(755,root,root) %{_datadir}/gnome-vpn-properties
-%attr(755,root,root) %{_libdir}/lib*.so.*.*.*
 %attr(755,root,root) %{_libdir}/nm-crash-logger
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
 %dir %{_datadir}/%{name}
@@ -136,6 +147,10 @@ fi
 %{_pkgconfigdir}/NetworkManager.pc
 %{_pkgconfigdir}/libnm-util.pc
 %{_pkgconfigdir}/libnm_glib.pc
+
+%files libs
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/lib*.so.*.*.*
 
 %files static
 %defattr(644,root,root,755)
