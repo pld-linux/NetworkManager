@@ -42,6 +42,18 @@ Network Manager for GNOME.
 %description -l pl
 Zarz±dca sieci dla GNOME.
 
+%package libs
+Summary:	Network Manager shared libraries
+Summary(pl):	Biblioteki dzielone Network Managera
+Group:		X11/Libraries
+Conflicts:	NetworkManager < 0.6.4-0.2
+
+%description libs
+Network Manager shared libraries.
+
+%description libs -l pl
+Biblioteki dzielone Network Managera.
+
 %package devel
 Summary:	Network Manager includes and more
 Summary(pl):	Pliki nag³ówkowe Network Managera
@@ -55,18 +67,6 @@ Network Manager includes and more.
 
 %description devel -l pl
 Pliki nag³ówkowe Network Manager.
-
-%package libs
-Summary:	Network Manager shared libraries
-Summary(pl):	Biblioteki dzielone Network Managera
-Group:		X11/Libraries
-Conflicts:	NetworkManager < 0.6.4-0.2
-
-%description libs
-Network Manager shared libraries
-
-%description libs -l pl
-Biblioteki dzielone Network Managera
 
 %package static
 Summary:	Network Manager static libraries
@@ -138,6 +138,10 @@ fi
 %{_sysconfdir}/dbus-1/system.d/*
 %{_iconsdir}/*/*/apps/*.png
 
+%files libs
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/lib*.so.*.*.*
+
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libnm-util.so
@@ -148,10 +152,6 @@ fi
 %{_pkgconfigdir}/NetworkManager.pc
 %{_pkgconfigdir}/libnm-util.pc
 %{_pkgconfigdir}/libnm_glib.pc
-
-%files libs
-%defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/lib*.so.*.*.*
 
 %files static
 %defattr(644,root,root,755)
