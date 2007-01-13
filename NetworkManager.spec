@@ -1,13 +1,12 @@
 # TODO:
-# - add a working(!) pld backend...
-# - many files are not packaged (including init.d)
+# - add a working(!) pld backend... (it work's 4 me as it is now - czarny)
 # - add requires for devel (if any)
 #
 Summary:	Network Manager for GNOME
 Summary(pl):	Zarz±dca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.6.4
-Release:	0.2
+Release:	1
 License:	GPL v2
 Group:		X11/Applications
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.6/%{name}-%{version}.tar.bz2
