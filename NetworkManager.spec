@@ -22,7 +22,7 @@ BuildRequires:	gtk+2-devel >= 2.0
 BuildRequires:	hal-devel >= 0.5.2
 BuildRequires:	libgcrypt-devel
 BuildRequires:	libglade2-devel >= 2.0
-BuildRequires:	libiw-devel >= 28
+BuildRequires:	libiw-devel >= 1:28
 BuildRequires:	libnl-devel >= 1.0
 BuildRequires:	libnotify-devel >= 0.3.0
 BuildRequires:	pkgconfig
