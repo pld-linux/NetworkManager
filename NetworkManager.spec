@@ -3,7 +3,7 @@
 # - add requires for devel (if any)
 #
 Summary:	Network Manager for GNOME
-Summary(pl):	Zarz±dca sieci dla GNOME
+Summary(pl.UTF-8):   ZarzÄ…dca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.6.4
 Release:	1
@@ -38,24 +38,24 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %description
 Network Manager for GNOME.
 
-%description -l pl
-Zarz±dca sieci dla GNOME.
+%description -l pl.UTF-8
+ZarzÄ…dca sieci dla GNOME.
 
 %package libs
 Summary:	Network Manager shared libraries
-Summary(pl):	Biblioteki dzielone Network Managera
+Summary(pl.UTF-8):   Biblioteki dzielone Network Managera
 Group:		X11/Libraries
 Conflicts:	NetworkManager < 0.6.4-0.2
 
 %description libs
 Network Manager shared libraries.
 
-%description libs -l pl
+%description libs -l pl.UTF-8
 Biblioteki dzielone Network Managera.
 
 %package devel
 Summary:	Network Manager includes and more
-Summary(pl):	Pliki nag³ówkowe Network Managera
+Summary(pl.UTF-8):   Pliki nagÅ‚Ã³wkowe Network Managera
 Group:		X11/Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	dbus-glib-devel >= 0.60
@@ -64,19 +64,19 @@ Requires:	libgcrypt-devel
 %description devel
 Network Manager includes and more.
 
-%description devel -l pl
-Pliki nag³ówkowe Network Manager.
+%description devel -l pl.UTF-8
+Pliki nagÅ‚Ã³wkowe Network Manager.
 
 %package static
 Summary:	Network Manager static libraries
-Summary(pl):	Statyczne biblioteki Network Managera
+Summary(pl.UTF-8):   Statyczne biblioteki Network Managera
 Group:		X11/Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 
 %description static
 Network Manager static libraries.
 
-%description static -l pl
+%description static -l pl.UTF-8
 Statyczne biblioteki Network Managera.
 
 %prep
