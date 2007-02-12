@@ -3,7 +3,7 @@
 # - add requires for devel (if any)
 #
 Summary:	Network Manager for GNOME
-Summary(pl.UTF-8):   Zarządca sieci dla GNOME
+Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.6.4
 Release:	1
@@ -43,7 +43,7 @@ Zarządca sieci dla GNOME.
 
 %package libs
 Summary:	Network Manager shared libraries
-Summary(pl.UTF-8):   Biblioteki dzielone Network Managera
+Summary(pl.UTF-8):	Biblioteki dzielone Network Managera
 Group:		X11/Libraries
 Conflicts:	NetworkManager < 0.6.4-0.2
 
@@ -55,7 +55,7 @@ Biblioteki dzielone Network Managera.
 
 %package devel
 Summary:	Network Manager includes and more
-Summary(pl.UTF-8):   Pliki nagłówkowe Network Managera
+Summary(pl.UTF-8):	Pliki nagłówkowe Network Managera
 Group:		X11/Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	dbus-glib-devel >= 0.60
@@ -69,7 +69,7 @@ Pliki nagłówkowe Network Manager.
 
 %package static
 Summary:	Network Manager static libraries
-Summary(pl.UTF-8):   Statyczne biblioteki Network Managera
+Summary(pl.UTF-8):	Statyczne biblioteki Network Managera
 Group:		X11/Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 
