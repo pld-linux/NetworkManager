@@ -16,6 +16,7 @@ Patch0:		%{name}-pld.patch
 Patch1:		%{name}-dbus.patch
 BuildRequires:	GConf2-devel >= 2.0
 BuildRequires:	dbus-glib-devel >= 0.60
+BuildRequires:	gettext-devel
 BuildRequires:	gnome-keyring-devel
 BuildRequires:	gnome-panel-devel >= 2.0
 BuildRequires:	gtk+2-devel >= 2.0
