@@ -1,6 +1,6 @@
 # TODO:
+# - missing BRs (ac/am/??? - don't hide them behind autoreconf call)
 # - add a working(!) pld backend... (it work's 4 me as it is now - czarny)
-# - add requires for devel (if any)
 #
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
@@ -18,10 +18,10 @@ BuildRequires:	dbus-glib-devel >= 0.60
 BuildRequires:	gettext-devel
 BuildRequires:	gnome-keyring-devel
 BuildRequires:	gnome-panel-devel >= 2.0
-BuildRequires:	gtk+2-devel >= 2.0
+BuildRequires:	gtk+2-devel >= 1:2.0
 BuildRequires:	hal-devel >= 0.5.2
 BuildRequires:	libgcrypt-devel
-BuildRequires:	libglade2-devel >= 2.0
+BuildRequires:	libglade2-devel >= 1:2.0
 BuildRequires:	libiw-devel >= 1:28
 BuildRequires:	libnl-devel >= 1.0
 BuildRequires:	libnotify-devel >= 0.3.0
