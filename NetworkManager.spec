@@ -1,5 +1,4 @@
 # TODO:
-# - missing BRs (ac/am/??? - don't hide them behind autoreconf call)
 # - add a working(!) pld backend... (it work's 4 me as it is now - czarny)
 #
 Summary:	Network Manager for GNOME
@@ -14,17 +13,21 @@ Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.6/%{name}-%{ver
 Source1:	%{name}.init
 Patch0:		%{name}-pld.patch
 BuildRequires:	GConf2-devel >= 2.0
+BuildRequires:	autoconf >= 2.52
+BuildRequires:	automake
 BuildRequires:	dbus-glib-devel >= 0.60
 BuildRequires:	gettext-devel
 BuildRequires:	gnome-keyring-devel
 BuildRequires:	gnome-panel-devel >= 2.0
 BuildRequires:	gtk+2-devel >= 1:2.0
 BuildRequires:	hal-devel >= 0.5.2
+BuildRequires:	intltool >= 0.35.5
 BuildRequires:	libgcrypt-devel
 BuildRequires:	libglade2-devel >= 1:2.0
 BuildRequires:	libiw-devel >= 1:28
 BuildRequires:	libnl-devel >= 1.0
 BuildRequires:	libnotify-devel >= 0.3.0
+BuildRequires:	libtool
 BuildRequires:	pkgconfig
 BuildRequires:	rpmbuild(macros) >= 1.268
 Requires(post):	/sbin/ldconfig
@@ -84,7 +87,12 @@ Statyczne biblioteki Network Managera.
 %patch0 -p1
 
 %build
-autoreconf
+%{__glib_gettextize}
+%{__intltoolize}
+%{__libtoolize}
+%{__aclocal}
+%{__autoconf}
+%{__automake}
 %configure \
 	--with-distro=pld \
 	--with-dhcdbd=%{_sbindir}/dhcdbd \
@@ -106,7 +114,6 @@ install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/NetworkManager
 rm -rf $RPM_BUILD_ROOT
 
 %post
-%gconf_schema_install
 /sbin/chkconfig --add NetworkManager
 %service NetworkManager restart "NetworkManager daemon"
 
