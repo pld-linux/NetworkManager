@@ -27,6 +27,7 @@ BuildRequires:	libglade2-devel >= 1:2.0
 BuildRequires:	libiw-devel >= 1:28
 BuildRequires:	libnl-devel >= 1.0
 BuildRequires:	libnotify-devel >= 0.3.0
+BuildRequires:	libselinux-devel
 BuildRequires:	libtool
 BuildRequires:	pkgconfig
 BuildRequires:	rpmbuild(macros) >= 1.268
