@@ -5,12 +5,13 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.6.5
-Release:	1.1
+Release:	1.3
 License:	GPL v2
 Group:		X11/Applications
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.6/%{name}-%{version}.tar.bz2
 # Source0-md5:	b827d300eb28458f6588eb843cba418d
 Source1:	%{name}.init
+Source2:	%{name}Dispatcher.init
 Patch0:		%{name}-pld.patch
 Patch1:		%{name}-deprecated.patch
 Patch2:		%{name}-branch.diff
@@ -106,12 +107,14 @@ Statyczne biblioteki Network Managera.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name}}
+install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},%{_sysconfigdir}/%{name}/dispatcher.d}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/NetworkManager
+install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/NetworkManagerDispatcher
+
 
 %find_lang %{name} --with-gnome --all-name
 
@@ -120,12 +123,16 @@ rm -rf $RPM_BUILD_ROOT
 
 %post
 /sbin/chkconfig --add NetworkManager
+/sbin/chkconfig --add NetworkManagerDispatcher
 %service NetworkManager restart "NetworkManager daemon"
+%service NetworkManagerDispatcher restart "NetworkManagerDispatcher daemon"
 
 %preun
 if [ "$1" = "0" ]; then
 	%service NetworkManager stop
+	%service NetworkManagerDispatcher stop
 	/sbin/chkconfig --del NetworkManager
+	/sbin/chkconfig --del NetworkManagerDispatcher
 fi
 
 %post	libs -p /sbin/ldconfig
@@ -139,6 +146,9 @@ fi
 %attr(755,root,root) %{_datadir}/gnome-vpn-properties
 %attr(755,root,root) %{_libdir}/nm-crash-logger
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
+%attr(754,root,root) /etc/rc.d/init.d/NetworkManagerDispatcher
+%dir %{_sysconfdir}/NetworkManager
+%dir %{_sysconfdir}/NetworkManager/dispatcher.d
 %dir %{_datadir}/%{name}
 %dir /var/run/%{name}
 %{_datadir}/%{name}/gdb-cmd
