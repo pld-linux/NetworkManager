@@ -5,7 +5,7 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.6.5
-Release:	1.3
+Release:	2
 License:	GPL v2
 Group:		X11/Applications
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.6/%{name}-%{version}.tar.bz2
@@ -112,6 +112,8 @@ install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},%{_sysconfigdir}/%{
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
+install test/nm-tool $RPM_BUILD_ROOT%{_bindir}/nm-tool
+
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/NetworkManager
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/NetworkManagerDispatcher
 
@@ -141,9 +143,10 @@ fi
 %files -f %{name}.lang
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS README TODO
-%attr(755,root,root) %{_bindir}/*
-%attr(755,root,root) %{_sbindir}/*
-%attr(755,root,root) %{_datadir}/gnome-vpn-properties
+%attr(755,root,root) %{_bindir}/nm-vpn-properties
+%attr(755,root,root) %{_bindir}/nm-tool
+%attr(755,root,root) %{_sbindir}/NetworkManager
+%attr(755,root,root) %{_sbindir}/NetworkManagerDispatcher
 %attr(755,root,root) %{_libdir}/nm-crash-logger
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManagerDispatcher
@@ -151,9 +154,12 @@ fi
 %dir %{_sysconfdir}/NetworkManager/dispatcher.d
 %dir %{_datadir}/%{name}
 %dir /var/run/%{name}
+%{_datadir}/gnome-vpn-properties
 %{_datadir}/%{name}/gdb-cmd
-%{_mandir}/man1/*
-%{_sysconfdir}/dbus-1/system.d/*
+%{_mandir}/man1/NetworkManager.1*
+%{_mandir}/man1/NetworkManagerDispatcher.1*
+%{_mandir}/man1/nm-tool.1*
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/dbus-1/system.d/NetworkManager.conf
 
 %files libs
 %defattr(644,root,root,755)
