@@ -1,19 +1,15 @@
 #!/bin/sh
 #
-# NetworkManager:   NetworkManager daemon
+# NetworkManager	NetworkManager daemon
 #
-# chkconfig: 5 98 02
-# description:  This is a daemon for automatically switching network \
-#               connections to the best available connection. \
+# chkconfig:		345 98 02
 #
-# processname: NetworkManager
-# pidfile: /var/run/NetworkManager.pid
+# description:		This is a daemon for automatically switching network \
+#			connections to the best available connection.
 #
-
-export PATH=/bin:/sbin:/usr/bin:/usr/sbin
-
-# We need /sbin/ip
-[ -x /sbin/ip ] || exit 1
+# processname:		NetworkManager
+# pidfile:		/var/run/NetworkManager.pid
+#
 
 # Source function library.
 . /etc/rc.d/init.d/functions
@@ -31,50 +27,48 @@ else
 	exit 0
 fi
 
-# so we can rearrange this easily
-processname=NetworkManager
-servicename=NetworkManager
-pidfile=/var/run/NetworkManager.pid
+start() {
+	# Check if the service is already running?
+	if [ ! -f /var/lock/subsys/NetworkManager ]; then
+		msg_starting NetworkManager
+		daemon NetworkManager --pid-file=/var/run/NetworkManager.pid
+		RETVAL=$?
+		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/NetworkManager
+	else
+		msg_already_running NetworkManager
+	fi
+}
+stop() {
+	if [ -f /var/lock/subsys/NetworkManager ]; then
+		# Stop daemons.
+		msg_stopping NetworkManager
+		killproc NetworkManager
+		rm -f /var/lock/subsys/NetworkManager
+	else
+		msg_not_running NetworkManager
+	fi
+}
 
 RETVAL=0
 
 case "$1" in
   start)
-	# Check if the service is already running?
-	if [ ! -f /var/lock/subsys/NetworkManager ]; then
-		msg_starting NetworkManager
-		sysctl -e -p /etc/sysctl.conf >/dev/null 2>&1
-		daemon $processname
-		RETVAL=$?
-		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/$servicename
-		[ $RETVAL -eq 0 ] && echo `/sbin/pidof $processname` > $pidfile
-	else
-		msg_already_running NetworkManager
-	fi
+	start
 	;;
   stop)
-	# Stop daemons.
-	if [ -f /var/lock/subsys/NetworkManager ]; then
-		msg_stopping NetworkManager
-		killproc $servicename
-		rm -f /var/lock/subsys/$servicename >/dev/null 2>&1
-		rm -f $pidfile
-	else
-		msg_not_running NetworkManager
-	fi
-	;;
-  status)
-	status $processname
-	RETVAL=$?
+	stop
 	;;
   restart)
-	$0 stop
-	$0 start
-	exit $?
+	stop
+	start
+	;;
+  status)
+	status NetworkManager
+	RETVAL=$?
 	;;
   *)
-	msg_usage "$0  {start|stop|status|restart}"
+	msg_usage "$0 {start|stop|restart|status}"
 	exit 3
 esac
-
+	        
 exit $RETVAL
