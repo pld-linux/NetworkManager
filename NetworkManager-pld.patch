@@ -36,7 +36,7 @@ diff -urN NetworkManager-0.6.5.orig/src/backends/Makefile.am NetworkManager-0.6.
  					$(GTHREAD_CFLAGS)				\
 diff -urN NetworkManager-0.6.5.orig/src/backends/NetworkManagerPLD.c NetworkManager-0.6.5/src/backends/NetworkManagerPLD.c
 --- NetworkManager-0.6.5.orig/src/backends/NetworkManagerPLD.c	1970-01-01 01:00:00.000000000 +0100
-+++ NetworkManager-0.6.5/src/backends/NetworkManagerPLD.c	2007-10-29 21:38:41.000000000 +0100
++++ NetworkManager-0.6.5/src/backends/NetworkManagerPLD.c	2007-10-29 23:09:06.000000000 +0100
 @@ -0,0 +1,694 @@
 +/* NetworkManager -- Network link manager
 + *
@@ -732,15 +732,3 @@ diff -urN NetworkManager-0.6.5.orig/src/backends/NetworkManagerPLD.c NetworkMana
 +{
 +	return 0;
 +}
-diff -urN NetworkManager-0.6.5.orig/src/backends/NetworkManagerRedHat.c NetworkManager-0.6.5/src/backends/NetworkManagerRedHat.c
---- NetworkManager-0.6.5.orig/src/backends/NetworkManagerRedHat.c	2007-07-23 19:44:13.000000000 +0200
-+++ NetworkManager-0.6.5/src/backends/NetworkManagerRedHat.c	2007-10-29 21:43:12.000000000 +0100
-@@ -927,7 +927,7 @@
-  */
- gboolean nm_system_should_modify_resolv_conf (void)
- {
--	return TRUE;
-+	return FALSE;
- }
- 
- 
