@@ -4,32 +4,28 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	0.6.5
-Release:	5
+Version:	0.7
+%define		_rev rev3104
+Release:	0.%{_rev}.1
 License:	GPL v2
 Group:		X11/Applications
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.6/%{name}-%{version}.tar.bz2
-# Source0-md5:	b827d300eb28458f6588eb843cba418d
+#Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.7/%{name}-%{version}.tar.bz2
+Source0:	%{name}-%{version}%{_rev}.tar.bz2
+# Source0-md5:	261b0672dfd21d5a99cbaae12e502006
 Source1:	%{name}.init
 Source2:	%{name}Dispatcher.init
 Patch0:		%{name}-pld.patch
-Patch1:		%{name}-deprecated.patch
-Patch2:		%{name}-branch.diff
-BuildRequires:	GConf2-devel >= 2.0
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
-BuildRequires:	dbus-glib-devel >= 0.60
+BuildRequires:	dbus-glib-devel >= 0.72
+BuildRequires:	glib2-devel >= 1:2.10.0
 BuildRequires:	gettext-devel
-BuildRequires:	gnome-keyring-devel
-BuildRequires:	gnome-panel-devel >= 2.0
-BuildRequires:	gtk+2-devel >= 1:2.0
+BuildRequires:	gnome-common
 BuildRequires:	hal-devel >= 0.5.2
 BuildRequires:	intltool >= 0.35.5
-BuildRequires:	libgcrypt-devel
-BuildRequires:	libglade2-devel >= 1:2.0
-BuildRequires:	libiw-devel >= 1:28
+BuildRequires:	libiw-devel >= 1:28-0.pre9.1
+BuildRequires:	ppp-plugin-devel
 BuildRequires:	libnl-devel >= 1.0
-BuildRequires:	libnotify-devel >= 0.3.0
 BuildRequires:	libselinux-devel
 BuildRequires:	libtool
 BuildRequires:	pkgconfig
@@ -39,10 +35,12 @@ Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	dhcdbd
 Requires:	rc-scripts
-Requires:	wpa_supplicant
+Requires:	wpa_supplicant >= 0.6-2
 # sr@Latn vs. sr@latin
 Conflicts:	glibc-misc < 6:2.7
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+
+%define		_libexecdir	%{_libdir}/%{name}
 
 %description
 Network Manager for GNOME.
@@ -67,8 +65,7 @@ Summary:	Network Manager includes and more
 Summary(pl.UTF-8):	Pliki nagłówkowe Network Managera
 Group:		X11/Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
-Requires:	dbus-glib-devel >= 0.60
-Requires:	libgcrypt-devel
+Requires:	dbus-glib-devel >= 0.72
 
 %description devel
 Network Manager includes and more.
@@ -89,22 +86,19 @@ Network Manager static libraries.
 Statyczne biblioteki Network Managera.
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}%{_rev}
 %patch0 -p1
-%patch1 -p1
-%patch2 -p1
 
 %build
 %{__glib_gettextize}
 %{__intltoolize}
 %{__libtoolize}
 %{__aclocal}
+%{__autoheader}
 %{__autoconf}
 %{__automake}
 %configure \
-	--with-distro=pld \
-	--with-dhcdbd=%{_sbindir}/dhcdbd \
-	--with-wpa_supplicant=%{_sbindir}/wpa_supplicant
+	--with-distro=pld
 %{__make}
 
 %install
@@ -147,35 +141,44 @@ fi
 %files -f %{name}.lang
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS README TODO
-%attr(755,root,root) %{_bindir}/nm-vpn-properties
 %attr(755,root,root) %{_bindir}/nm-tool
 %attr(755,root,root) %{_sbindir}/NetworkManager
 %attr(755,root,root) %{_sbindir}/NetworkManagerDispatcher
-%attr(755,root,root) %{_libdir}/nm-crash-logger
+%attr(755,root,root) %{_sbindir}/nm-system-settings
+%dir %{_libdir}/NetworkManager
+%attr(755,root,root) %{_libexecdir}/nm-crash-logger
+%attr(755,root,root) %{_libdir}/nm-pppd-plugin.so
+%attr(755,root,root) %{_libexecdir}/nm-dhcp-client.action
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManagerDispatcher
 %dir %{_sysconfdir}/NetworkManager
 %dir %{_sysconfdir}/NetworkManager/dispatcher.d
 %dir %{_datadir}/%{name}
 %dir /var/run/%{name}
-%{_datadir}/gnome-vpn-properties
 %{_datadir}/%{name}/gdb-cmd
-%{_mandir}/man1/NetworkManager.1*
-%{_mandir}/man1/NetworkManagerDispatcher.1*
+%{_mandir}/man8/NetworkManager.8*
+%{_mandir}/man8/NetworkManagerDispatcher.8*
 %{_mandir}/man1/nm-tool.1*
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/dbus-1/system.d/nm-dhcp-client.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/dbus-1/system.d/nm-system-settings.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/dbus-1/system.d/NetworkManager.conf
 
 %files libs
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/lib*.so.*.*.*
+%attr(755,root,root) %{_libdir}/libnm-util.so.*.*.*
+%attr(755,root,root) %{_libdir}/libnm_glib.so.*.*.*
+%attr(755,root,root) %{_libdir}/libnm_glib_vpn.so.*.*.*
 
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libnm-util.so
 %attr(755,root,root) %{_libdir}/libnm_glib.so
+%attr(755,root,root) %{_libdir}/libnm_glib_vpn.so
 %{_libdir}/libnm-util.la
 %{_libdir}/libnm_glib.la
+%{_libdir}/libnm_glib_vpn.la
 %{_includedir}/NetworkManager
+%{_includedir}/libnm-glib
 %{_pkgconfigdir}/NetworkManager.pc
 %{_pkgconfigdir}/libnm-util.pc
 %{_pkgconfigdir}/libnm_glib.pc
@@ -184,3 +187,4 @@ fi
 %defattr(644,root,root,755)
 %{_libdir}/libnm-util.a
 %{_libdir}/libnm_glib.a
+%{_libdir}/libnm_glib_vpn.a
