@@ -2,7 +2,7 @@
 #
 # NetworkManagerDispatcher	NetworkManagerDispatcher daemon
 #
-# chkconfig:	345 98 02
+# chkconfig:	345 99 01
 #
 # description:	This daemon automatically runs scripts when \
 #		NetworkManager changes the network state.
