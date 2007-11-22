@@ -103,7 +103,7 @@ Statyczne biblioteki Network Managera.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},%{_sysconfigdir}/%{name}/dispatcher.d}
+install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},%{_sysconfdir}/%{name}/{VPN,dispatcher.d}}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -153,6 +153,7 @@ fi
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManagerDispatcher
 %dir %{_sysconfdir}/NetworkManager
 %dir %{_sysconfdir}/NetworkManager/dispatcher.d
+%dir %{_sysconfdir}/NetworkManager/VPN
 %dir %{_datadir}/%{name}
 %dir /var/run/%{name}
 %{_datadir}/%{name}/gdb-cmd
