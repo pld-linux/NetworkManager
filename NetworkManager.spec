@@ -5,13 +5,13 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.7
-%define		_rev rev3104
+%define		_rev rev3190
 Release:	0.%{_rev}.1
 License:	GPL v2
 Group:		X11/Applications
 #Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.7/%{name}-%{version}.tar.bz2
 Source0:	%{name}-%{version}%{_rev}.tar.bz2
-# Source0-md5:	261b0672dfd21d5a99cbaae12e502006
+# Source0-md5:	69aa5dc40f6aa657e8ef878a740b132f
 Source1:	%{name}.init
 Source2:	%{name}Dispatcher.init
 Patch0:		%{name}-pld.patch
@@ -25,7 +25,7 @@ BuildRequires:	hal-devel >= 0.5.2
 BuildRequires:	intltool >= 0.35.5
 BuildRequires:	libiw-devel >= 1:28-0.pre9.1
 BuildRequires:	ppp-plugin-devel
-BuildRequires:	libnl-devel >= 1.0
+BuildRequires:	libnl-devel >= 1:1.0-0.pre8.1
 BuildRequires:	libselinux-devel
 BuildRequires:	libtool
 BuildRequires:	pkgconfig
@@ -113,6 +113,9 @@ install test/nm-tool $RPM_BUILD_ROOT%{_bindir}/nm-tool
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/NetworkManager
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/NetworkManagerDispatcher
 
+# Cleanup
+rm -f $RPM_BUILD_ROOT%{_libexecdir}/*.{a,la}
+rm -f $RPM_BUILD_ROOT%{_libdir}/pppd/2.4.4/*.{a,la}
 
 [ -d $RPM_BUILD_ROOT%{_datadir}/locale/sr@latin ] || \
 	mv -f $RPM_BUILD_ROOT%{_datadir}/locale/sr@{Latn,latin}
@@ -147,8 +150,9 @@ fi
 %attr(755,root,root) %{_sbindir}/nm-system-settings
 %dir %{_libdir}/NetworkManager
 %attr(755,root,root) %{_libexecdir}/nm-crash-logger
-%attr(755,root,root) %{_libdir}/nm-pppd-plugin.so
+%attr(755,root,root) %{_libdir}/pppd/2.4.4/nm-pppd-plugin.so
 %attr(755,root,root) %{_libexecdir}/nm-dhcp-client.action
+%attr(755,root,root) %{_libexecdir}/libnm-settings-plugin-ifcfg.so
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManagerDispatcher
 %dir %{_sysconfdir}/NetworkManager
