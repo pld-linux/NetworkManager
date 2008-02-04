@@ -5,7 +5,7 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.6.5
-Release:	5
+Release:	6
 License:	GPL v2
 Group:		X11/Applications
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.6/%{name}-%{version}.tar.bz2
@@ -13,24 +13,21 @@ Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.6/%{name}-%{ver
 Source1:	%{name}.init
 Source2:	%{name}Dispatcher.init
 Patch0:		%{name}-pld.patch
-Patch1:		%{name}-deprecated.patch
-Patch2:		%{name}-branch.diff
-BuildRequires:	GConf2-devel >= 2.0
+Patch1:		%{name}-branch.diff
+BuildRequires:	GConf2-devel >= 2.20.0
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
-BuildRequires:	dbus-glib-devel >= 0.60
+BuildRequires:	dbus-glib-devel >= 0.74
 BuildRequires:	gettext-devel
-BuildRequires:	gnome-keyring-devel
-BuildRequires:	gnome-panel-devel >= 2.0
-BuildRequires:	gtk+2-devel >= 1:2.0
-BuildRequires:	hal-devel >= 0.5.2
+BuildRequires:	gnome-keyring-devel >= 2.20.0
+BuildRequires:	gtk+2-devel >= 2:2.12.0
+BuildRequires:	hal-devel >= 0.5.9
 BuildRequires:	intltool >= 0.35.5
 BuildRequires:	libgcrypt-devel
-BuildRequires:	libglade2-devel >= 1:2.0
+BuildRequires:	libgnomeui-devel >= 2.20.0
+BuildRequires:	libglade2-devel >= 1:2.6.2
 BuildRequires:	libiw-devel >= 1:28
-BuildRequires:	libnl-devel >= 1.0
-BuildRequires:	libnotify-devel >= 0.3.0
-BuildRequires:	libselinux-devel
+BuildRequires:	libnl-devel >= 1:1.1
 BuildRequires:	libtool
 BuildRequires:	pkgconfig
 BuildRequires:	rpmbuild(macros) >= 1.268
@@ -38,6 +35,7 @@ Requires(post):	/sbin/ldconfig
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	dhcdbd
+Requires:	libnl >= 1:1.1
 Requires:	rc-scripts
 Requires:	wpa_supplicant
 # sr@Latn vs. sr@latin
@@ -67,7 +65,7 @@ Summary:	Network Manager includes and more
 Summary(pl.UTF-8):	Pliki nagłówkowe Network Managera
 Group:		X11/Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
-Requires:	dbus-glib-devel >= 0.60
+Requires:	dbus-glib-devel >= 0.72
 Requires:	libgcrypt-devel
 
 %description devel
@@ -92,7 +90,6 @@ Statyczne biblioteki Network Managera.
 %setup -q
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
 
 %build
 %{__glib_gettextize}
@@ -100,6 +97,7 @@ Statyczne biblioteki Network Managera.
 %{__libtoolize}
 %{__aclocal}
 %{__autoconf}
+%{__autoheader}
 %{__automake}
 %configure \
 	--with-distro=pld \
@@ -160,14 +158,17 @@ fi
 %dir /var/run/%{name}
 %{_datadir}/gnome-vpn-properties
 %{_datadir}/%{name}/gdb-cmd
-%{_mandir}/man1/NetworkManager.1*
-%{_mandir}/man1/NetworkManagerDispatcher.1*
+%{_mandir}/man8/NetworkManager.8*
+%{_mandir}/man8/NetworkManagerDispatcher.8*
 %{_mandir}/man1/nm-tool.1*
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/dbus-1/system.d/NetworkManager.conf
 
 %files libs
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/lib*.so.*.*.*
+%attr(755,root,root) %{_libdir}/libnm-util.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libnm-util.so.0
+%attr(755,root,root) %{_libdir}/libnm_glib.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libnm_glib.so.0
 
 %files devel
 %defattr(644,root,root,755)
