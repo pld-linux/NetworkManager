@@ -107,7 +107,7 @@ Statyczne biblioteki Network Managera.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},%{_sysconfigdir}/%{name}/dispatcher.d}
+install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},%{_sysconfdir}/%{name}/dispatcher.d}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
