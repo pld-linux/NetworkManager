@@ -4,16 +4,15 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	0.6.5
-Release:	6
+Version:	0.6.6
+Release:	1
 License:	GPL v2
 Group:		X11/Applications
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.6/%{name}-%{version}.tar.bz2
-# Source0-md5:	b827d300eb28458f6588eb843cba418d
+Source0:	http://people.redhat.com/dcbw/NetworkManager/0.6.6/%{name}-%{version}.tar.gz
+# Source0-md5:	412ed4db5d2db04285799c4303ddeeed
 Source1:	%{name}.init
 Source2:	%{name}Dispatcher.init
 Patch0:		%{name}-pld.patch
-Patch1:		%{name}-branch.diff
 BuildRequires:	GConf2-devel >= 2.20.0
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
@@ -22,7 +21,7 @@ BuildRequires:	gettext-devel
 BuildRequires:	gnome-keyring-devel >= 2.20.0
 BuildRequires:	gtk+2-devel >= 2:2.12.0
 BuildRequires:	hal-devel >= 0.5.9
-BuildRequires:	intltool >= 0.35.5
+BuildRequires:	intltool >= 0.36.0
 BuildRequires:	libgcrypt-devel
 BuildRequires:	libgnomeui-devel >= 2.20.0
 BuildRequires:	libglade2-devel >= 1:2.6.2
@@ -31,7 +30,6 @@ BuildRequires:	libnl-devel >= 1:1.1
 BuildRequires:	libtool
 BuildRequires:	pkgconfig
 BuildRequires:	rpmbuild(macros) >= 1.268
-Requires(post):	/sbin/ldconfig
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	dhcdbd
@@ -89,7 +87,6 @@ Statyczne biblioteki Network Managera.
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p1
 
 %build
 %{__glib_gettextize}
@@ -120,7 +117,7 @@ install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/NetworkManagerDispatcher
 
 [ -d $RPM_BUILD_ROOT%{_datadir}/locale/sr@latin ] || \
 	mv -f $RPM_BUILD_ROOT%{_datadir}/locale/sr@{Latn,latin}
-%find_lang %{name} --with-gnome --all-name
+%find_lang %{name}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
