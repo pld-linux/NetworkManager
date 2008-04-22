@@ -5,19 +5,19 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.7
-%define		_rev rev3190
+%define		_rev rev3588
 Release:	0.%{_rev}.1
 License:	GPL v2
 Group:		X11/Applications
 #Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.7/%{name}-%{version}.tar.bz2
 Source0:	%{name}-%{version}%{_rev}.tar.bz2
-# Source0-md5:	69aa5dc40f6aa657e8ef878a740b132f
+# Source0-md5:	98f1fffeb6e3bcfac5461a5b83cd9bfb
 Source1:	%{name}.init
 Source2:	%{name}Dispatcher.init
 Patch0:		%{name}-pld.patch
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
-BuildRequires:	dbus-glib-devel >= 0.72
+BuildRequires:	dbus-glib-devel >= 0.74-2
 BuildRequires:	glib2-devel >= 1:2.10.0
 BuildRequires:	gettext-devel
 BuildRequires:	gnome-common
@@ -152,7 +152,7 @@ fi
 %attr(755,root,root) %{_libexecdir}/nm-crash-logger
 %attr(755,root,root) %{_libdir}/pppd/2.4.4/nm-pppd-plugin.so
 %attr(755,root,root) %{_libexecdir}/nm-dhcp-client.action
-%attr(755,root,root) %{_libexecdir}/libnm-settings-plugin-ifcfg.so
+%attr(755,root,root) %{_libexecdir}/libnm-settings-plugin-keyfile.so
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManagerDispatcher
 %dir %{_sysconfdir}/NetworkManager
@@ -160,6 +160,7 @@ fi
 %dir %{_sysconfdir}/NetworkManager/VPN
 %dir %{_datadir}/%{name}
 %dir /var/run/%{name}
+%{_datadir}/dbus-1/system-services/org.freedesktop.NetworkManagerSystemSettings.service
 %{_datadir}/%{name}/gdb-cmd
 %{_mandir}/man8/NetworkManager.8*
 %{_mandir}/man8/NetworkManagerDispatcher.8*
@@ -171,8 +172,11 @@ fi
 %files libs
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libnm-util.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libnm-util.so.0
 %attr(755,root,root) %{_libdir}/libnm_glib.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libnm_glib.so.0
 %attr(755,root,root) %{_libdir}/libnm_glib_vpn.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libnm_glib_vpn.so.0
 
 %files devel
 %defattr(644,root,root,755)
