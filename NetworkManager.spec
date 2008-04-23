@@ -5,7 +5,7 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.6.6
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		X11/Applications
 Source0:	http://people.redhat.com/dcbw/NetworkManager/0.6.6/%{name}-%{version}.tar.gz
@@ -98,6 +98,7 @@ Statyczne biblioteki Network Managera.
 %{__automake}
 %configure \
 	--with-distro=pld \
+	--without-gnome \
 	--with-dhcdbd=%{_sbindir}/dhcdbd \
 	--with-wpa_supplicant=%{_sbindir}/wpa_supplicant
 %{__make}
@@ -109,6 +110,7 @@ install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},%{_sysconfdir}/%{na
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
+install -d $RPM_BUILD_ROOT%{_bindir}
 install test/nm-tool $RPM_BUILD_ROOT%{_bindir}/nm-tool
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/NetworkManager
@@ -142,7 +144,7 @@ fi
 %files -f %{name}.lang
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS README TODO
-%attr(755,root,root) %{_bindir}/nm-vpn-properties
+#%attr(755,root,root) %{_bindir}/nm-vpn-properties
 %attr(755,root,root) %{_bindir}/nm-tool
 %attr(755,root,root) %{_sbindir}/NetworkManager
 %attr(755,root,root) %{_sbindir}/NetworkManagerDispatcher
@@ -153,7 +155,7 @@ fi
 %dir %{_sysconfdir}/NetworkManager/dispatcher.d
 %dir %{_datadir}/%{name}
 %dir /var/run/%{name}
-%{_datadir}/gnome-vpn-properties
+#%{_datadir}/gnome-vpn-properties
 %{_datadir}/%{name}/gdb-cmd
 %{_mandir}/man8/NetworkManager.8*
 %{_mandir}/man8/NetworkManagerDispatcher.8*
