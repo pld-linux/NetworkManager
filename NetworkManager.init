@@ -31,7 +31,7 @@ start() {
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/NetworkManager ]; then
 		msg_starting NetworkManager
-		daemon NetworkManager --pid-file=/var/run/NetworkManager.pid
+		daemon /usr/sbin/NetworkManager --pid-file=/var/run/NetworkManager.pid
 		RETVAL=$?
 		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/NetworkManager
 	else
