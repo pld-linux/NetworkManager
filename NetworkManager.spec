@@ -5,7 +5,7 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.6.6
-Release:	3
+Release:	4
 License:	GPL v2
 Group:		X11/Applications
 Source0:	http://people.redhat.com/dcbw/NetworkManager/0.6.6/%{name}-%{version}.tar.gz
@@ -29,7 +29,7 @@ BuildRequires:	libiw-devel >= 1:28
 BuildRequires:	libnl-devel >= 1:1.1
 BuildRequires:	libtool
 BuildRequires:	pkgconfig
-BuildRequires:	rpmbuild(macros) >= 1.268
+BuildRequires:	rpmbuild(macros) >= 1.450
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	dhcdbd
@@ -127,8 +127,8 @@ rm -rf $RPM_BUILD_ROOT
 %post
 /sbin/chkconfig --add NetworkManager
 /sbin/chkconfig --add NetworkManagerDispatcher
-%service NetworkManager restart "NetworkManager daemon"
-%service NetworkManagerDispatcher restart "NetworkManagerDispatcher daemon"
+%service -n NetworkManager restart "NetworkManager daemon"
+%service -n NetworkManagerDispatcher restart "NetworkManagerDispatcher daemon"
 
 %preun
 if [ "$1" = "0" ]; then
