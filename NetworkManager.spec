@@ -33,11 +33,11 @@ BuildRequires:	rpmbuild(macros) >= 1.268
 Requires(post):	/sbin/ldconfig
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-libs = %{version}-%{release}
-Requires:	dhcdbd
 Requires:	rc-scripts
 Requires:	wpa_supplicant >= 0.6-2
 # sr@Latn vs. sr@latin
 Conflicts:	glibc-misc < 6:2.7
+Obsoletes:	dhcdbd <= 3.0-1
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_libexecdir	%{_libdir}/%{name}
