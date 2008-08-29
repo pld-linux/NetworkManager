@@ -1,16 +1,16 @@
 # TODO:
 # - add a working(!) pld backend... (it work's 4 me as it is now - czarny)
 #
+%define		rev rev3588
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.7
-%define		_rev rev3588
-Release:	0.%{_rev}.1
+Release:	0.%{rev}.2
 License:	GPL v2
 Group:		X11/Applications
 #Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.7/%{name}-%{version}.tar.bz2
-Source0:	%{name}-%{version}%{_rev}.tar.bz2
+Source0:	%{name}-%{version}%{rev}.tar.bz2
 # Source0-md5:	98f1fffeb6e3bcfac5461a5b83cd9bfb
 Source1:	%{name}.init
 Source2:	%{name}Dispatcher.init
@@ -18,26 +18,27 @@ Patch0:		%{name}-pld.patch
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
 BuildRequires:	dbus-glib-devel >= 0.74-2
-BuildRequires:	glib2-devel >= 1:2.10.0
 BuildRequires:	gettext-devel
+BuildRequires:	glib2-devel >= 1:2.10.0
 BuildRequires:	gnome-common
 BuildRequires:	hal-devel >= 0.5.2
 BuildRequires:	intltool >= 0.35.5
 BuildRequires:	libiw-devel >= 1:28-0.pre9.1
-BuildRequires:	ppp-plugin-devel
 BuildRequires:	libnl-devel >= 1:1.0-0.pre8.1
 BuildRequires:	libselinux-devel
 BuildRequires:	libtool
 BuildRequires:	pkgconfig
+BuildRequires:	ppp-plugin-devel
 BuildRequires:	rpmbuild(macros) >= 1.268
+BuildRequires:	sed >= 4.0
 Requires(post):	/sbin/ldconfig
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	rc-scripts
 Requires:	wpa_supplicant >= 0.6-2
 # sr@Latn vs. sr@latin
-Conflicts:	glibc-misc < 6:2.7
 Obsoletes:	dhcdbd < 3.0-1
+Conflicts:	glibc-misc < 6:2.7
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_libexecdir	%{_libdir}/%{name}
@@ -86,8 +87,11 @@ Network Manager static libraries.
 Statyczne biblioteki Network Managera.
 
 %prep
-%setup -q -n %{name}-%{version}%{_rev}
+%setup -q -n %{name}-%{version}%{rev}
 %patch0 -p1
+%if "%{rev}" == "rev3588"
+%{__sed} -i -e 's,-Werror,,' configure.in
+%endif
 
 %build
 %{__glib_gettextize}
@@ -165,9 +169,9 @@ fi
 %{_mandir}/man8/NetworkManager.8*
 %{_mandir}/man8/NetworkManagerDispatcher.8*
 %{_mandir}/man1/nm-tool.1*
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/dbus-1/system.d/nm-dhcp-client.conf
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/dbus-1/system.d/nm-system-settings.conf
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/dbus-1/system.d/NetworkManager.conf
+%config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-dhcp-client.conf
+%config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-system-settings.conf
+%config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/NetworkManager.conf
 
 %files libs
 %defattr(644,root,root,755)
