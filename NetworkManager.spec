@@ -36,8 +36,8 @@ Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	rc-scripts
 Requires:	wpa_supplicant >= 0.6-2
-# sr@Latn vs. sr@latin
 Obsoletes:	dhcdbd < 3.0-1
+# sr@Latn vs. sr@latin
 Conflicts:	glibc-misc < 6:2.7
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
