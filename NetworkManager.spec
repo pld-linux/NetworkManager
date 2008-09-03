@@ -1,20 +1,18 @@
 # TODO:
 # - add a working(!) pld backend... (it work's 4 me as it is now - czarny)
 #
-%define		rev rev3588
+%define		rev svn4027
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	0.7
-Release:	0.%{rev}.2
+Version:	0.7.0
+Release:	0.%{rev}.1
 License:	GPL v2
 Group:		X11/Applications
 #Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.7/%{name}-%{version}.tar.bz2
-Source0:	%{name}-%{version}%{rev}.tar.bz2
-# Source0-md5:	98f1fffeb6e3bcfac5461a5b83cd9bfb
-Source1:	%{name}.init
-Source2:	%{name}Dispatcher.init
-Patch0:		%{name}-pld.patch
+Source0:	%{name}-%{version}.tar.gz
+# Source0-md5:	214567f13871e081365eea58bfe26077
+BuildRequires:	PolicyKit-devel
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
 BuildRequires:	dbus-glib-devel >= 0.74-2
@@ -34,6 +32,7 @@ BuildRequires:	sed >= 4.0
 Requires(post):	/sbin/ldconfig
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-libs = %{version}-%{release}
+Requires:	PolicyKit
 Requires:	rc-scripts
 Requires:	wpa_supplicant >= 0.6-2
 Obsoletes:	dhcdbd < 3.0-1
@@ -48,6 +47,18 @@ Network Manager for GNOME.
 
 %description -l pl.UTF-8
 Zarządca sieci dla GNOME.
+
+%package apidocs
+Summary:	libnm-glib library API documentation
+Summary(pl.UTF-8):	Dokumentacja API biblioteki libnm-glib
+Group:		Documentation
+Requires:	gtk-doc-common
+
+%description apidocs
+libnm-glib library API documentation.
+
+%description apidocs -l pl.UTF-8
+Dokumentacja API biblioteki libnm-glib.
 
 %package libs
 Summary:	Network Manager shared libraries
@@ -87,11 +98,7 @@ Network Manager static libraries.
 Statyczne biblioteki Network Managera.
 
 %prep
-%setup -q -n %{name}-%{version}%{rev}
-%patch0 -p1
-%if "%{rev}" == "rev3588"
-%{__sed} -i -e 's,-Werror,,' configure.in
-%endif
+%setup -q
 
 %build
 %{__glib_gettextize}
@@ -102,6 +109,7 @@ Statyczne biblioteki Network Managera.
 %{__autoconf}
 %{__automake}
 %configure \
+	--with-html-dir=%{_gtkdocdir} \
 	--with-distro=pld
 %{__make}
 
@@ -113,9 +121,6 @@ install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},%{_sysconfdir}/%{na
 	DESTDIR=$RPM_BUILD_ROOT
 
 install test/nm-tool $RPM_BUILD_ROOT%{_bindir}/nm-tool
-
-install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/NetworkManager
-install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/NetworkManagerDispatcher
 
 # Cleanup
 rm -f $RPM_BUILD_ROOT%{_libexecdir}/*.{a,la}
@@ -130,16 +135,12 @@ rm -rf $RPM_BUILD_ROOT
 
 %post
 /sbin/chkconfig --add NetworkManager
-/sbin/chkconfig --add NetworkManagerDispatcher
 %service NetworkManager restart "NetworkManager daemon"
-%service NetworkManagerDispatcher restart "NetworkManagerDispatcher daemon"
 
 %preun
 if [ "$1" = "0" ]; then
 	%service NetworkManager stop
-	%service NetworkManagerDispatcher stop
 	/sbin/chkconfig --del NetworkManager
-	/sbin/chkconfig --del NetworkManagerDispatcher
 fi
 
 %post	libs -p /sbin/ldconfig
@@ -150,28 +151,36 @@ fi
 %doc AUTHORS ChangeLog NEWS README TODO
 %attr(755,root,root) %{_bindir}/nm-tool
 %attr(755,root,root) %{_sbindir}/NetworkManager
-%attr(755,root,root) %{_sbindir}/NetworkManagerDispatcher
 %attr(755,root,root) %{_sbindir}/nm-system-settings
 %dir %{_libdir}/NetworkManager
 %attr(755,root,root) %{_libexecdir}/nm-crash-logger
 %attr(755,root,root) %{_libdir}/pppd/2.4.4/nm-pppd-plugin.so
+%attr(755,root,root) %{_libexecdir}/nm-avahi-autoipd.action
 %attr(755,root,root) %{_libexecdir}/nm-dhcp-client.action
+%attr(755,root,root) %{_libexecdir}/nm-dispatcher.action
+%attr(755,root,root) %{_libexecdir}/libnm-settings-plugin-ifcfg-pld.so
 %attr(755,root,root) %{_libexecdir}/libnm-settings-plugin-keyfile.so
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
-%attr(754,root,root) /etc/rc.d/init.d/NetworkManagerDispatcher
 %dir %{_sysconfdir}/NetworkManager
 %dir %{_sysconfdir}/NetworkManager/dispatcher.d
 %dir %{_sysconfdir}/NetworkManager/VPN
 %dir %{_datadir}/%{name}
 %dir /var/run/%{name}
+%{_datadir}/PolicyKit/policy/org.freedesktop.network-manager-settings.system.policy
 %{_datadir}/dbus-1/system-services/org.freedesktop.NetworkManagerSystemSettings.service
+%{_datadir}/dbus-1/system-services/org.freedesktop.nm_dispatcher.service
 %{_datadir}/%{name}/gdb-cmd
 %{_mandir}/man8/NetworkManager.8*
-%{_mandir}/man8/NetworkManagerDispatcher.8*
 %{_mandir}/man1/nm-tool.1*
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-dhcp-client.conf
+%config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-avahi-autoipd.conf
+%config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-dispatcher.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-system-settings.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/NetworkManager.conf
+
+%files apidocs
+%defattr(644,root,root,755)
+%{_gtkdocdir}/libnm-glib
 
 %files libs
 %defattr(644,root,root,755)
@@ -194,6 +203,7 @@ fi
 %{_includedir}/libnm-glib
 %{_pkgconfigdir}/NetworkManager.pc
 %{_pkgconfigdir}/libnm-util.pc
+%{_pkgconfigdir}/libnm_glib_vpn.pc
 %{_pkgconfigdir}/libnm_glib.pc
 
 %files static
