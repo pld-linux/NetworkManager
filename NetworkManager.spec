@@ -19,12 +19,15 @@ BuildRequires:	dbus-glib-devel >= 0.74-2
 BuildRequires:	gettext-devel
 BuildRequires:	glib2-devel >= 1:2.10.0
 BuildRequires:	gnome-common
+BuildRequires:	gtk-doc-automake
 BuildRequires:	hal-devel >= 0.5.2
 BuildRequires:	intltool >= 0.35.5
 BuildRequires:	libiw-devel >= 1:28-0.pre9.1
 BuildRequires:	libnl-devel >= 1:1.0-0.pre8.1
 BuildRequires:	libselinux-devel
 BuildRequires:	libtool
+BuildRequires:	libuuid-devel
+BuildRequires:	nss-devel
 BuildRequires:	pkgconfig
 BuildRequires:	ppp-plugin-devel
 BuildRequires:	rpmbuild(macros) >= 1.268
