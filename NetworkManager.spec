@@ -6,12 +6,13 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.7.0
-Release:	0.%{rev}.1
+Release:	0.%{rev}.2
 License:	GPL v2
 Group:		X11/Applications
 #Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.7/%{name}-%{version}.tar.bz2
 Source0:	%{name}-%{version}.tar.gz
 # Source0-md5:	214567f13871e081365eea58bfe26077
+Source1:	%{name}-system-settings.conf
 BuildRequires:	PolicyKit-devel
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
@@ -124,6 +125,7 @@ install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},%{_sysconfdir}/%{na
 	DESTDIR=$RPM_BUILD_ROOT
 
 install test/nm-tool $RPM_BUILD_ROOT%{_bindir}/nm-tool
+install %SOURCE1 $RPM_BUILD_ROOT%{_sysconfdir}/NetworkManager/nm-system-settings.conf
 
 # Cleanup
 rm -f $RPM_BUILD_ROOT%{_libexecdir}/*.{a,la}
@@ -165,8 +167,10 @@ fi
 %attr(755,root,root) %{_libexecdir}/libnm-settings-plugin-keyfile.so
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
 %dir %{_sysconfdir}/NetworkManager
-%dir %{_sysconfdir}/NetworkManager/dispatcher.d
 %dir %{_sysconfdir}/NetworkManager/VPN
+%dir %{_sysconfdir}/NetworkManager/dispatcher.d
+%dir %{_sysconfdir}/NetworkManager/system-connections
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/NetworkManager/nm-system-settings.conf
 %dir %{_datadir}/%{name}
 %dir /var/run/%{name}
 %{_datadir}/PolicyKit/policy/org.freedesktop.network-manager-settings.system.policy
