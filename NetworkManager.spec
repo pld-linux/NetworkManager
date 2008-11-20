@@ -23,12 +23,13 @@ BuildRequires:	gtk+2-devel >= 2:2.12.0
 BuildRequires:	hal-devel >= 0.5.9
 BuildRequires:	intltool >= 0.36.0
 BuildRequires:	libgcrypt-devel
-BuildRequires:	libgnomeui-devel >= 2.20.0
 BuildRequires:	libglade2-devel >= 1:2.6.2
+BuildRequires:	libgnomeui-devel >= 2.20.0
 BuildRequires:	libiw-devel >= 1:28
 BuildRequires:	libnl-devel >= 1:1.1
 BuildRequires:	libtool
 BuildRequires:	pkgconfig
+BuildRequires:	readline-devel
 BuildRequires:	rpmbuild(macros) >= 1.450
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-libs = %{version}-%{release}
@@ -160,7 +161,7 @@ fi
 %{_mandir}/man8/NetworkManager.8*
 %{_mandir}/man8/NetworkManagerDispatcher.8*
 %{_mandir}/man1/nm-tool.1*
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/dbus-1/system.d/NetworkManager.conf
+%config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/NetworkManager.conf
 
 %files libs
 %defattr(644,root,root,755)
