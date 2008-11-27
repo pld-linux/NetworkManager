@@ -35,6 +35,7 @@ Requires:	%{name}-libs = %{version}-%{release}
 Requires:	PolicyKit
 Requires:	rc-scripts
 Requires:	wpa_supplicant >= 0.6-2
+Requires:	dhcp-client
 Obsoletes:	dhcdbd < 3.0-1
 # sr@Latn vs. sr@latin
 Conflicts:	glibc-misc < 6:2.7
