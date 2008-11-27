@@ -1,31 +1,28 @@
 # TODO:
 # - add a working(!) pld backend... (it work's 4 me as it is now - czarny)
 #
-%define		rev svn4027
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.7.0
-Release:	0.%{rev}.2
+Release:	0.1
 License:	GPL v2
-Group:		X11/Applications
-#Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.7/%{name}-%{version}.tar.bz2
-Source0:	%{name}-%{version}.tar.gz
-# Source0-md5:	214567f13871e081365eea58bfe26077
+Group:		Applications
+Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.7/%{name}-%{version}.tar.bz2
+# Source0-md5:	64f780e7f95c252eaaed0201c3d9a4ca
 Source1:	%{name}-system-settings.conf
+Patch0:		%{name}-pld.patch
 BuildRequires:	PolicyKit-devel
 BuildRequires:	autoconf >= 2.52
-BuildRequires:	automake
-BuildRequires:	dbus-glib-devel >= 0.74-2
+BuildRequires:	automake >= 1:1.9
+BuildRequires:	dbus-glib-devel >= 0.75
 BuildRequires:	gettext-devel
-BuildRequires:	glib2-devel >= 1:2.10.0
-BuildRequires:	gnome-common
+BuildRequires:	glib2-devel >= 1:2.16.0
 BuildRequires:	gtk-doc-automake
 BuildRequires:	hal-devel >= 0.5.2
 BuildRequires:	intltool >= 0.35.5
 BuildRequires:	libiw-devel >= 1:28-0.pre9.1
 BuildRequires:	libnl-devel >= 1:1.0-0.pre8.1
-BuildRequires:	libselinux-devel
 BuildRequires:	libtool
 BuildRequires:	libuuid-devel
 BuildRequires:	nss-devel
@@ -33,7 +30,6 @@ BuildRequires:	pkgconfig
 BuildRequires:	ppp-plugin-devel
 BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	sed >= 4.0
-Requires(post):	/sbin/ldconfig
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	PolicyKit
@@ -67,7 +63,7 @@ Dokumentacja API biblioteki libnm-glib.
 %package libs
 Summary:	Network Manager shared libraries
 Summary(pl.UTF-8):	Biblioteki dzielone Network Managera
-Group:		X11/Libraries
+Group:		Libraries
 Conflicts:	NetworkManager < 0.6.4-0.2
 
 %description libs
@@ -79,7 +75,7 @@ Biblioteki dzielone Network Managera.
 %package devel
 Summary:	Network Manager includes and more
 Summary(pl.UTF-8):	Pliki nagłówkowe Network Managera
-Group:		X11/Development/Libraries
+Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	dbus-glib-devel >= 0.72
 
@@ -92,7 +88,7 @@ Pliki nagłówkowe Network Manager.
 %package static
 Summary:	Network Manager static libraries
 Summary(pl.UTF-8):	Statyczne biblioteki Network Managera
-Group:		X11/Development/Libraries
+Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 
 %description static
@@ -103,18 +99,19 @@ Statyczne biblioteki Network Managera.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
-%{__glib_gettextize}
 %{__intltoolize}
 %{__libtoolize}
 %{__aclocal}
-%{__autoheader}
 %{__autoconf}
+%{__autoheader}
 %{__automake}
 %configure \
 	--with-html-dir=%{_gtkdocdir} \
-	--with-distro=pld
+	--with-distro=pld \
+	--with-system-ca-path=/etc/certs
 %{__make}
 
 %install
@@ -124,8 +121,7 @@ install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},%{_sysconfdir}/%{na
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-install test/nm-tool $RPM_BUILD_ROOT%{_bindir}/nm-tool
-install %SOURCE1 $RPM_BUILD_ROOT%{_sysconfdir}/NetworkManager/nm-system-settings.conf
+install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/NetworkManager/nm-system-settings.conf
 
 # Cleanup
 rm -f $RPM_BUILD_ROOT%{_libexecdir}/*.{a,la}
@@ -133,7 +129,8 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/pppd/2.4.4/*.{a,la}
 
 [ -d $RPM_BUILD_ROOT%{_datadir}/locale/sr@latin ] || \
 	mv -f $RPM_BUILD_ROOT%{_datadir}/locale/sr@{Latn,latin}
-%find_lang %{name} --with-gnome --all-name
+
+%find_lang %{name}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -147,6 +144,10 @@ if [ "$1" = "0" ]; then
 	%service NetworkManager stop
 	/sbin/chkconfig --del NetworkManager
 fi
+
+%triggerun -- NetworkManager < 0.7.0-0.svn4027.1
+%service -q NetworkManagerDispatcher stop
+/sbin/chkconfig --del NetworkManagerDispatcher
 
 %post	libs -p /sbin/ldconfig
 %postun	libs -p /sbin/ldconfig
@@ -163,7 +164,6 @@ fi
 %attr(755,root,root) %{_libexecdir}/nm-avahi-autoipd.action
 %attr(755,root,root) %{_libexecdir}/nm-dhcp-client.action
 %attr(755,root,root) %{_libexecdir}/nm-dispatcher.action
-%attr(755,root,root) %{_libexecdir}/libnm-settings-plugin-ifcfg-pld.so
 %attr(755,root,root) %{_libexecdir}/libnm-settings-plugin-keyfile.so
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
 %dir %{_sysconfdir}/NetworkManager
@@ -188,6 +188,7 @@ fi
 %files apidocs
 %defattr(644,root,root,755)
 %{_gtkdocdir}/libnm-glib
+%{_gtkdocdir}/libnm-util
 
 %files libs
 %defattr(644,root,root,755)
