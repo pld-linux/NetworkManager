@@ -112,8 +112,7 @@ Statyczne biblioteki Network Managera.
 %configure \
 	--with-html-dir=%{_gtkdocdir} \
 	--with-distro=pld \
-	--with-system-ca-path=/etc/certs \
-	--with-distro=PLD
+	--with-system-ca-path=/etc/certs
 
 %{__make}
 
