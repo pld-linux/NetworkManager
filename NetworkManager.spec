@@ -7,7 +7,7 @@ Name:		NetworkManager
 Version:	0.7.0
 Release:	1
 License:	GPL v2
-Group:		Applications
+Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.7/%{name}-%{version}.tar.bz2
 # Source0-md5:	64f780e7f95c252eaaed0201c3d9a4ca
 Source1:	%{name}-system-settings.conf
