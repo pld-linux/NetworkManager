@@ -27,7 +27,7 @@ BuildRequires:	libtool
 BuildRequires:	libuuid-devel
 BuildRequires:	nss-devel
 BuildRequires:	pkgconfig
-BuildRequires:	ppp-plugin-devel
+BuildRequires:	ppp-plugin-devel >= 3:2.4.4-2
 BuildRequires:	rpmbuild(macros) >= 1.450
 BuildRequires:	sed >= 4.0
 Requires(post,preun):	/sbin/chkconfig
