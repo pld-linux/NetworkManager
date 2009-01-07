@@ -91,6 +91,7 @@ Summary:	Network Manager static libraries
 Summary(pl.UTF-8):	Statyczne biblioteki Network Managera
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
+Requires:	libuuid-devel
 
 %description static
 Network Manager static libraries.
