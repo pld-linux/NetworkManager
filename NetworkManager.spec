@@ -1,6 +1,3 @@
-# TODO:
-# - add a working(!) pld backend... (it work's 4 me as it is now - czarny)
-#
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
