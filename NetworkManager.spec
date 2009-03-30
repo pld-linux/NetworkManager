@@ -12,6 +12,9 @@ Patch0:		%{name}-pld.patch
 # http://svn.gnome.org/viewvc/network-manager-applet?view=revision&revision=1207
 # ...or upgrade to 7.0.99:
 BuildRequires:	security(CVE-2009-0365)
+# http://svn.gnome.org/viewvc/network-manager-applet?view=revision&revision=1209
+# ...or upgrade to 7.0.99:
+BuildRequires:	security(CVE-2009-0578)
 BuildRequires:	PolicyKit-devel
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake >= 1:1.9
