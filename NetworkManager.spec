@@ -9,6 +9,9 @@ Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.7/%{name}-%{ver
 # Source0-md5:	64f780e7f95c252eaaed0201c3d9a4ca
 Source1:	%{name}-system-settings.conf
 Patch0:		%{name}-pld.patch
+# http://svn.gnome.org/viewvc/network-manager-applet?view=revision&revision=1207
+# ...or upgrade to 7.0.99:
+BuildRequires:	security(CVE-2009-0365)
 BuildRequires:	PolicyKit-devel
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake >= 1:1.9
