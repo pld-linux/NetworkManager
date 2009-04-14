@@ -1,20 +1,14 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	0.7.0
+Version:	0.7.1
 Release:	1
 License:	GPL v2
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.7/%{name}-%{version}.tar.bz2
-# Source0-md5:	64f780e7f95c252eaaed0201c3d9a4ca
+# Source0-md5:	954742cfd47191204d62d8d57f2bc6dd
 Source1:	%{name}-system-settings.conf
 Patch0:		%{name}-pld.patch
-# http://svn.gnome.org/viewvc/network-manager-applet?view=revision&revision=1207
-# ...or upgrade to 7.0.99:
-BuildRequires:	security(CVE-2009-0365)
-# http://svn.gnome.org/viewvc/network-manager-applet?view=revision&revision=1209
-# ...or upgrade to 7.0.99:
-BuildRequires:	security(CVE-2009-0578)
 BuildRequires:	PolicyKit-devel
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake >= 1:1.9
@@ -33,12 +27,13 @@ BuildRequires:	pkgconfig
 BuildRequires:	ppp-plugin-devel >= 3:2.4.4-2
 BuildRequires:	rpmbuild(macros) >= 1.450
 BuildRequires:	sed >= 4.0
+BuildRequires:	udev-devel
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	PolicyKit
+Requires:	dhcp-client
 Requires:	rc-scripts
 Requires:	wpa_supplicant >= 0.6-2
-Requires:	dhcp-client
 Obsoletes:	dhcdbd < 3.0-1
 # sr@Latn vs. sr@latin
 Conflicts:	glibc-misc < 6:2.7
@@ -172,6 +167,8 @@ fi
 %attr(755,root,root) %{_libexecdir}/nm-dispatcher.action
 %attr(755,root,root) %{_libexecdir}/libnm-settings-plugin-keyfile.so
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
+%attr(755,root,root) /lib/udev/nm-modem-probe
+/lib/udev/rules.d/77-nm-probe-modem-capabilities.rules
 %dir %{_sysconfdir}/NetworkManager
 %dir %{_sysconfdir}/NetworkManager/VPN
 %dir %{_sysconfdir}/NetworkManager/dispatcher.d
@@ -199,7 +196,7 @@ fi
 %files libs
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libnm-util.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libnm-util.so.0
+%attr(755,root,root) %ghost %{_libdir}/libnm-util.so.1
 %attr(755,root,root) %{_libdir}/libnm_glib.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libnm_glib.so.0
 %attr(755,root,root) %{_libdir}/libnm_glib_vpn.so.*.*.*
