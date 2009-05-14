@@ -9,6 +9,7 @@ Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.7/%{name}-%{ver
 # Source0-md5:	954742cfd47191204d62d8d57f2bc6dd
 Source1:	%{name}-system-settings.conf
 Patch0:		%{name}-pld.patch
+URL:		http://projects.gnome.org/NetworkManager/
 BuildRequires:	PolicyKit-devel
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake >= 1:1.9
