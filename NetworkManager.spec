@@ -1,12 +1,12 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	0.7.1
+Version:	0.7.2
 Release:	1
 License:	GPL v2
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.7/%{name}-%{version}.tar.bz2
-# Source0-md5:	954742cfd47191204d62d8d57f2bc6dd
+# Source0-md5:	8e4e69b2836d4849771d905cb9f16138
 Source1:	%{name}-system-settings.conf
 Patch0:		%{name}-pld.patch
 URL:		http://projects.gnome.org/NetworkManager/
@@ -23,7 +23,7 @@ BuildRequires:	libiw-devel >= 1:28-0.pre9.1
 BuildRequires:	libnl-devel >= 1:1.0-0.pre8.1
 BuildRequires:	libtool
 BuildRequires:	libuuid-devel
-BuildRequires:	nss-devel
+BuildRequires:	nss-devel >= 3.11
 BuildRequires:	pkgconfig
 BuildRequires:	ppp-plugin-devel >= 3:2.4.4-2
 BuildRequires:	rpmbuild(macros) >= 1.450
@@ -105,7 +105,7 @@ Statyczne biblioteki Network Managera.
 %build
 %{__intltoolize}
 %{__libtoolize}
-%{__aclocal}
+%{__aclocal} -I m4
 %{__autoconf}
 %{__autoheader}
 %{__automake}
@@ -128,9 +128,6 @@ install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/NetworkManager/nm-system-settin
 # Cleanup
 rm -f $RPM_BUILD_ROOT%{_libexecdir}/*.{a,la}
 rm -f $RPM_BUILD_ROOT%{_libdir}/pppd/2.4.4/*.{a,la}
-
-[ -d $RPM_BUILD_ROOT%{_datadir}/locale/sr@latin ] || \
-	mv -f $RPM_BUILD_ROOT%{_datadir}/locale/sr@{Latn,latin}
 
 %find_lang %{name}
 
@@ -170,6 +167,7 @@ fi
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
 %attr(755,root,root) /lib/udev/nm-modem-probe
 /lib/udev/rules.d/77-nm-probe-modem-capabilities.rules
+/lib/udev/rules.d/77-nm-zte-port-types.rules
 %dir %{_sysconfdir}/NetworkManager
 %dir %{_sysconfdir}/NetworkManager/VPN
 %dir %{_sysconfdir}/NetworkManager/dispatcher.d
