@@ -198,7 +198,6 @@ fi
 %attr(755,root,root) %{_libdir}/libnm-glib-vpn.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libnm-glib-vpn.so.1
 
-
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libnm-util.so
@@ -213,7 +212,6 @@ fi
 %{_pkgconfigdir}/libnm-util.pc
 %{_pkgconfigdir}/libnm-glib-vpn.pc
 %{_pkgconfigdir}/libnm-glib.pc
-
 
 %files static
 %defattr(644,root,root,755)
