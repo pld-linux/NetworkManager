@@ -1,12 +1,12 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	0.7.2
+Version:	0.7.999
 Release:	1
 License:	GPL v2
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.7/%{name}-%{version}.tar.bz2
-# Source0-md5:	8e4e69b2836d4849771d905cb9f16138
+# Source0-md5:	581cf6ea9ef358df874359cc8cb9af69
 Source1:	%{name}-system-settings.conf
 Patch0:		%{name}-pld.patch
 URL:		http://projects.gnome.org/NetworkManager/
@@ -19,6 +19,7 @@ BuildRequires:	glib2-devel >= 1:2.16.0
 BuildRequires:	gtk-doc-automake
 BuildRequires:	hal-devel >= 0.5.2
 BuildRequires:	intltool >= 0.35.5
+BuildRequires:	iptables
 BuildRequires:	libiw-devel >= 1:28-0.pre9.1
 BuildRequires:	libnl-devel >= 1:1.0-0.pre8.1
 BuildRequires:	libtool
@@ -29,6 +30,7 @@ BuildRequires:	ppp-plugin-devel >= 3:2.4.4-2
 BuildRequires:	rpmbuild(macros) >= 1.450
 BuildRequires:	sed >= 4.0
 BuildRequires:	udev-devel
+BuildRequires:	udev-glib-devel
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	PolicyKit
@@ -156,7 +158,6 @@ fi
 %doc AUTHORS ChangeLog NEWS README TODO
 %attr(755,root,root) %{_bindir}/nm-tool
 %attr(755,root,root) %{_sbindir}/NetworkManager
-%attr(755,root,root) %{_sbindir}/nm-system-settings
 %dir %{_libdir}/NetworkManager
 %attr(755,root,root) %{_libexecdir}/nm-crash-logger
 %attr(755,root,root) %{_libdir}/pppd/2.4.4/nm-pppd-plugin.so
@@ -165,9 +166,7 @@ fi
 %attr(755,root,root) %{_libexecdir}/nm-dispatcher.action
 %attr(755,root,root) %{_libexecdir}/libnm-settings-plugin-keyfile.so
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
-%attr(755,root,root) /lib/udev/nm-modem-probe
-/lib/udev/rules.d/77-nm-probe-modem-capabilities.rules
-/lib/udev/rules.d/77-nm-zte-port-types.rules
+/lib/udev/rules.d/77-nm-olpc-mesh.rules
 %dir %{_sysconfdir}/NetworkManager
 %dir %{_sysconfdir}/NetworkManager/VPN
 %dir %{_sysconfdir}/NetworkManager/dispatcher.d
@@ -175,8 +174,7 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/NetworkManager/nm-system-settings.conf
 %dir %{_datadir}/%{name}
 %dir /var/run/%{name}
-%{_datadir}/PolicyKit/policy/org.freedesktop.network-manager-settings.system.policy
-%{_datadir}/dbus-1/system-services/org.freedesktop.NetworkManagerSystemSettings.service
+%{_datadir}/polkit-1/actions/org.freedesktop.network-manager-settings.system.policy
 %{_datadir}/dbus-1/system-services/org.freedesktop.nm_dispatcher.service
 %{_datadir}/%{name}/gdb-cmd
 %{_mandir}/man8/NetworkManager.8*
@@ -184,7 +182,6 @@ fi
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-dhcp-client.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-avahi-autoipd.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-dispatcher.conf
-%config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-system-settings.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/NetworkManager.conf
 
 %files apidocs
@@ -196,28 +193,30 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libnm-util.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libnm-util.so.1
-%attr(755,root,root) %{_libdir}/libnm_glib.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libnm_glib.so.0
-%attr(755,root,root) %{_libdir}/libnm_glib_vpn.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libnm_glib_vpn.so.0
+%attr(755,root,root) %{_libdir}/libnm-glib.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libnm-glib.so.2
+%attr(755,root,root) %{_libdir}/libnm-glib-vpn.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libnm-glib-vpn.so.1
+
 
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libnm-util.so
-%attr(755,root,root) %{_libdir}/libnm_glib.so
-%attr(755,root,root) %{_libdir}/libnm_glib_vpn.so
+%attr(755,root,root) %{_libdir}/libnm-glib.so
+%attr(755,root,root) %{_libdir}/libnm-glib-vpn.so
 %{_libdir}/libnm-util.la
-%{_libdir}/libnm_glib.la
-%{_libdir}/libnm_glib_vpn.la
+%{_libdir}/libnm-glib.la
+%{_libdir}/libnm-glib-vpn.la
 %{_includedir}/NetworkManager
 %{_includedir}/libnm-glib
 %{_pkgconfigdir}/NetworkManager.pc
 %{_pkgconfigdir}/libnm-util.pc
-%{_pkgconfigdir}/libnm_glib_vpn.pc
-%{_pkgconfigdir}/libnm_glib.pc
+%{_pkgconfigdir}/libnm-glib-vpn.pc
+%{_pkgconfigdir}/libnm-glib.pc
+
 
 %files static
 %defattr(644,root,root,755)
 %{_libdir}/libnm-util.a
-%{_libdir}/libnm_glib.a
-%{_libdir}/libnm_glib_vpn.a
+%{_libdir}/libnm-glib.a
+%{_libdir}/libnm-glib-vpn.a
