@@ -10,14 +10,13 @@ Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.7/%{name}-%{ver
 Source1:	%{name}-system-settings.conf
 Patch0:		%{name}-pld.patch
 URL:		http://projects.gnome.org/NetworkManager/
-BuildRequires:	PolicyKit-devel
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake >= 1:1.9
 BuildRequires:	dbus-glib-devel >= 0.75
 BuildRequires:	gettext-devel
 BuildRequires:	glib2-devel >= 1:2.16.0
 BuildRequires:	gtk-doc-automake
-BuildRequires:	hal-devel >= 0.5.2
+#BuildRequires:	hal-devel >= 0.5.2
 BuildRequires:	intltool >= 0.35.5
 BuildRequires:	iptables
 BuildRequires:	libiw-devel >= 1:28-0.pre9.1
@@ -26,6 +25,7 @@ BuildRequires:	libtool
 BuildRequires:	libuuid-devel
 BuildRequires:	nss-devel >= 3.11
 BuildRequires:	pkgconfig
+BuildRequires:	polkit-devel
 BuildRequires:	ppp-plugin-devel >= 3:2.4.4-2
 BuildRequires:	rpmbuild(macros) >= 1.450
 BuildRequires:	sed >= 4.0
