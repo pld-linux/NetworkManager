@@ -1,24 +1,23 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	0.7.999
+Version:	0.8
 Release:	1
 License:	GPL v2
 Group:		Networking/Admin
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.7/%{name}-%{version}.tar.bz2
-# Source0-md5:	581cf6ea9ef358df874359cc8cb9af69
+Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.8/%{name}-%{version}.tar.bz2
+# Source0-md5:	d343e22f132754696654511acde354c2
 Source1:	%{name}-system-settings.conf
 Patch0:		%{name}-pld.patch
 URL:		http://projects.gnome.org/NetworkManager/
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake >= 1:1.9
+BuildRequires:	dbus-devel >= 1.1.0
 BuildRequires:	dbus-glib-devel >= 0.75
 BuildRequires:	gettext-devel
-BuildRequires:	glib2-devel >= 1:2.16.0
+BuildRequires:	glib2-devel >= 1:2.18.0
 BuildRequires:	gtk-doc-automake
-#BuildRequires:	hal-devel >= 0.5.2
 BuildRequires:	intltool >= 0.35.5
-BuildRequires:	iptables
 BuildRequires:	libiw-devel >= 1:28-0.pre9.1
 BuildRequires:	libnl-devel >= 1:1.0-0.pre8.1
 BuildRequires:	libtool
@@ -33,8 +32,8 @@ BuildRequires:	udev-devel
 BuildRequires:	udev-glib-devel
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-libs = %{version}-%{release}
-Requires:	PolicyKit
 Requires:	dhcp-client
+Requires:	polkit
 Requires:	rc-scripts
 Requires:	wpa_supplicant >= 0.6-2
 Obsoletes:	dhcdbd < 3.0-1
@@ -79,7 +78,7 @@ Summary:	Network Manager includes and more
 Summary(pl.UTF-8):	Pliki nagłówkowe Network Managera
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
-Requires:	dbus-glib-devel >= 0.72
+Requires:	dbus-glib-devel >= 0.75
 Requires:	libuuid-devel
 
 %description devel
@@ -114,6 +113,8 @@ Statyczne biblioteki Network Managera.
 %configure \
 	--with-html-dir=%{_gtkdocdir} \
 	--with-distro=pld \
+	--with-dhcp-client=/sbin/dhclient \
+	--with-iptables=/usr/sbin/iptables \
 	--with-system-ca-path=/etc/certs
 
 %{__make}
