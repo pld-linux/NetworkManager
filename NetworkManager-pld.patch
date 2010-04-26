@@ -225,7 +225,7 @@ diff -urN NetworkManager-0.7.2/src/backends/NetworkManagerPLD.c NetworkManager-0
 +void nm_system_update_dns (void)
 +{
 +	if (g_file_test ("/usr/sbin/nscd", G_FILE_TEST_EXISTS | G_FILE_TEST_IS_EXECUTABLE | G_FILE_TEST_IS_REGULAR)) {
-+		nm_spawn_process ("/etc/rc.d/init.d/nscd restart");
++		nm_spawn_process ("/usr/sbin/nscd -i hosts");
 +	}
 +}
 +
