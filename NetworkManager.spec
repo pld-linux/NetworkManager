@@ -1,8 +1,11 @@
+#
+%define		ppp_version	2.4.5
+#
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.8
-Release:	2
+Release:	3
 License:	GPL v2
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.8/%{name}-%{version}.tar.bz2
@@ -25,7 +28,7 @@ BuildRequires:	libuuid-devel
 BuildRequires:	nss-devel >= 3.11
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel
-BuildRequires:	ppp-plugin-devel >= 3:2.4.4-2
+BuildRequires:	ppp-plugin-devel >= 3:%{ppp_version}
 BuildRequires:	rpmbuild(macros) >= 1.450
 BuildRequires:	sed >= 4.0
 BuildRequires:	udev-devel
@@ -115,7 +118,8 @@ Statyczne biblioteki Network Managera.
 	--with-distro=pld \
 	--with-dhcp-client=/sbin/dhclient \
 	--with-iptables=/usr/sbin/iptables \
-	--with-system-ca-path=/etc/certs
+	--with-system-ca-path=/etc/certs \
+	--with-pppd-plugin-dir=%{_libdir}/pppd/%{ppp_version}
 
 %{__make}
 
@@ -130,7 +134,7 @@ install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/NetworkManager/nm-system-settin
 
 # Cleanup
 rm -f $RPM_BUILD_ROOT%{_libexecdir}/*.{a,la}
-rm -f $RPM_BUILD_ROOT%{_libdir}/pppd/2.4.4/*.{a,la}
+rm -f $RPM_BUILD_ROOT%{_libdir}/pppd/*.*.*/*.{a,la}
 
 %find_lang %{name}
 
@@ -161,7 +165,7 @@ fi
 %attr(755,root,root) %{_sbindir}/NetworkManager
 %dir %{_libdir}/NetworkManager
 %attr(755,root,root) %{_libexecdir}/nm-crash-logger
-%attr(755,root,root) %{_libdir}/pppd/2.4.4/nm-pppd-plugin.so
+%attr(755,root,root) %{_libdir}/pppd/%{ppp_version}/nm-pppd-plugin.so
 %attr(755,root,root) %{_libexecdir}/nm-avahi-autoipd.action
 %attr(755,root,root) %{_libexecdir}/nm-dhcp-client.action
 %attr(755,root,root) %{_libexecdir}/nm-dispatcher.action
