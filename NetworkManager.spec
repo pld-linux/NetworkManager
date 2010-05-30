@@ -4,12 +4,12 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	0.8
-Release:	3
+Version:	0.8.0.998
+Release:	0.1
 License:	GPL v2
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.8/%{name}-%{version}.tar.bz2
-# Source0-md5:	d343e22f132754696654511acde354c2
+# Source0-md5:	76ab6db9fcd46e673f6b14c6e2829460
 Source1:	%{name}-system-settings.conf
 Patch0:		%{name}-pld.patch
 URL:		http://projects.gnome.org/NetworkManager/
@@ -162,6 +162,7 @@ fi
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS README TODO
 %attr(755,root,root) %{_bindir}/nm-tool
+%attr(755,root,root) %{_bindir}/nmcli
 %attr(755,root,root) %{_sbindir}/NetworkManager
 %dir %{_libdir}/NetworkManager
 %attr(755,root,root) %{_libexecdir}/nm-crash-logger
@@ -182,8 +183,11 @@ fi
 %{_datadir}/polkit-1/actions/org.freedesktop.network-manager-settings.system.policy
 %{_datadir}/dbus-1/system-services/org.freedesktop.nm_dispatcher.service
 %{_datadir}/%{name}/gdb-cmd
-%{_mandir}/man8/NetworkManager.8*
 %{_mandir}/man1/nm-tool.1*
+%{_mandir}/man1/nmcli.1*
+%{_mandir}/man5/NetworkManager.conf.5*
+%{_mandir}/man5/nm-system-settings.conf.5*
+%{_mandir}/man8/NetworkManager.8*
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-dhcp-client.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-avahi-autoipd.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-dispatcher.conf
