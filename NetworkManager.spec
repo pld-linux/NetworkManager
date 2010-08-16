@@ -1,17 +1,16 @@
-#
 %define		ppp_version	2.4.5
-#
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.8.1
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.8/%{name}-%{version}.tar.bz2
 # Source0-md5:	96e551149dda8f6e0a5621f77468ba79
-Source1:	%{name}-system-settings.conf
+Source1:	%{name}.conf
 Patch0:		%{name}-pld.patch
+Patch1:		%{name}-plugins-Makefile.patch
 URL:		http://projects.gnome.org/NetworkManager/
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake >= 1:1.9
@@ -39,6 +38,8 @@ Requires:	dhcp-client
 Requires:	polkit
 Requires:	rc-scripts
 Requires:	wpa_supplicant >= 0.6-2
+Suggests:	ModemManager
+Suggests:	mobile-broadband-provider-info
 Obsoletes:	dhcdbd < 3.0-1
 # sr@Latn vs. sr@latin
 Conflicts:	glibc-misc < 6:2.7
@@ -106,6 +107,7 @@ Statyczne biblioteki Network Managera.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
 %{__intltoolize}
@@ -117,7 +119,8 @@ Statyczne biblioteki Network Managera.
 %configure \
 	--with-html-dir=%{_gtkdocdir} \
 	--with-distro=pld \
-	--with-dhcp-client=/sbin/dhclient \
+	--enable-more-warnings=yes \
+	--with-dhclient=/sbin/dhclient \
 	--with-iptables=/usr/sbin/iptables \
 	--with-system-ca-path=/etc/certs \
 	--with-pppd-plugin-dir=%{_libdir}/pppd/%{ppp_version}
@@ -126,12 +129,12 @@ Statyczne biblioteki Network Managera.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},%{_sysconfdir}/%{name}/{VPN,dispatcher.d}}
+install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},%{_sysconfdir}/%{name}/{VPN,dispatcher.d,system-connections}}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/NetworkManager/nm-system-settings.conf
+cp -a %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 
 # Cleanup
 rm -f $RPM_BUILD_ROOT%{_libexecdir}/*.{a,la}
@@ -172,13 +175,14 @@ fi
 %attr(755,root,root) %{_libexecdir}/nm-dhcp-client.action
 %attr(755,root,root) %{_libexecdir}/nm-dispatcher.action
 %attr(755,root,root) %{_libexecdir}/libnm-settings-plugin-keyfile.so
+%attr(755,root,root) %{_libexecdir}/libnm-settings-plugin-ifcfg-rh.so
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
 /lib/udev/rules.d/77-nm-olpc-mesh.rules
-%dir %{_sysconfdir}/NetworkManager
-%dir %{_sysconfdir}/NetworkManager/VPN
-%dir %{_sysconfdir}/NetworkManager/dispatcher.d
-%dir %{_sysconfdir}/NetworkManager/system-connections
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/NetworkManager/nm-system-settings.conf
+%dir %{_sysconfdir}/%{name}
+%dir %{_sysconfdir}/%{name}/VPN
+%dir %{_sysconfdir}/%{name}/dispatcher.d
+%dir %{_sysconfdir}/%{name}/system-connections
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/%{name}.conf
 %dir %{_datadir}/%{name}
 %dir /var/run/%{name}
 %{_datadir}/polkit-1/actions/org.freedesktop.network-manager-settings.system.policy
@@ -186,12 +190,13 @@ fi
 %{_datadir}/%{name}/gdb-cmd
 %{_mandir}/man1/nm-tool.1*
 %{_mandir}/man1/nmcli.1*
-%{_mandir}/man5/NetworkManager.conf.5*
 %{_mandir}/man5/nm-system-settings.conf.5*
+%{_mandir}/man5/NetworkManager.conf.5*
 %{_mandir}/man8/NetworkManager.8*
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-dhcp-client.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-avahi-autoipd.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-dispatcher.conf
+%config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-ifcfg-rh.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/NetworkManager.conf
 
 %files apidocs
