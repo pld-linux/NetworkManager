@@ -11,6 +11,7 @@ Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.8/%{name}-%{ver
 Source1:	%{name}.conf
 Patch0:		%{name}-pld.patch
 Patch1:		%{name}-plugins-Makefile.patch
+Patch2:		%{name}-compile.patch
 URL:		http://projects.gnome.org/NetworkManager/
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake >= 1:1.9
@@ -111,6 +112,7 @@ Statyczne biblioteki Network Managera.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %build
 %{__intltoolize}

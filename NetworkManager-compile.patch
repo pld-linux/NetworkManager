@@ -1,0 +1,25 @@
+* Fix usage of uninitialized `addr'
+* Kill qualifier without effect
+--- NetworkManager-0.8.1/system-settings/plugins/ifcfg-rh/reader.c.orig	2010-07-22 01:48:36.000000000 +0200
++++ NetworkManager-0.8.1/system-settings/plugins/ifcfg-rh/reader.c	2010-09-19 15:30:03.444556463 +0200
+@@ -907,7 +907,8 @@ parse_full_ip6_address (const char *addr
+ 	if (g_strv_length (list) < 1) {
+ 		g_set_error (error, ifcfg_plugin_error_quark (), 0,
+ 		             "Invalid IP6 address '%s'", addr_str);
+-		goto error;
++		g_strfreev (list);
++		return NULL;
+ 	}
+ 
+ 	ip_tag = list[0];
+--- NetworkManager-0.8.1/src/nm-udev-manager.c.orig	2010-06-30 20:55:33.000000000 +0200
++++ NetworkManager-0.8.1/src/nm-udev-manager.c	2010-09-19 15:07:53.632556463 +0200
+@@ -226,7 +226,7 @@ killswitch_find_by_name (NMUdevManager *
+ 	return NULL;
+ }
+ 
+-static const RfKillType
++static RfKillType
+ rfkill_type_to_enum (const char *str)
+ {
+ 	g_return_val_if_fail (str != NULL, RFKILL_TYPE_UNKNOWN);
