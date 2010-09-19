@@ -18,7 +18,7 @@ BuildRequires:	dbus-devel >= 1.1.0
 BuildRequires:	dbus-glib-devel >= 0.75
 BuildRequires:	gettext-devel
 BuildRequires:	glib2-devel >= 1:2.18.0
-BuildRequires:	gtk-doc-automake
+BuildRequires:	gtk-doc-automake >= 1.0
 BuildRequires:	intltool >= 0.35.5
 BuildRequires:	libiw-devel >= 1:28-0.pre9.1
 BuildRequires:	libnl-devel >= 1:1.0-0.pre8.1
@@ -69,6 +69,8 @@ Dokumentacja API biblioteki libnm-glib.
 Summary:	Network Manager shared libraries
 Summary(pl.UTF-8):	Biblioteki dzielone Network Managera
 Group:		Libraries
+Requires:	dbus-glib >= 0.75
+Requires:	glib2 >= 1:2.18.0
 Conflicts:	NetworkManager < 0.6.4-0.2
 
 %description libs
@@ -83,6 +85,7 @@ Summary(pl.UTF-8):	Pliki nagłówkowe Network Managera
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	dbus-glib-devel >= 0.75
+Requires:	glib2-devel >= 1:2.18.0
 Requires:	libuuid-devel
 Requires:	udev-glib-devel
 
