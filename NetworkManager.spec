@@ -4,7 +4,7 @@ Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.8.1
 Release:	2
-License:	GPL v2
+License:	GPL v2+
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.8/%{name}-%{version}.tar.bz2
 # Source0-md5:	96e551149dda8f6e0a5621f77468ba79
@@ -137,8 +137,8 @@ install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},%{_sysconfdir}/%{na
 cp -a %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 
 # Cleanup
-rm -f $RPM_BUILD_ROOT%{_libexecdir}/*.{a,la}
-rm -f $RPM_BUILD_ROOT%{_libdir}/pppd/*.*.*/*.{a,la}
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/NetworkManager/*.{a,la}
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/pppd/%{ppp_version}/*.{a,la}
 
 %find_lang %{name}
 
@@ -169,35 +169,35 @@ fi
 %attr(755,root,root) %{_bindir}/nmcli
 %attr(755,root,root) %{_sbindir}/NetworkManager
 %dir %{_libdir}/NetworkManager
-%attr(755,root,root) %{_libexecdir}/nm-crash-logger
-%attr(755,root,root) %{_libdir}/pppd/%{ppp_version}/nm-pppd-plugin.so
+%attr(755,root,root) %{_libdir}/NetworkManager/libnm-settings-plugin-keyfile.so
+%attr(755,root,root) %{_libdir}/NetworkManager/libnm-settings-plugin-ifcfg-rh.so
 %attr(755,root,root) %{_libexecdir}/nm-avahi-autoipd.action
 %attr(755,root,root) %{_libexecdir}/nm-dhcp-client.action
 %attr(755,root,root) %{_libexecdir}/nm-dispatcher.action
-%attr(755,root,root) %{_libexecdir}/libnm-settings-plugin-keyfile.so
-%attr(755,root,root) %{_libexecdir}/libnm-settings-plugin-ifcfg-rh.so
+%attr(755,root,root) %{_libexecdir}/nm-crash-logger
+%attr(755,root,root) %{_libdir}/pppd/%{ppp_version}/nm-pppd-plugin.so
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
+%dir %{_datadir}/%{name}
+%{_datadir}/%{name}/gdb-cmd
+%{_datadir}/dbus-1/system-services/org.freedesktop.nm_dispatcher.service
+%{_datadir}/polkit-1/actions/org.freedesktop.network-manager-settings.system.policy
 /lib/udev/rules.d/77-nm-olpc-mesh.rules
 %dir %{_sysconfdir}/%{name}
 %dir %{_sysconfdir}/%{name}/VPN
 %dir %{_sysconfdir}/%{name}/dispatcher.d
 %dir %{_sysconfdir}/%{name}/system-connections
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/%{name}.conf
-%dir %{_datadir}/%{name}
-%dir /var/run/%{name}
-%{_datadir}/polkit-1/actions/org.freedesktop.network-manager-settings.system.policy
-%{_datadir}/dbus-1/system-services/org.freedesktop.nm_dispatcher.service
-%{_datadir}/%{name}/gdb-cmd
-%{_mandir}/man1/nm-tool.1*
-%{_mandir}/man1/nmcli.1*
-%{_mandir}/man5/nm-system-settings.conf.5*
-%{_mandir}/man5/NetworkManager.conf.5*
-%{_mandir}/man8/NetworkManager.8*
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-dhcp-client.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-avahi-autoipd.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-dispatcher.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-ifcfg-rh.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/NetworkManager.conf
+%dir /var/run/%{name}
+%{_mandir}/man1/nm-tool.1*
+%{_mandir}/man1/nmcli.1*
+%{_mandir}/man5/nm-system-settings.conf.5*
+%{_mandir}/man5/NetworkManager.conf.5*
+%{_mandir}/man8/NetworkManager.8*
 
 %files apidocs
 %defattr(644,root,root,755)
