@@ -2,16 +2,15 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	0.8.1
-Release:	2
+Version:	0.8.2
+Release:	1
 License:	GPL v2+
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.8/%{name}-%{version}.tar.bz2
-# Source0-md5:	96e551149dda8f6e0a5621f77468ba79
+# Source0-md5:	951158258544f761d9c09c052a7072e2
 Source1:	%{name}.conf
 Patch0:		%{name}-pld.patch
-Patch1:		%{name}-plugins-Makefile.patch
-Patch2:		%{name}-compile.patch
+Patch1:		%{name}-compile.patch
 URL:		http://projects.gnome.org/NetworkManager/
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake >= 1:1.9
@@ -112,7 +111,6 @@ Statyczne biblioteki Network Managera.
 %setup -q
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
 
 %build
 %{__intltoolize}
@@ -128,7 +126,9 @@ Statyczne biblioteki Network Managera.
 	--with-dhclient=/sbin/dhclient \
 	--with-iptables=/usr/sbin/iptables \
 	--with-system-ca-path=/etc/certs \
-	--with-pppd-plugin-dir=%{_libdir}/pppd/%{ppp_version}
+	--with-pppd-plugin-dir=%{_libdir}/pppd/%{ppp_version} \
+	--with-dist-version=%{version}-%{release} \
+	--with-docs
 
 %{__make}
 
@@ -185,6 +185,7 @@ fi
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/gdb-cmd
 %{_datadir}/dbus-1/system-services/org.freedesktop.nm_dispatcher.service
+%{_datadir}/polkit-1/actions/org.freedesktop.NetworkManager.policy
 %{_datadir}/polkit-1/actions/org.freedesktop.network-manager-settings.system.policy
 /lib/udev/rules.d/77-nm-olpc-mesh.rules
 %dir %{_sysconfdir}/%{name}
@@ -198,6 +199,7 @@ fi
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-ifcfg-rh.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/NetworkManager.conf
 %dir /var/run/%{name}
+%{_mandir}/man1/nm-online.1*
 %{_mandir}/man1/nm-tool.1*
 %{_mandir}/man1/nmcli.1*
 %{_mandir}/man5/nm-system-settings.conf.5*
