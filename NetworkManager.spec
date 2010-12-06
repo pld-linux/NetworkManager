@@ -3,7 +3,7 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.8.2
-Release:	1
+Release:	2
 License:	GPL v2+
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.8/%{name}-%{version}.tar.bz2
@@ -147,6 +147,11 @@ cp -a %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 
 %find_lang %{name}
 
+# examples
+install -d $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
+cp -a examples/* $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
+find $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version} -name 'Makefile*' | xargs rm
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -205,6 +210,7 @@ fi
 %{_mandir}/man5/nm-system-settings.conf.5*
 %{_mandir}/man5/NetworkManager.conf.5*
 %{_mandir}/man8/NetworkManager.8*
+%{_examplesdir}/%{name}-%{version}
 
 %files apidocs
 %defattr(644,root,root,755)
