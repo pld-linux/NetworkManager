@@ -3,7 +3,7 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.8.2
-Release:	2
+Release:	3
 License:	GPL v2+
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.8/%{name}-%{version}.tar.bz2
@@ -35,6 +35,7 @@ BuildRequires:	udev-glib-devel
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	dhcp-client
+Requires:	filesystem >= 3.0-37
 Requires:	polkit
 Requires:	rc-scripts
 Requires:	wpa_supplicant >= 0.6-2
@@ -193,9 +194,7 @@ fi
 %{_datadir}/polkit-1/actions/org.freedesktop.NetworkManager.policy
 %{_datadir}/polkit-1/actions/org.freedesktop.network-manager-settings.system.policy
 /lib/udev/rules.d/77-nm-olpc-mesh.rules
-%dir %{_sysconfdir}/%{name}
 %dir %{_sysconfdir}/%{name}/VPN
-%dir %{_sysconfdir}/%{name}/dispatcher.d
 %dir %{_sysconfdir}/%{name}/system-connections
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/%{name}.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-dhcp-client.conf
