@@ -3,7 +3,7 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.8.2
-Release:	3
+Release:	4
 License:	GPL v2+
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.8/%{name}-%{version}.tar.bz2
@@ -11,6 +11,7 @@ Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.8/%{name}-%{ver
 Source1:	%{name}.conf
 Patch0:		%{name}-pld.patch
 Patch1:		%{name}-compile.patch
+Patch2:		upstart.patch
 URL:		http://projects.gnome.org/NetworkManager/
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake >= 1:1.9
@@ -37,7 +38,7 @@ Requires:	%{name}-libs = %{version}-%{release}
 Requires:	dhcp-client
 Requires:	filesystem >= 3.0-37
 Requires:	polkit
-Requires:	rc-scripts
+Requires:	rc-scripts >= 0.4.3.0
 Requires:	wpa_supplicant >= 0.6-2
 Suggests:	ModemManager
 Suggests:	mobile-broadband-provider-info
@@ -112,6 +113,7 @@ Statyczne biblioteki Network Managera.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %build
 %{__intltoolize}
