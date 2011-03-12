@@ -43,7 +43,7 @@ Requires:	dhcp-client
 Requires:	filesystem >= 3.0-37
 Requires:	polkit
 Requires:	rc-scripts >= 0.4.3.0
-Requires:	wpa_supplicant >= 0.6-2
+Requires:	wpa_supplicant >= 0.7.3-4
 Suggests:	ModemManager
 Suggests:	mobile-broadband-provider-info
 Obsoletes:	dhcdbd < 3.0-1
