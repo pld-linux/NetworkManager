@@ -2,12 +2,12 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	0.8.996
+Version:	0.8.997
 Release:	1
 License:	GPL v2+
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.8/%{name}-%{version}.tar.bz2
-# Source0-md5:	f5f6a6b2f7fcfe78e26ac026e2891649
+# Source0-md5:	9013a046e49a9d7e384a94290f40f28a
 Source1:	%{name}.conf
 Patch0:		%{name}-pld.patch
 URL:		http://projects.gnome.org/NetworkManager/
@@ -228,7 +228,7 @@ fi
 %attr(755,root,root) %{_libdir}/libnm-util.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libnm-util.so.2
 %attr(755,root,root) %{_libdir}/libnm-glib.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libnm-glib.so.3
+%attr(755,root,root) %ghost %{_libdir}/libnm-glib.so.4
 %attr(755,root,root) %{_libdir}/libnm-glib-vpn.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libnm-glib-vpn.so.1
 %{_libdir}/girepository-1.0/NMClient-1.0.typelib
