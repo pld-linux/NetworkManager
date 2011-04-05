@@ -2,29 +2,29 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	0.8.997
+Version:	0.8.998
 Release:	1
 License:	GPL v2+
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.8/%{name}-%{version}.tar.bz2
-# Source0-md5:	9013a046e49a9d7e384a94290f40f28a
+# Source0-md5:	600a4b538456be6f622567a2711a1bf1
 Source1:	%{name}.conf
 Patch0:		%{name}-pld.patch
 URL:		http://projects.gnome.org/NetworkManager/
-BuildRequires:	autoconf >= 2.52
-BuildRequires:	automake >= 1:1.9
+BuildRequires:	autoconf >= 2.63
+BuildRequires:	automake >= 1:1.10
 BuildRequires:	dbus-devel >= 1.1.0
 BuildRequires:	dbus-glib-devel >= 0.75
 BuildRequires:	docbook-dtd412-xml
-BuildRequires:	gettext-devel
+BuildRequires:	gettext-devel >= 0.17
 BuildRequires:	glib2-devel >= 1:2.24.0
 BuildRequires:	gobject-introspection-devel >= 0.10.0
 BuildRequires:	gtk-doc
 BuildRequires:	gtk-doc-automake >= 1.0
-BuildRequires:	intltool >= 0.35.5
+BuildRequires:	intltool >= 0.40.0
 BuildRequires:	libiw-devel >= 1:28-0.pre9.1
-BuildRequires:	libnl-devel >= 1:1.0-0.pre8.1
-BuildRequires:	libtool
+BuildRequires:	libnl1-devel >= 1.1
+BuildRequires:	libtool >= 2.2
 BuildRequires:	libuuid-devel
 BuildRequires:	nss-devel >= 3.11
 BuildRequires:	pkgconfig
@@ -34,8 +34,8 @@ BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.450
 BuildRequires:	sed >= 4.0
 BuildRequires:	udev-devel
-BuildRequires:	udev-glib-devel
-BuildRequires:	wimax-devel >= 1.5.1
+BuildRequires:	udev-glib-devel >= 147
+#BuildRequires:	wimax-devel >= 1.5.1
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	ConsoleKit
@@ -130,11 +130,13 @@ Statyczne biblioteki Network Managera.
 	--with-distro=pld \
 	--enable-more-warnings=yes \
 	--with-dhclient=/sbin/dhclient \
-	--with-iptables=/usr/sbin/iptables \
+	--with-iptables=%{_sbindir}/iptables \
 	--with-system-ca-path=/etc/certs \
 	--with-pppd-plugin-dir=%{_libdir}/pppd/%{ppp_version} \
 	--with-dist-version=%{version}-%{release} \
-	--with-docs
+	--with-docs \
+	--enable-static \
+    --disable-wimax
 
 %{__make}
 
