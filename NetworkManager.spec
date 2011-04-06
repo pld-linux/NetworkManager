@@ -1,4 +1,9 @@
+
+# Conditional build
+%bcond_with	wimax	# enable wimax support
+
 %define		ppp_version	2.4.5
+
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
@@ -35,7 +40,7 @@ BuildRequires:	rpmbuild(macros) >= 1.450
 BuildRequires:	sed >= 4.0
 BuildRequires:	udev-devel
 BuildRequires:	udev-glib-devel >= 147
-#BuildRequires:	wimax-devel >= 1.5.1
+%{?with_wimax:BuildRequires:	wimax-devel >= 1.5.1}
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	ConsoleKit
@@ -130,13 +135,13 @@ Statyczne biblioteki Network Managera.
 	--with-distro=pld \
 	--enable-more-warnings=yes \
 	--with-dhclient=/sbin/dhclient \
-	--with-iptables=%{_sbindir}/iptables \
+	--with-iptables=/usr/sbin/iptables \
 	--with-system-ca-path=/etc/certs \
 	--with-pppd-plugin-dir=%{_libdir}/pppd/%{ppp_version} \
 	--with-dist-version=%{version}-%{release} \
 	--with-docs \
-	--enable-static \
-    --disable-wimax
+	%{__enable_disable wimax} \
+	--enable-static
 
 %{__make}
 
