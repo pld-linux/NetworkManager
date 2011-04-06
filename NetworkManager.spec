@@ -1,31 +1,35 @@
+
+# Conditional build
+%bcond_with	wimax	# enable wimax support
+
 %define		ppp_version	2.4.5
+
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	0.8.2
-Release:	6
+Version:	0.8.998
+Release:	1
 License:	GPL v2+
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.8/%{name}-%{version}.tar.bz2
-# Source0-md5:	951158258544f761d9c09c052a7072e2
+# Source0-md5:	600a4b538456be6f622567a2711a1bf1
 Source1:	%{name}.conf
 Patch0:		%{name}-pld.patch
-Patch1:		%{name}-compile.patch
-Patch2:		upstart.patch
 URL:		http://projects.gnome.org/NetworkManager/
-BuildRequires:	autoconf >= 2.52
-BuildRequires:	automake >= 1:1.9
+BuildRequires:	autoconf >= 2.63
+BuildRequires:	automake >= 1:1.10
 BuildRequires:	dbus-devel >= 1.1.0
 BuildRequires:	dbus-glib-devel >= 0.75
 BuildRequires:	docbook-dtd412-xml
-BuildRequires:	gettext-devel
-BuildRequires:	glib2-devel >= 1:2.18.0
+BuildRequires:	gettext-devel >= 0.17
+BuildRequires:	glib2-devel >= 1:2.24.0
+BuildRequires:	gobject-introspection-devel >= 0.10.0
 BuildRequires:	gtk-doc
 BuildRequires:	gtk-doc-automake >= 1.0
-BuildRequires:	intltool >= 0.35.5
+BuildRequires:	intltool >= 0.40.0
 BuildRequires:	libiw-devel >= 1:28-0.pre9.1
 BuildRequires:	libnl1-devel >= 1.1
-BuildRequires:	libtool
+BuildRequires:	libtool >= 2.2
 BuildRequires:	libuuid-devel
 BuildRequires:	nss-devel >= 3.11
 BuildRequires:	pkgconfig
@@ -35,14 +39,16 @@ BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.450
 BuildRequires:	sed >= 4.0
 BuildRequires:	udev-devel
-BuildRequires:	udev-glib-devel
+BuildRequires:	udev-glib-devel >= 147
+%{?with_wimax:BuildRequires:	wimax-devel >= 1.5.1}
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-libs = %{version}-%{release}
+Requires:	ConsoleKit
 Requires:	dhcp-client
 Requires:	filesystem >= 3.0-37
 Requires:	polkit
 Requires:	rc-scripts >= 0.4.3.0
-Requires:	wpa_supplicant >= 0.6-2
+Requires:	wpa_supplicant >= 0.7.3-4
 Suggests:	ModemManager
 Suggests:	mobile-broadband-provider-info
 Obsoletes:	dhcdbd < 3.0-1
@@ -75,7 +81,7 @@ Summary:	Network Manager shared libraries
 Summary(pl.UTF-8):	Biblioteki dzielone Network Managera
 Group:		Libraries
 Requires:	dbus-glib >= 0.75
-Requires:	glib2 >= 1:2.18.0
+Requires:	glib2 >= 1:2.24.0
 Conflicts:	NetworkManager < 0.6.4-0.2
 
 %description libs
@@ -90,7 +96,7 @@ Summary(pl.UTF-8):	Pliki nagłówkowe Network Managera
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	dbus-glib-devel >= 0.75
-Requires:	glib2-devel >= 1:2.18.0
+Requires:	glib2-devel >= 1:2.24.0
 Requires:	libuuid-devel
 Requires:	udev-glib-devel
 
@@ -115,8 +121,6 @@ Statyczne biblioteki Network Managera.
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p1
-%patch2 -p1
 
 %build
 %{__intltoolize}
@@ -126,6 +130,7 @@ Statyczne biblioteki Network Managera.
 %{__autoheader}
 %{__automake}
 %configure \
+	--disable-silent-rules \
 	--with-html-dir=%{_gtkdocdir} \
 	--with-distro=pld \
 	--enable-more-warnings=yes \
@@ -134,7 +139,9 @@ Statyczne biblioteki Network Managera.
 	--with-system-ca-path=/etc/certs \
 	--with-pppd-plugin-dir=%{_libdir}/pppd/%{ppp_version} \
 	--with-dist-version=%{version}-%{release} \
-	--with-docs
+	--with-docs \
+	%{__enable_disable wimax} \
+	--enable-static
 
 %{__make}
 
@@ -148,6 +155,7 @@ install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},%{_sysconfdir}/%{na
 cp -a %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 
 # Cleanup
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/*.la
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/NetworkManager/*.{a,la}
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/pppd/%{ppp_version}/*.{a,la}
 
@@ -181,11 +189,11 @@ fi
 %files -f %{name}.lang
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS README TODO
+%attr(755,root,root) %{_bindir}/nm-online
 %attr(755,root,root) %{_bindir}/nm-tool
 %attr(755,root,root) %{_bindir}/nmcli
 %attr(755,root,root) %{_sbindir}/NetworkManager
 %dir %{_libdir}/NetworkManager
-%attr(755,root,root) %{_libdir}/NetworkManager/libnm-settings-plugin-keyfile.so
 %attr(755,root,root) %{_libdir}/NetworkManager/libnm-settings-plugin-ifcfg-rh.so
 %attr(755,root,root) %{_libexecdir}/nm-avahi-autoipd.action
 %attr(755,root,root) %{_libexecdir}/nm-dhcp-client.action
@@ -197,7 +205,6 @@ fi
 %{_datadir}/%{name}/gdb-cmd
 %{_datadir}/dbus-1/system-services/org.freedesktop.nm_dispatcher.service
 %{_datadir}/polkit-1/actions/org.freedesktop.NetworkManager.policy
-%{_datadir}/polkit-1/actions/org.freedesktop.network-manager-settings.system.policy
 /lib/udev/rules.d/77-nm-olpc-mesh.rules
 %dir %{_sysconfdir}/%{name}/VPN
 %dir %{_sysconfdir}/%{name}/system-connections
@@ -207,7 +214,8 @@ fi
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-dispatcher.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-ifcfg-rh.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/NetworkManager.conf
-%dir /var/run/%{name}
+%attr(700,root,root) %dir /var/run/%{name}
+%attr(700,root,root) %dir /var/lib/%{name}
 %{_mandir}/man1/nm-online.1*
 %{_mandir}/man1/nm-tool.1*
 %{_mandir}/man1/nmcli.1*
@@ -218,32 +226,34 @@ fi
 
 %files apidocs
 %defattr(644,root,root,755)
+%{_gtkdocdir}/NetworkManager
 %{_gtkdocdir}/libnm-glib
 %{_gtkdocdir}/libnm-util
 
 %files libs
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libnm-util.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libnm-util.so.1
+%attr(755,root,root) %ghost %{_libdir}/libnm-util.so.2
 %attr(755,root,root) %{_libdir}/libnm-glib.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libnm-glib.so.2
+%attr(755,root,root) %ghost %{_libdir}/libnm-glib.so.4
 %attr(755,root,root) %{_libdir}/libnm-glib-vpn.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libnm-glib-vpn.so.1
+%{_libdir}/girepository-1.0/NMClient-1.0.typelib
+%{_libdir}/girepository-1.0/NetworkManager-1.0.typelib
 
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libnm-util.so
 %attr(755,root,root) %{_libdir}/libnm-glib.so
 %attr(755,root,root) %{_libdir}/libnm-glib-vpn.so
-%{_libdir}/libnm-util.la
-%{_libdir}/libnm-glib.la
-%{_libdir}/libnm-glib-vpn.la
 %{_includedir}/NetworkManager
 %{_includedir}/libnm-glib
 %{_pkgconfigdir}/NetworkManager.pc
 %{_pkgconfigdir}/libnm-util.pc
 %{_pkgconfigdir}/libnm-glib-vpn.pc
 %{_pkgconfigdir}/libnm-glib.pc
+%{_datadir}/gir-1.0/NMClient-1.0.gir
+%{_datadir}/gir-1.0/NetworkManager-1.0.gir
 
 %files static
 %defattr(644,root,root,755)
