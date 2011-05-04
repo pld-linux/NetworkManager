@@ -11,8 +11,11 @@ Version:	0.8.999
 Release:	1
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.8/%{name}-%{version}.tar.bz2
-# Source0-md5:	6fad04853049e6eb152b66759667c50e
+#Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.8/%{name}-%{version}.tar.bz2
+# official NetworkManager with changes from f15 branch
+# (provides org.freedesktop.NetworkManagerCompat interface for KDE)
+Source0:	%{name}-%{version}-compat.tar.bz2
+# Source0-md5:	5053d54e65652b232bc6a45737d5a775
 Source1:	%{name}.conf
 Patch0:		%{name}-pld.patch
 URL:		http://projects.gnome.org/NetworkManager/
@@ -123,6 +126,7 @@ Statyczne biblioteki Network Managera.
 %patch0 -p1
 
 %build
+%{__gtkdocize}
 %{__intltoolize}
 %{__libtoolize}
 %{__aclocal} -I m4
