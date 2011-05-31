@@ -7,7 +7,7 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	0.8.999
+Version:	0.8.9997
 Release:	1
 License:	GPL v2+
 Group:		Networking/Admin
@@ -15,7 +15,7 @@ Group:		Networking/Admin
 # official NetworkManager with changes from f15 branch
 # (provides org.freedesktop.NetworkManagerCompat interface for KDE)
 Source0:	%{name}-%{version}-compat.tar.bz2
-# Source0-md5:	5053d54e65652b232bc6a45737d5a775
+# Source0-md5:	7a7fab2336c24b5cafa371782674fc06
 Source1:	%{name}.conf
 Patch0:		%{name}-pld.patch
 URL:		http://projects.gnome.org/NetworkManager/
