@@ -3,7 +3,7 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.8.2
-Release:	4
+Release:	5
 Epoch:		1
 License:	GPL v2+
 Group:		Networking/Admin
