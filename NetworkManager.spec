@@ -24,7 +24,7 @@ BuildRequires:	gtk-doc
 BuildRequires:	gtk-doc-automake >= 1.0
 BuildRequires:	intltool >= 0.35.5
 BuildRequires:	libiw-devel >= 1:28-0.pre9.1
-BuildRequires:	libnl-devel >= 1:1.0-0.pre8.1
+BuildRequires:	libnl1-devel
 BuildRequires:	libtool
 BuildRequires:	libuuid-devel
 BuildRequires:	nss-devel >= 3.11
@@ -116,7 +116,9 @@ Statyczne biblioteki Network Managera.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%if "%{pld_release}" == "th"
 %patch2 -p1
+%endif
 
 %build
 %{__intltoolize}
