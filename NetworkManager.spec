@@ -8,7 +8,7 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.8.9997
-Release:	1
+Release:	2
 License:	GPL v2+
 Group:		Networking/Admin
 #Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.8/%{name}-%{version}.tar.bz2
@@ -46,7 +46,7 @@ BuildRequires:	udev-glib-devel >= 147
 %{?with_wimax:BuildRequires:	wimax-devel >= 1.5.1}
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-libs = %{version}-%{release}
-Requires:	ConsoleKit
+Requires:	ConsoleKit-x11
 Requires:	dhcp-client
 Requires:	filesystem >= 3.0-37
 Requires:	polkit
