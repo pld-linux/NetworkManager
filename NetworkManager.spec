@@ -17,6 +17,7 @@ Group:		Networking/Admin
 Source0:	%{name}-%{version}-compat.tar.bz2
 # Source0-md5:	7a7fab2336c24b5cafa371782674fc06
 Source1:	%{name}.conf
+Source2:	NetworkManager.upstart
 Patch0:		%{name}-pld.patch
 URL:		http://projects.gnome.org/NetworkManager/
 BuildRequires:	autoconf >= 2.63
@@ -156,7 +157,10 @@ install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},%{_sysconfdir}/%{na
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-cp -a %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
+cp -p %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
+
+install -d $RPM_BUILD_ROOT/etc/init
+cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/init/NetworkManager.conf
 
 # Cleanup
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/*.la
@@ -205,6 +209,7 @@ fi
 %attr(755,root,root) %{_libexecdir}/nm-crash-logger
 %attr(755,root,root) %{_libdir}/pppd/%{ppp_version}/nm-pppd-plugin.so
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
+%config(noreplace) %verify(not md5 mtime size) /etc/init/NetworkManager.conf
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/gdb-cmd
 %{_datadir}/dbus-1/system-services/org.freedesktop.nm_dispatcher.service
