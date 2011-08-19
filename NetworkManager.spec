@@ -8,7 +8,7 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.8.9997
-Release:	4
+Release:	5
 License:	GPL v2+
 Group:		Networking/Admin
 #Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.8/%{name}-%{version}.tar.bz2
@@ -193,9 +193,11 @@ fi
 %service -q NetworkManagerDispatcher stop
 /sbin/chkconfig --del NetworkManagerDispatcher
 
-%triggerun -- NetworkManager < 0.8.9997-4
+%triggerun -- NetworkManager < 0.8.9997-5
 # move network interfaces description files to new location
 mv -f /etc/sysconfig/network-scripts/ifcfg-* /etc/sysconfig/interfaces
+mv -f /etc/sysconfig/network-scripts/keys-* /etc/sysconfig/interfaces
+exit 0
 
 %post	libs -p /sbin/ldconfig
 %postun	libs -p /sbin/ldconfig
