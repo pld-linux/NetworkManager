@@ -8,7 +8,7 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.8.9997
-Release:	3
+Release:	4
 License:	GPL v2+
 Group:		Networking/Admin
 #Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.8/%{name}-%{version}.tar.bz2
@@ -17,8 +17,9 @@ Group:		Networking/Admin
 Source0:	%{name}-%{version}-compat.tar.bz2
 # Source0-md5:	7a7fab2336c24b5cafa371782674fc06
 Source1:	%{name}.conf
-Source2:	NetworkManager.upstart
+Source2:	%{name}.upstart
 Patch0:		%{name}-pld.patch
+Patch1:		ifcfg-path.patch
 URL:		http://projects.gnome.org/NetworkManager/
 BuildRequires:	autoconf >= 2.63
 BuildRequires:	automake >= 1:1.10
@@ -125,6 +126,7 @@ Statyczne biblioteki Network Managera.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
 %{__gtkdocize}
@@ -190,6 +192,10 @@ fi
 %triggerun -- NetworkManager < 0.7.0-0.svn4027.1
 %service -q NetworkManagerDispatcher stop
 /sbin/chkconfig --del NetworkManagerDispatcher
+
+%triggerun -- NetworkManager < 0.8.9997-4
+# move network interfaces description files to new location
+mv -f /etc/sysconfig/network-scripts/ifcfg-* /etc/sysconfig/interfaces
 
 %post	libs -p /sbin/ldconfig
 %postun	libs -p /sbin/ldconfig
