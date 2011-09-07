@@ -11,8 +11,8 @@ Version:	0.9.0
 Release:	1
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.9/%{name}-%{version}.tar.bz2
-# Source0-md5:	f807102109e63ec708d4fd7a7f3f7deb
+Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.9/%{name}-%{version}.tar.xz
+# Source0-md5:	658f1faa6dd42a0f9a81bdff43667ab8
 Source1:	%{name}.conf
 Source2:	%{name}.upstart
 Patch0:		%{name}-pld.patch
@@ -40,9 +40,11 @@ BuildRequires:	ppp-plugin-devel >= 3:%{ppp_version}
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.450
 BuildRequires:	sed >= 4.0
+BuildRequires:	tar >= 1:1.22
 BuildRequires:	udev-devel
 BuildRequires:	udev-glib-devel >= 147
 %{?with_wimax:BuildRequires:	wimax-devel >= 1.5.1}
+BuildRequires:	xz
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	ConsoleKit-x11
