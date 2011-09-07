@@ -7,15 +7,12 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	0.8.9997
-Release:	5
+Version:	0.9.0
+Release:	1
 License:	GPL v2+
 Group:		Networking/Admin
-#Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.8/%{name}-%{version}.tar.bz2
-# official NetworkManager with changes from f15 branch
-# (provides org.freedesktop.NetworkManagerCompat interface for KDE)
-Source0:	%{name}-%{version}-compat.tar.bz2
-# Source0-md5:	7a7fab2336c24b5cafa371782674fc06
+Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.9/%{name}-%{version}.tar.bz2
+# Source0-md5:	f807102109e63ec708d4fd7a7f3f7deb
 Source1:	%{name}.conf
 Source2:	%{name}.upstart
 Patch0:		%{name}-pld.patch
@@ -33,7 +30,7 @@ BuildRequires:	gtk-doc
 BuildRequires:	gtk-doc-automake >= 1.0
 BuildRequires:	intltool >= 0.40.0
 BuildRequires:	libiw-devel >= 1:28-0.pre9.1
-BuildRequires:	libnl1-devel >= 1.1
+BuildRequires:	libnl1-devel >= 1.1-2
 BuildRequires:	libtool >= 2.2
 BuildRequires:	libuuid-devel
 BuildRequires:	nss-devel >= 3.11
