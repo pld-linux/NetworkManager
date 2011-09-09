@@ -1,7 +1,7 @@
-
+#
 # Conditional build
 %bcond_with	wimax	# enable wimax support
-
+#
 %define		ppp_version	2.4.5
 
 Summary:	Network Manager for GNOME
@@ -26,16 +26,16 @@ BuildRequires:	docbook-dtd412-xml
 BuildRequires:	gettext-devel >= 0.17
 BuildRequires:	glib2-devel >= 1:2.24.0
 BuildRequires:	gobject-introspection-devel >= 0.10.0
-BuildRequires:	gtk-doc
+BuildRequires:	gtk-doc >= 1.0
 BuildRequires:	gtk-doc-automake >= 1.0
 BuildRequires:	intltool >= 0.40.0
 BuildRequires:	libiw-devel >= 1:28-0.pre9.1
 BuildRequires:	libnl1-devel >= 1.1-2
-BuildRequires:	libtool >= 2.2
+BuildRequires:	libtool >= 2:2.2
 BuildRequires:	libuuid-devel
 BuildRequires:	nss-devel >= 3.11
 BuildRequires:	pkgconfig
-BuildRequires:	polkit-devel
+BuildRequires:	polkit-devel >= 0.97
 BuildRequires:	ppp-plugin-devel >= 3:%{ppp_version}
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.450
@@ -50,7 +50,7 @@ Requires:	%{name}-libs = %{version}-%{release}
 Requires:	ConsoleKit-x11
 Requires:	dhcp-client
 Requires:	filesystem >= 3.0-37
-Requires:	polkit
+Requires:	polkit >= 0.97
 Requires:	rc-scripts >= 0.4.3.0
 Requires:	wpa_supplicant >= 0.7.3-4
 Suggests:	ModemManager
@@ -86,6 +86,8 @@ Summary(pl.UTF-8):	Biblioteki dzielone Network Managera
 Group:		Libraries
 Requires:	dbus-glib >= 0.75
 Requires:	glib2 >= 1:2.24.0
+Requires:	nss >= 3.11
+Requires:	udev-glib >= 147
 Conflicts:	NetworkManager < 0.6.4-0.2
 
 %description libs
@@ -102,7 +104,8 @@ Requires:	%{name}-libs = %{version}-%{release}
 Requires:	dbus-glib-devel >= 0.75
 Requires:	glib2-devel >= 1:2.24.0
 Requires:	libuuid-devel
-Requires:	udev-glib-devel
+Requires:	nss-devel >= 3.11
+Requires:	udev-glib-devel >= 147
 
 %description devel
 Network Manager includes and more.
