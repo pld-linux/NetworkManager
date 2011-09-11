@@ -37,6 +37,8 @@ diff -urN NetworkManager-0.8.2/initscript/PLD/NetworkManager.in NetworkManager-0
 +# Source function library.
 +. /etc/rc.d/init.d/functions
 +
++upstart_controlled
++
 +# Source networking configuration.
 +. /etc/sysconfig/network
 +
@@ -71,8 +73,6 @@ diff -urN NetworkManager-0.8.2/initscript/PLD/NetworkManager.in NetworkManager-0
 +		msg_not_running NetworkManager
 +	fi
 +}
-+
-+upstart_controlled
 +
 +RETVAL=0
 +case "$1" in
