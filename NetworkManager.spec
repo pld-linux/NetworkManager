@@ -9,6 +9,7 @@ Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.9.0
 Release:	1
+Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.9/%{name}-%{version}.tar.xz
@@ -46,7 +47,7 @@ BuildRequires:	udev-glib-devel >= 147
 %{?with_wimax:BuildRequires:	wimax-devel >= 1.5.1}
 BuildRequires:	xz
 Requires(post,preun):	/sbin/chkconfig
-Requires:	%{name}-libs = %{version}-%{release}
+Requires:	%{name}-libs = %{epoch}:%{version}-%{release}
 Requires:	ConsoleKit-x11
 Requires:	dhcp-client
 Requires:	filesystem >= 3.0-37
@@ -100,7 +101,7 @@ Biblioteki dzielone Network Managera.
 Summary:	Network Manager includes and more
 Summary(pl.UTF-8):	Pliki nagłówkowe Network Managera
 Group:		Development/Libraries
-Requires:	%{name}-libs = %{version}-%{release}
+Requires:	%{name}-libs = %{epoch}:%{version}-%{release}
 Requires:	dbus-glib-devel >= 0.75
 Requires:	glib2-devel >= 1:2.24.0
 Requires:	libuuid-devel
@@ -117,7 +118,7 @@ Pliki nagłówkowe Network Manager.
 Summary:	Network Manager static libraries
 Summary(pl.UTF-8):	Statyczne biblioteki Network Managera
 Group:		Development/Libraries
-Requires:	%{name}-devel = %{version}-%{release}
+Requires:	%{name}-devel = %{epoch}:%{version}-%{release}
 
 %description static
 Network Manager static libraries.
