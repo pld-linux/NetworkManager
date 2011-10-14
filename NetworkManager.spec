@@ -47,6 +47,7 @@ BuildRequires:	udev-devel
 BuildRequires:	udev-glib-devel >= 147
 %{?with_wimax:BuildRequires:	wimax-devel >= 1.5.1}
 BuildRequires:	xz
+BuildConflicts:	libnl1-devel
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-libs = %{epoch}:%{version}-%{release}
 Requires:	ConsoleKit-x11
