@@ -19,6 +19,7 @@ Source2:	%{name}.upstart
 Patch0:		%{name}-pld.patch
 Patch1:		ifcfg-path.patch
 Patch2:		libnl.patch
+Patch3:		libnl_noconflict.patch
 URL:		http://projects.gnome.org/NetworkManager/
 BuildRequires:	autoconf >= 2.63
 BuildRequires:	automake >= 1:1.10
@@ -47,7 +48,6 @@ BuildRequires:	udev-devel
 BuildRequires:	udev-glib-devel >= 147
 %{?with_wimax:BuildRequires:	wimax-devel >= 1.5.1}
 BuildRequires:	xz
-BuildConflicts:	libnl1-devel
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-libs = %{epoch}:%{version}-%{release}
 Requires:	ConsoleKit-x11
@@ -133,6 +133,7 @@ Statyczne biblioteki Network Managera.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
 %{__gtkdocize}
