@@ -8,7 +8,7 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.9.2.0
-Release:	1
+Release:	2
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
@@ -81,6 +81,14 @@ libnm-glib library API documentation.
 %description apidocs -l pl.UTF-8
 Dokumentacja API biblioteki libnm-glib.
 
+%package systemd
+Summary:	systemd units for Network Manager
+Group:		Base
+Requires:	%{name} = %{epoch}:%{version}-%{release}
+
+%description systemd
+systemd units for Network Manager.
+
 %package libs
 Summary:	Network Manager shared libraries
 Summary(pl.UTF-8):	Biblioteki dzielone Network Managera
@@ -147,6 +155,7 @@ Statyczne biblioteki Network Managera.
 	--with-dhclient=/sbin/dhclient \
 	--with-iptables=/usr/sbin/iptables \
 	--with-system-ca-path=/etc/certs \
+	--with-systemdsystemunitdir=/lib/systemd/system \
 	--with-pppd-plugin-dir=%{_libdir}/pppd/%{ppp_version} \
 	--with-dist-version=%{version}-%{release} \
 	--with-docs \
@@ -249,6 +258,12 @@ exit 0
 %{_gtkdocdir}/NetworkManager
 %{_gtkdocdir}/libnm-glib
 %{_gtkdocdir}/libnm-util
+
+%files systemd
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) /lib/systemd/system/NetworkManager.service
+%config(noreplace) %verify(not md5 mtime size) /lib/systemd/system/NetworkManager-wait-online.service
+%{_datadir}/dbus-1/system-services/org.freedesktop.NetworkManager.service
 
 %files libs
 %defattr(644,root,root,755)
