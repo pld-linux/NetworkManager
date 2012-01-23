@@ -39,7 +39,7 @@ BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.97
 BuildRequires:	ppp-plugin-devel >= 3:%{ppp_version}
 BuildRequires:	rpm-pythonprov
-BuildRequires:	rpmbuild(macros) >= 1.450
+BuildRequires:	rpmbuild(macros) >= 1.629
 BuildRequires:	sed >= 4.0
 BuildRequires:	tar >= 1:1.22
 BuildRequires:	udev-devel
@@ -83,11 +83,16 @@ Dokumentacja API biblioteki libnm-glib.
 
 %package systemd
 Summary:	systemd units for Network Manager
+Summary(pl.UTF-8):	Jednostki systemd dla Network Managera
 Group:		Base
 Requires:	%{name} = %{epoch}:%{version}-%{release}
+Requires:	systemd-units >= 37-0.10
 
 %description systemd
 systemd units for Network Manager.
+
+%description systemd -l pl.UTF-8
+Jednostki systemd dla Network Managera.
 
 %package libs
 Summary:	Network Manager shared libraries
@@ -155,7 +160,7 @@ Statyczne biblioteki Network Managera.
 	--with-dhclient=/sbin/dhclient \
 	--with-iptables=/usr/sbin/iptables \
 	--with-system-ca-path=/etc/certs \
-	--with-systemdsystemunitdir=/lib/systemd/system \
+	--with-systemdsystemunitdir=%{systemdunitdir} \
 	--with-pppd-plugin-dir=%{_libdir}/pppd/%{ppp_version} \
 	--with-dist-version=%{version}-%{release} \
 	--with-docs \
@@ -214,6 +219,15 @@ exit 0
 %post	libs -p /sbin/ldconfig
 %postun	libs -p /sbin/ldconfig
 
+%post systemd
+%systemd_post NetworkManager.service NetworkManager-wait-online.service
+
+%preun systemd
+%systemd_preun NetworkManager.service NetworkManager-wait-online.service
+
+%postun systemd
+%systemd_reload
+
 %files -f %{name}.lang
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS README TODO
@@ -261,8 +275,8 @@ exit 0
 
 %files systemd
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) /lib/systemd/system/NetworkManager.service
-%config(noreplace) %verify(not md5 mtime size) /lib/systemd/system/NetworkManager-wait-online.service
+%{systemdunitdir}/NetworkManager.service
+%{systemdunitdir}/NetworkManager-wait-online.service
 %{_datadir}/dbus-1/system-services/org.freedesktop.NetworkManager.service
 
 %files libs
