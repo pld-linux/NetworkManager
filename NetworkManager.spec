@@ -8,7 +8,7 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.9.2.0
-Release:	2
+Release:	3
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
@@ -16,6 +16,7 @@ Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.9/%{name}-%{ver
 # Source0-md5:	d7dce01e97758253bc4ed81d7b86045f
 Source1:	%{name}.conf
 Source2:	%{name}.upstart
+Source3:	%{name}.tmpfiles
 Patch0:		%{name}-pld.patch
 Patch1:		ifcfg-path.patch
 URL:		http://projects.gnome.org/NetworkManager/
@@ -171,7 +172,8 @@ Statyczne biblioteki Network Managera.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},%{_sysconfdir}/%{name}/{VPN,dispatcher.d,system-connections}}
+install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},/usr/lib/tmpfiles.d} \
+	$RPM_BUILD_ROOT{%{_sysconfdir}/%{name}/{VPN,dispatcher.d,system-connections}}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -180,6 +182,8 @@ cp -p %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 
 install -d $RPM_BUILD_ROOT/etc/init
 cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/init/NetworkManager.conf
+
+install %{SOURCE3} $RPM_BUILD_ROOT/usr/lib/tmpfiles.d/%{name}.conf
 
 # Cleanup
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/*.la
@@ -259,6 +263,7 @@ exit 0
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/NetworkManager.conf
 %attr(700,root,root) %dir /var/run/%{name}
 %attr(700,root,root) %dir /var/lib/%{name}
+/usr/lib/tmpfiles.d/%{name}.conf
 %{_mandir}/man1/nm-online.1*
 %{_mandir}/man1/nm-tool.1*
 %{_mandir}/man1/nmcli.1*
