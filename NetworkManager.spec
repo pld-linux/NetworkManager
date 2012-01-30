@@ -173,7 +173,7 @@ Statyczne biblioteki Network Managera.
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},/usr/lib/tmpfiles.d} \
-	$RPM_BUILD_ROOT{%{_sysconfdir}/%{name}/{VPN,dispatcher.d,system-connections}}
+	$RPM_BUILD_ROOT%{_sysconfdir}/%{name}/{VPN,dispatcher.d,system-connections}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
