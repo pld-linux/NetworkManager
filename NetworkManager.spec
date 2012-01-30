@@ -172,7 +172,7 @@ Statyczne biblioteki Network Managera.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},/etc/tmpfiles.d} \
+install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},/usr/lib/tmpfiles.d} \
 	$RPM_BUILD_ROOT{%{_sysconfdir}/%{name}/{VPN,dispatcher.d,system-connections}}
 
 %{__make} install \
@@ -183,7 +183,7 @@ cp -p %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 install -d $RPM_BUILD_ROOT/etc/init
 cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/init/NetworkManager.conf
 
-install %{SOURCE3} $RPM_BUILD_ROOT/etc/tmpfiles.d/%{name}.conf
+install %{SOURCE3} $RPM_BUILD_ROOT/usr/lib/tmpfiles.d/%{name}.conf
 
 # Cleanup
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/*.la
@@ -248,7 +248,7 @@ exit 0
 %attr(755,root,root) %{_libdir}/pppd/%{ppp_version}/nm-pppd-plugin.so
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
 %config(noreplace) %verify(not md5 mtime size) /etc/init/NetworkManager.conf
-%config(noreplace) %verify(not md5 mtime size) /etc/tmpfiles.d/%{name}.conf
+/usr/lib/tmpfiles.d/%{name}.conf
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/gdb-cmd
 %{_datadir}/dbus-1/system-services/org.freedesktop.nm_dispatcher.service
