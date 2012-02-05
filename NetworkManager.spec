@@ -8,7 +8,7 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.9.2.0
-Release:	4
+Release:	5
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
@@ -54,10 +54,12 @@ Requires:	dhcp-client
 Requires:	filesystem >= 3.0-37
 Requires:	polkit >= 0.97
 Requires:	rc-scripts >= 0.4.3.0
+Requires:	systemd-units >= 37-0.10
 Requires:	wpa_supplicant >= 0.7.3-4
 Suggests:	ModemManager
 Suggests:	mobile-broadband-provider-info
 Obsoletes:	dhcdbd < 3.0-1
+Obsoletes:	NetworkManager-systemd
 # sr@Latn vs. sr@latin
 Conflicts:	glibc-misc < 6:2.7
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -81,19 +83,6 @@ libnm-glib library API documentation.
 
 %description apidocs -l pl.UTF-8
 Dokumentacja API biblioteki libnm-glib.
-
-%package systemd
-Summary:	systemd units for Network Manager
-Summary(pl.UTF-8):	Jednostki systemd dla Network Managera
-Group:		Base
-Requires:	%{name} = %{epoch}:%{version}-%{release}
-Requires:	systemd-units >= 37-0.10
-
-%description systemd
-systemd units for Network Manager.
-
-%description systemd -l pl.UTF-8
-Jednostki systemd dla Network Managera.
 
 %package libs
 Summary:	Network Manager shared libraries
@@ -223,14 +212,17 @@ exit 0
 %post	libs -p /sbin/ldconfig
 %postun	libs -p /sbin/ldconfig
 
-%post systemd
+%post
 %systemd_post NetworkManager.service NetworkManager-wait-online.service
 
-%preun systemd
+%preun
 %systemd_preun NetworkManager.service NetworkManager-wait-online.service
 
-%postun systemd
+%postun
 %systemd_reload
+
+%triggerpostun -- NetworkManager < 2:0.9.2.0-5
+%systemd_trigger NetworkManager.service NetworkManager-wait-online.service
 
 %files -f %{name}.lang
 %defattr(644,root,root,755)
@@ -248,6 +240,9 @@ exit 0
 %attr(755,root,root) %{_libdir}/pppd/%{ppp_version}/nm-pppd-plugin.so
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
 %config(noreplace) %verify(not md5 mtime size) /etc/init/NetworkManager.conf
+%{systemdunitdir}/NetworkManager.service
+%{systemdunitdir}/NetworkManager-wait-online.service
+%{_datadir}/dbus-1/system-services/org.freedesktop.NetworkManager.service
 /usr/lib/tmpfiles.d/%{name}.conf
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/gdb-cmd
@@ -277,12 +272,6 @@ exit 0
 %{_gtkdocdir}/NetworkManager
 %{_gtkdocdir}/libnm-glib
 %{_gtkdocdir}/libnm-util
-
-%files systemd
-%defattr(644,root,root,755)
-%{systemdunitdir}/NetworkManager.service
-%{systemdunitdir}/NetworkManager-wait-online.service
-%{_datadir}/dbus-1/system-services/org.freedesktop.NetworkManager.service
 
 %files libs
 %defattr(644,root,root,755)
