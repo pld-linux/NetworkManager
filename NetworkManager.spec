@@ -192,12 +192,20 @@ rm -rf $RPM_BUILD_ROOT
 %post
 /sbin/chkconfig --add NetworkManager
 %service -n NetworkManager restart "NetworkManager daemon"
+%systemd_post NetworkManager.service NetworkManager-wait-online.service
 
 %preun
 if [ "$1" = "0" ]; then
 	%service NetworkManager stop
 	/sbin/chkconfig --del NetworkManager
 fi
+%systemd_preun NetworkManager.service NetworkManager-wait-online.service
+
+%postun
+%systemd_reload
+
+%triggerpostun -- NetworkManager < 2:0.9.2.0-5
+%systemd_trigger NetworkManager.service NetworkManager-wait-online.service
 
 %triggerun -- NetworkManager < 0.7.0-0.svn4027.1
 %service -q NetworkManagerDispatcher stop
@@ -211,18 +219,6 @@ exit 0
 
 %post	libs -p /sbin/ldconfig
 %postun	libs -p /sbin/ldconfig
-
-%post
-%systemd_post NetworkManager.service NetworkManager-wait-online.service
-
-%preun
-%systemd_preun NetworkManager.service NetworkManager-wait-online.service
-
-%postun
-%systemd_reload
-
-%triggerpostun -- NetworkManager < 2:0.9.2.0-5
-%systemd_trigger NetworkManager.service NetworkManager-wait-online.service
 
 %files -f %{name}.lang
 %defattr(644,root,root,755)
