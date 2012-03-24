@@ -1,6 +1,56 @@
-diff -urN NetworkManager-0.8.2/initscript/Makefile.am NetworkManager-0.8.2.new//initscript/Makefile.am
---- NetworkManager-0.8.2/initscript/Makefile.am	2010-10-19 01:44:05.000000000 +0200
-+++ NetworkManager-0.8.2.new//initscript/Makefile.am	2010-11-04 23:09:47.487444761 +0100
+diff -urN NetworkManager-0.9.4.0/configure.ac NetworkManager-0.9.4.0.new/configure.ac
+--- NetworkManager-0.9.4.0/configure.ac	2012-03-23 21:11:15.000000000 +0100
++++ NetworkManager-0.9.4.0.new/configure.ac	2012-03-24 11:29:26.057723008 +0100
+@@ -107,7 +107,7 @@
+ dnl
+ AC_C_BIGENDIAN
+ 
+-AC_ARG_WITH(distro, AS_HELP_STRING([--with-distro=DISTRO], [Specify the Linux distribution to target: One of redhat, suse, gentoo, debian, arch, slackware, paldo, mandriva, pardus, linexa or exherbo]))
++AC_ARG_WITH(distro, AS_HELP_STRING([--with-distro=DISTRO], [Specify the Linux distribution to target: One of redhat, suse, gentoo, debian, arch, slackware, paldo, mandriva, pardus, linexa, exherbo or pld]))
+ if test "z$with_distro" = "z"; then
+ 	AC_CHECK_FILE(/etc/redhat-release,with_distro="redhat")
+ 	AC_CHECK_FILE(/etc/SuSE-release,with_distro="suse")
+@@ -121,6 +121,7 @@
+ 	AC_CHECK_FILE(/etc/pardus-release,with_distro="pardus")
+ 	AC_CHECK_FILE(/etc/linexa-release,with_distro="linexa")
+ 	AC_CHECK_FILE(/etc/exherbo-release,with_distro="exherbo")
++	AC_CHECK_FILE(/etc/pld-release,with_distro="pld")
+ 	if test "z$with_distro" = "z"; then
+ 		with_distro=`lsb_release -is`
+ 	fi
+@@ -132,7 +133,7 @@
+ 	exit 1
+ else
+ 	case $with_distro in
+-		redhat|suse|gentoo|debian|slackware|arch|paldo|frugalware|mandriva|pardus|linexa|exherbo|generic) ;;
++		redhat|suse|gentoo|debian|slackware|arch|paldo|frugalware|mandriva|pardus|linexa|exherbo|generic|pld) ;;
+ 		*)
+ 			echo "Your distribution (${with_distro}) is not yet supported!  (patches welcome)"
+ 			exit 1
+@@ -205,6 +206,11 @@
+   AC_DEFINE(TARGET_EXHERBO, 1, [Define if you have Exherbo])
+ fi
+ 
++AM_CONDITIONAL(TARGET_PLD, test x"$with_distro" = xpld)
++if test x"$with_distro" = xpld; then
++  AC_DEFINE(TARGET_PLD, 1, [Define if you have PLD])
++fi  
++
+ dnl
+ dnl Distribution version string
+ dnl
+@@ -790,6 +796,8 @@
+ initscript/paldo/NetworkManager
+ initscript/Mandriva/Makefile
+ initscript/Mandriva/networkmanager
++initscript/PLD/Makefile
++initscript/PLD/NetworkManager
+ initscript/linexa/Makefile
+ initscript/linexa/networkmanager
+ introspection/Makefile
+diff -urN NetworkManager-0.9.4.0/initscript/Makefile.am NetworkManager-0.9.4.0.new/initscript/Makefile.am
+--- NetworkManager-0.9.4.0/initscript/Makefile.am	2011-04-19 07:06:22.000000000 +0200
++++ NetworkManager-0.9.4.0.new/initscript/Makefile.am	2012-03-24 11:25:37.842292690 +0100
 @@ -26,3 +26,6 @@
  if TARGET_LINEXA
  SUBDIRS += linexa
@@ -8,18 +58,18 @@ diff -urN NetworkManager-0.8.2/initscript/Makefile.am NetworkManager-0.8.2.new//
 +if TARGET_PLD
 +SUBDIRS += PLD
 +endif
-diff -urN NetworkManager-0.8.2/initscript/PLD/Makefile.am NetworkManager-0.8.2.new//initscript/PLD/Makefile.am
---- NetworkManager-0.8.2/initscript/PLD/Makefile.am	1970-01-01 01:00:00.000000000 +0100
-+++ NetworkManager-0.8.2.new//initscript/PLD/Makefile.am	2010-11-04 21:54:27.000000000 +0100
+diff -urN NetworkManager-0.9.4.0/initscript/PLD/Makefile.am NetworkManager-0.9.4.0.new/initscript/PLD/Makefile.am
+--- NetworkManager-0.9.4.0/initscript/PLD/Makefile.am	1970-01-01 01:00:00.000000000 +0100
++++ NetworkManager-0.9.4.0.new/initscript/PLD/Makefile.am	2012-03-24 11:25:37.845626005 +0100
 @@ -0,0 +1,5 @@
 +EXTRA_DIST = NetworkManager
 +DISTCLEANFILES = NetworkManager
 +
 +initddir = $(sysconfdir)/rc.d/init.d
 +initd_SCRIPTS = NetworkManager
-diff -urN NetworkManager-0.8.2/initscript/PLD/NetworkManager.in NetworkManager-0.8.2.new//initscript/PLD/NetworkManager.in
---- NetworkManager-0.8.2/initscript/PLD/NetworkManager.in	1970-01-01 01:00:00.000000000 +0100
-+++ NetworkManager-0.8.2.new//initscript/PLD/NetworkManager.in	2010-11-04 21:54:27.000000000 +0100
+diff -urN NetworkManager-0.9.4.0/initscript/PLD/NetworkManager.in NetworkManager-0.9.4.0.new/initscript/PLD/NetworkManager.in
+--- NetworkManager-0.9.4.0/initscript/PLD/NetworkManager.in	1970-01-01 01:00:00.000000000 +0100
++++ NetworkManager-0.9.4.0.new/initscript/PLD/NetworkManager.in	2012-03-24 11:25:37.845626005 +0100
 @@ -0,0 +1,75 @@
 +#!/bin/sh
 +#
@@ -96,10 +146,24 @@ diff -urN NetworkManager-0.8.2/initscript/PLD/NetworkManager.in NetworkManager-0
 +esac
 +	        
 +exit $RETVAL
-diff -urN NetworkManager-0.8.2/src/backends/NetworkManagerPLD.c NetworkManager-0.8.2.new//src/backends/NetworkManagerPLD.c
---- NetworkManager-0.8.2/src/backends/NetworkManagerPLD.c	1970-01-01 01:00:00.000000000 +0100
-+++ NetworkManager-0.8.2.new//src/backends/NetworkManagerPLD.c	2010-11-04 21:54:27.000000000 +0100
-@@ -0,0 +1,62 @@
+diff -urN NetworkManager-0.9.4.0/src/backends/Makefile.am NetworkManager-0.9.4.0.new/src/backends/Makefile.am
+--- NetworkManager-0.9.4.0/src/backends/Makefile.am	2012-02-27 16:57:16.000000000 +0100
++++ NetworkManager-0.9.4.0.new/src/backends/Makefile.am	2012-03-24 11:30:34.634018164 +0100
+@@ -64,6 +64,10 @@
+ libnmbackend_la_SOURCES += NetworkManagerExherbo.c
+ endif
+ 
++if TARGET_PLD
++libnmbackend_la_SOURCES += NetworkManagerPLD.c
++endif
++
+ libnmbackend_la_LIBADD += \
+ 	$(top_builddir)/src/logging/libnm-logging.la \
+ 	$(LIBNL_LIBS) \
+diff -urN NetworkManager-0.9.4.0/src/backends/NetworkManagerPLD.c NetworkManager-0.9.4.0.new/src/backends/NetworkManagerPLD.c
+--- NetworkManager-0.9.4.0/src/backends/NetworkManagerPLD.c	1970-01-01 01:00:00.000000000 +0100
++++ NetworkManager-0.9.4.0.new/src/backends/NetworkManagerPLD.c	2012-03-24 11:46:34.925482485 +0100
+@@ -0,0 +1,68 @@
 +/* NetworkManager -- Network link manager
 + *
 + * Patryk Zawadzki <patrys@pld-linux.org>
@@ -121,7 +185,7 @@ diff -urN NetworkManager-0.8.2/src/backends/NetworkManagerPLD.c NetworkManager-0
 + * (C) Copyright 2004 RedHat, Inc.
 + * (C) Copyright 2004 Narayan Newton
 + * (C) Copyright 2005 wrobell <wrobell@pld-linux.org>
-+ * (C) Copyright 2007 Marcin Banasiak <megabajt@pld-linux.org>
++ * (C) Copyright 2007, 2012 Marcin Banasiak <megabajt@pld-linux.org>
 + * (C) Copyright 2005-2008 Patryk Zawadzki <patrys@pld-linux.org>
 + */
 +
@@ -129,106 +193,48 @@ diff -urN NetworkManager-0.8.2/src/backends/NetworkManagerPLD.c NetworkManager-0
 +#include <config.h>
 +#endif
 +
-+#include <stdio.h>
-+#include <string.h>
-+#include <stdlib.h>
-+
 +#include "NetworkManagerGeneric.h"
-+#include "nm-system.h"
 +#include "NetworkManagerUtils.h"
 +
 +/*
-+ * nm_system_enable_loopback
++ * nm_backend_enable_loopback
 + *
 + * Bring up the loopback interface
 + *
 + */
-+void nm_system_enable_loopback (void)
++void nm_backend_enable_loopback (void)
 +{
 +	nm_generic_enable_loopback ();
 +}
 +
 +/*
-+ * nm_system_update_dns
++ * nm_backend_update_dns
 + *
 + * Invalidate the nscd host cache, if it exists, since
 + * we changed resolv.conf.
 + *
 + */
-+void nm_system_update_dns (void)
++void nm_backend_update_dns (void)
 +{
 +	if (g_file_test ("/usr/sbin/nscd", G_FILE_TEST_EXISTS | G_FILE_TEST_IS_EXECUTABLE | G_FILE_TEST_IS_REGULAR)) {
 +		nm_spawn_process ("/usr/sbin/nscd -i hosts");
 +	}
 +}
 +
-diff -urN NetworkManager-0.8.996/configure.ac NetworkManager-0.8.996.new//configure.ac
---- NetworkManager-0.8.996/configure.ac	2011-03-10 07:44:53.000000000 +0000
-+++ NetworkManager-0.8.996.new//configure.ac	2011-03-11 21:56:12.369999140 +0000
-@@ -95,7 +95,7 @@
- dnl
- AC_C_BIGENDIAN
- 
--AC_ARG_WITH(distro, AS_HELP_STRING([--with-distro=DISTRO], [Specify the Linux distribution to target: One of redhat, suse, gentoo, debian, arch, slackware, paldo, mandriva, pardus, linexa or exherbo]))
-+AC_ARG_WITH(distro, AS_HELP_STRING([--with-distro=DISTRO], [Specify the Linux distribution to target: One of redhat, suse, gentoo, debian, arch, slackware, paldo, mandriva, pardus, linexa, exherbo or pld]))
- if test "z$with_distro" = "z"; then
- 	AC_CHECK_FILE(/etc/redhat-release,with_distro="redhat")
- 	AC_CHECK_FILE(/etc/SuSE-release,with_distro="suse")
-@@ -109,6 +109,7 @@
- 	AC_CHECK_FILE(/etc/pardus-release,with_distro="pardus")
- 	AC_CHECK_FILE(/etc/linexa-release,with_distro="linexa")
- 	AC_CHECK_FILE(/etc/exherbo-release,with_distro="exherbo")
-+	AC_CHECK_FILE(/etc/pld-release,with_distro="pld")
- 	if test "z$with_distro" = "z"; then
- 		with_distro=`lsb_release -is`
- 	fi
-@@ -120,7 +121,7 @@
- 	exit 1
- else
- 	case $with_distro in
--		redhat|suse|gentoo|debian|slackware|arch|paldo|frugalware|mandriva|pardus|linexa|exherbo) ;;
-+		redhat|suse|gentoo|debian|slackware|arch|paldo|frugalware|mandriva|pardus|linexa|exherbo|pld) ;;
- 		*)
- 			echo "Your distribution (${with_distro}) is not yet supported!  (patches welcome)"
- 			exit 1
-@@ -188,6 +189,11 @@
-   AC_DEFINE(TARGET_EXHERBO, 1, [Define if you have Exherbo])
- fi
- 
-+AM_CONDITIONAL(TARGET_PLD, test x"$with_distro" = xpld)
-+if test x"$with_distro" = xpld; then
-+  AC_DEFINE(TARGET_PLD, 1, [Define if you have PLD])
-+fi
-+
- dnl
- dnl Distribution version string
- dnl
-@@ -617,6 +623,8 @@
- initscript/paldo/NetworkManager
- initscript/Mandriva/Makefile
- initscript/Mandriva/networkmanager
-+initscript/PLD/Makefile
-+initscript/PLD/NetworkManager
- initscript/linexa/Makefile
- initscript/linexa/networkmanager
- introspection/Makefile
-diff -urN NetworkManager-0.8.996/src/backends/Makefile.am NetworkManager-0.8.996.new//src/backends/Makefile.am
---- NetworkManager-0.8.996/src/backends/Makefile.am	2011-01-02 23:18:57.000000000 +0000
-+++ NetworkManager-0.8.996.new//src/backends/Makefile.am	2011-03-11 21:57:30.163333077 +0000
-@@ -61,6 +61,10 @@
- libnmbackend_la_SOURCES += NetworkManagerExherbo.c
- endif
- 
-+if TARGET_PLD
-+libnmbackend_la_SOURCES += NetworkManagerPLD.c
-+endif
-+
- libnmbackend_la_LIBADD += \
- 	$(top_builddir)/src/logging/libnm-logging.la \
- 	$(DBUS_LIBS) \
-diff -urN NetworkManager-0.8.996/src/settings/plugins/Makefile.am NetworkManager-0.8.996.new//src/settings/plugins/Makefile.am
---- NetworkManager-0.8.996/src/settings/plugins/Makefile.am	2011-03-08 16:19:01.000000000 +0000
-+++ NetworkManager-0.8.996.new//src/settings/plugins/Makefile.am	2011-03-11 21:59:26.183332964 +0000
++/*
++ * nm_backend_ipv6_use_tempaddr
++ *
++ * Get net.ipv6.conf.default.use_tempaddr from /etc/sysctl.conf or
++ * /lib/sysctl.d/sysctl.conf
++ *
++ */
++int nm_backend_ipv6_use_tempaddr (void)
++{
++	return nm_generic_ipv6_use_tempaddr ();
++}
+diff -urN NetworkManager-0.9.4.0/src/settings/plugins/Makefile.am NetworkManager-0.9.4.0.new/src/settings/plugins/Makefile.am
+--- NetworkManager-0.9.4.0/src/settings/plugins/Makefile.am	2012-02-08 17:44:53.000000000 +0100
++++ NetworkManager-0.9.4.0.new/src/settings/plugins/Makefile.am	2012-03-24 11:25:37.845626005 +0100
 @@ -4,6 +4,10 @@
  SUBDIRS+=ifcfg-rh
  endif

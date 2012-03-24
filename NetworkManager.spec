@@ -1,5 +1,6 @@
 #
 # Conditional build
+%bcond_with	systemd # rely on systemd for session tracking instead of ConsoleKit
 %bcond_with	wimax	# enable wimax support
 #
 %define		ppp_version	2.4.5
@@ -7,13 +8,13 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	0.9.2.0
-Release:	5
+Version:	0.9.4.0
+Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.9/%{name}-%{version}.tar.xz
-# Source0-md5:	d7dce01e97758253bc4ed81d7b86045f
+# Source0-md5:	66a54b51a4998c484613911b72a7e6ff
 Source1:	%{name}.conf
 Source2:	%{name}.upstart
 Source3:	%{name}.tmpfiles
@@ -33,6 +34,7 @@ BuildRequires:	gtk-doc-automake >= 1.0
 BuildRequires:	intltool >= 0.40.0
 BuildRequires:	libiw-devel >= 1:28-0.pre9.1
 BuildRequires:	libnl-devel >= 3.0
+BuildRequires:	libsoup-devel >= 2.26.0
 BuildRequires:	libtool >= 2:2.2
 BuildRequires:	libuuid-devel
 BuildRequires:	nss-devel >= 3.11
@@ -42,6 +44,7 @@ BuildRequires:	ppp-plugin-devel >= 3:%{ppp_version}
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.629
 BuildRequires:	sed >= 4.0
+%{?with_systemd:BuildRequires:	systemd-devel}
 BuildRequires:	tar >= 1:1.22
 BuildRequires:	udev-devel
 BuildRequires:	udev-glib-devel >= 147
@@ -58,8 +61,8 @@ Requires:	systemd-units >= 37-0.10
 Requires:	wpa_supplicant >= 0.7.3-4
 Suggests:	ModemManager
 Suggests:	mobile-broadband-provider-info
-Obsoletes:	dhcdbd < 3.0-1
 Obsoletes:	NetworkManager-systemd
+Obsoletes:	dhcdbd < 3.0-1
 # sr@Latn vs. sr@latin
 Conflicts:	glibc-misc < 6:2.7
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -151,6 +154,7 @@ Statyczne biblioteki Network Managera.
 	--with-iptables=/usr/sbin/iptables \
 	--with-system-ca-path=/etc/certs \
 	--with-systemdsystemunitdir=%{systemdunitdir} \
+	--with-session-tracking=%{?with_systemd:systemd}%{!?with_systemd:ck} \
 	--with-pppd-plugin-dir=%{_libdir}/pppd/%{ppp_version} \
 	--with-dist-version=%{version}-%{release} \
 	--with-docs \
@@ -252,7 +256,7 @@ exit 0
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-avahi-autoipd.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-dispatcher.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-ifcfg-rh.conf
-%config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/NetworkManager.conf
+%config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/org.freedesktop.NetworkManager.conf
 %attr(700,root,root) %dir /var/run/%{name}
 %attr(700,root,root) %dir /var/lib/%{name}
 %{_mandir}/man1/nm-online.1*
