@@ -1,6 +1,6 @@
 #
 # Conditional build
-%bcond_with	systemd # rely on systemd for session tracking instead of ConsoleKit
+%bcond_without	systemd # use systemd for session tracking instead of ConsoleKit (fallback to ConsoleKit on runtime)
 %bcond_with	wimax	# enable wimax support
 #
 %define		ppp_version	2.4.5
@@ -9,7 +9,7 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.9.4.0
-Release:	1
+Release:	2
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
@@ -20,6 +20,7 @@ Source2:	%{name}.upstart
 Source3:	%{name}.tmpfiles
 Patch0:		%{name}-pld.patch
 Patch1:		ifcfg-path.patch
+%{?with_systemd:Patch2: systemd-fallback.patch}
 URL:		http://projects.gnome.org/NetworkManager/
 BuildRequires:	autoconf >= 2.63
 BuildRequires:	automake >= 1:1.10
@@ -136,6 +137,7 @@ Statyczne biblioteki Network Managera.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%{?with_systemd:%patch2 -p1}
 
 %build
 %{__gtkdocize}
@@ -165,7 +167,7 @@ Statyczne biblioteki Network Managera.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},/usr/lib/tmpfiles.d} \
+install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},%{systemdtmpfilesdir}} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/%{name}/{VPN,dispatcher.d,system-connections}
 
 %{__make} install \
@@ -176,7 +178,7 @@ cp -p %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 install -d $RPM_BUILD_ROOT/etc/init
 cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/init/NetworkManager.conf
 
-install %{SOURCE3} $RPM_BUILD_ROOT/usr/lib/tmpfiles.d/%{name}.conf
+install %{SOURCE3} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
 
 # Cleanup
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/*.la
@@ -243,7 +245,7 @@ exit 0
 %{systemdunitdir}/NetworkManager.service
 %{systemdunitdir}/NetworkManager-wait-online.service
 %{_datadir}/dbus-1/system-services/org.freedesktop.NetworkManager.service
-/usr/lib/tmpfiles.d/%{name}.conf
+%{systemdtmpfilesdir}/%{name}.conf
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/gdb-cmd
 %{_datadir}/dbus-1/system-services/org.freedesktop.nm_dispatcher.service
