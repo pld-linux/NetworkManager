@@ -47,7 +47,7 @@ BuildRequires:	sed >= 4.0
 %{?with_systemd:BuildRequires:	systemd-devel}
 BuildRequires:	tar >= 1:1.22
 BuildRequires:	udev-devel
-BuildRequires:	udev-glib-devel >= 147
+BuildRequires:	udev-glib-devel >= 1:147
 %{?with_wimax:BuildRequires:	wimax-devel >= 1.5.1}
 BuildRequires:	xz
 Requires(post,preun):	/sbin/chkconfig
@@ -94,7 +94,7 @@ Group:		Libraries
 Requires:	dbus-glib >= 0.75
 Requires:	glib2 >= 1:2.24.0
 Requires:	nss >= 3.11
-Requires:	udev-glib >= 147
+Requires:	udev-glib >= 1:147
 Conflicts:	NetworkManager < 0.6.4-0.2
 
 %description libs
@@ -112,7 +112,7 @@ Requires:	dbus-glib-devel >= 0.75
 Requires:	glib2-devel >= 1:2.24.0
 Requires:	libuuid-devel
 Requires:	nss-devel >= 3.11
-Requires:	udev-glib-devel >= 147
+Requires:	udev-glib-devel >= 1:147
 
 %description devel
 Network Manager includes and more.
