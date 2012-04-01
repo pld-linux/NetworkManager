@@ -20,7 +20,7 @@ Source2:	%{name}.upstart
 Source3:	%{name}.tmpfiles
 Patch0:		%{name}-pld.patch
 Patch1:		ifcfg-path.patch
-%{?with_systemd:Patch2: systemd-fallback.patch}
+Patch2:		systemd-fallback.patch
 URL:		http://projects.gnome.org/NetworkManager/
 BuildRequires:	autoconf >= 2.63
 BuildRequires:	automake >= 1:1.10
