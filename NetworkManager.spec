@@ -2,14 +2,12 @@
 # Conditional build
 %bcond_without	systemd # use systemd for session tracking instead of ConsoleKit (fallback to ConsoleKit on runtime)
 %bcond_with	wimax	# enable wimax support
-#
-%define		ppp_version	2.4.5
 
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.9.4.0
-Release:	2
+Release:	3
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
@@ -41,7 +39,7 @@ BuildRequires:	libuuid-devel
 BuildRequires:	nss-devel >= 3.11
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.97
-BuildRequires:	ppp-plugin-devel >= 3:%{ppp_version}
+BuildRequires:	ppp-plugin-devel >= 3:2.4.5
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.629
 BuildRequires:	sed >= 4.0
@@ -157,7 +155,7 @@ Statyczne biblioteki Network Managera.
 	--with-system-ca-path=/etc/certs \
 	--with-systemdsystemunitdir=%{systemdunitdir} \
 	--with-session-tracking=%{?with_systemd:systemd}%{!?with_systemd:ck} \
-	--with-pppd-plugin-dir=%{_libdir}/pppd/%{ppp_version} \
+	--with-pppd-plugin-dir=%{_libdir}/pppd/plugins \
 	--with-dist-version=%{version}-%{release} \
 	--with-docs \
 	%{__enable_disable wimax} \
@@ -183,7 +181,7 @@ install %{SOURCE3} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
 # Cleanup
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/*.la
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/NetworkManager/*.{a,la}
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/pppd/%{ppp_version}/*.{a,la}
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/pppd/plugins/*.{a,la}
 
 %find_lang %{name}
 
@@ -239,7 +237,7 @@ exit 0
 %attr(755,root,root) %{_libexecdir}/nm-dhcp-client.action
 %attr(755,root,root) %{_libexecdir}/nm-dispatcher.action
 %attr(755,root,root) %{_libexecdir}/nm-crash-logger
-%attr(755,root,root) %{_libdir}/pppd/%{ppp_version}/nm-pppd-plugin.so
+%attr(755,root,root) %{_libdir}/pppd/plugins/nm-pppd-plugin.so
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
 %config(noreplace) %verify(not md5 mtime size) /etc/init/NetworkManager.conf
 %{systemdunitdir}/NetworkManager.service
