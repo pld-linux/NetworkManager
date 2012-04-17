@@ -7,7 +7,7 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.9.4.0
-Release:	3
+Release:	4
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
@@ -50,13 +50,14 @@ BuildRequires:	udev-glib-devel >= 1:147
 %{?with_wimax:BuildRequires:	wimax-devel >= 1.5.1}
 BuildRequires:	xz
 Requires(post,preun):	/sbin/chkconfig
+Requires(post,preun,postun):	systemd-units >= 38
 Requires:	%{name}-libs = %{epoch}:%{version}-%{release}
 Requires:	ConsoleKit-x11
 Requires:	dhcp-client
 Requires:	filesystem >= 3.0-37
 Requires:	polkit >= 0.97
 Requires:	rc-scripts >= 0.4.3.0
-Requires:	systemd-units >= 37-0.10
+Requires:	systemd-units >= 38
 Requires:	wpa_supplicant >= 0.7.3-4
 Suggests:	ModemManager
 Suggests:	mobile-broadband-provider-info
