@@ -19,6 +19,7 @@ Source3:	%{name}.tmpfiles
 Patch0:		%{name}-pld.patch
 Patch1:		ifcfg-path.patch
 Patch2:		systemd-fallback.patch
+Patch3:		llh340.patch
 URL:		http://projects.gnome.org/NetworkManager/
 BuildRequires:	autoconf >= 2.63
 BuildRequires:	automake >= 1:1.10
@@ -137,6 +138,7 @@ Statyczne biblioteki Network Managera.
 %patch0 -p1
 %patch1 -p1
 %{?with_systemd:%patch2 -p1}
+%patch3 -p1
 
 %build
 %{__gtkdocize}
