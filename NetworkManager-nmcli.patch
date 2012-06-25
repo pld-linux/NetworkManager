@@ -1,0 +1,64 @@
+From 8a2267ab6b37948a70c10f0af781be4822a54c6b Mon Sep 17 00:00:00 2001
+From: Dan Winship <danw@gnome.org>
+Date: Thu, 05 Apr 2012 17:30:09 +0000
+Subject: Fix a few misc issues noticed by Coverity
+
+---
+diff --git a/cli/src/settings.c b/cli/src/settings.c
+index bf42292..3e17891 100644
+--- a/cli/src/settings.c
++++ b/cli/src/settings.c
+@@ -607,10 +607,11 @@ vlan_priorities_to_string (NMSettingVlan *s_vlan, NMVlanPriorityMap map)
+ 	for (i = 0; i < nm_setting_vlan_get_num_priorities (s_vlan, map); i++) {
+ 		guint32 from, to;
+ 
+-		nm_setting_vlan_get_priority (s_vlan, map, i, &from, &to);
+-		g_string_append_printf (priorities, "%d:%d,", from, to);
++		if (nm_setting_vlan_get_priority (s_vlan, map, i, &from, &to))
++			g_string_append_printf (priorities, "%d:%d,", from, to);
+ 	}
+-	g_string_truncate (priorities, priorities->len-1);  /* chop off trailing ',' */
++	if (priorities->len)
++		g_string_truncate (priorities, priorities->len-1);  /* chop off trailing ',' */
+ 
+ 	return g_string_free (priorities, FALSE);
+ }
+diff --git a/libnm-util/nm-setting-vlan.c b/libnm-util/nm-setting-vlan.c
+index 71760dc..f87ad92 100644
+--- a/libnm-util/nm-setting-vlan.c
++++ b/libnm-util/nm-setting-vlan.c
+@@ -460,7 +460,7 @@ verify (NMSetting *setting, GSList *all_settings, GError **error)
+ 		return FALSE;
+ 	}
+ 
+-	if (priv->flags & !(NM_VLAN_FLAG_REORDER_HEADERS |
++	if (priv->flags & ~(NM_VLAN_FLAG_REORDER_HEADERS |
+ 	                    NM_VLAN_FLAG_GVRP |
+ 	                    NM_VLAN_FLAG_LOOSE_BINDING)) {
+ 		g_set_error (error,
+diff --git a/src/nm-device-vlan.c b/src/nm-device-vlan.c
+index 14be849..b9c9323 100644
+--- a/src/nm-device-vlan.c
++++ b/src/nm-device-vlan.c
+@@ -643,17 +643,17 @@ nm_device_vlan_new (const char *udi, const char *iface, NMDevice *parent)
+ 			g_object_unref (device);
+ 			return NULL;
+ 		}
+-		priv->vlan_id = vlan_id;
+ 
+ 		if (   parent_ifindex < 0
+ 		    || parent_ifindex != nm_device_get_ip_ifindex (parent)
+-		    || priv->vlan_id < 0) {
++		    || vlan_id < 0) {
+ 			nm_log_warn (LOGD_DEVICE, "(%s): VLAN parent ifindex (%d) or VLAN ID (%d) invalid.",
+ 			             iface, parent_ifindex, priv->vlan_id);
+ 			g_object_unref (device);
+ 			return NULL;
+ 		}
+ 
++		priv->vlan_id = vlan_id;
+ 		priv->parent = g_object_ref (parent);
+ 		priv->parent_state_id = g_signal_connect (priv->parent,
+ 		                                          "state-changed",
+--
+cgit v0.9.0.2-2-gbebe
