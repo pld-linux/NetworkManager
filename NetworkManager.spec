@@ -6,13 +6,13 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	0.9.4.0
-Release:	6
+Version:	0.9.6.0
+Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.9/%{name}-%{version}.tar.xz
-# Source0-md5:	66a54b51a4998c484613911b72a7e6ff
+# Source0-md5:	85f9ed7fe08533a33c5117488f81e7ac
 Source1:	%{name}.conf
 Source2:	%{name}.upstart
 Source3:	%{name}.tmpfiles
@@ -21,7 +21,6 @@ Patch1:		ifcfg-path.patch
 Patch2:		systemd-fallback.patch
 Patch3:		llh340.patch
 Patch4:		11-initialize-nm-remote-settings.patch
-Patch5:	    %{name}-nmcli.patch
 URL:		http://projects.gnome.org/NetworkManager/
 BuildRequires:	autoconf >= 2.63
 BuildRequires:	automake >= 1:1.10
@@ -142,7 +141,6 @@ Statyczne biblioteki Network Managera.
 %{?with_systemd:%patch2 -p1}
 %patch3 -p1
 %patch4 -p1
-%patch5 -p1
 
 %build
 %{__gtkdocize}
