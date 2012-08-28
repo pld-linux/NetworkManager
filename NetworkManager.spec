@@ -1,3 +1,4 @@
+# TODO: Vala binding (BR: vala >= 0.17.1.24)
 #
 # Conditional build
 %bcond_without	systemd # use systemd for session tracking instead of ConsoleKit (fallback to ConsoleKit on runtime)
@@ -25,7 +26,7 @@ URL:		http://projects.gnome.org/NetworkManager/
 BuildRequires:	autoconf >= 2.63
 BuildRequires:	automake >= 1:1.10
 BuildRequires:	dbus-devel >= 1.1.0
-BuildRequires:	dbus-glib-devel >= 0.75
+BuildRequires:	dbus-glib-devel >= 0.94
 BuildRequires:	docbook-dtd412-xml
 BuildRequires:	gettext-devel >= 0.17
 BuildRequires:	glib2-devel >= 1:2.24.0
@@ -93,7 +94,7 @@ Dokumentacja API biblioteki libnm-glib.
 Summary:	Network Manager shared libraries
 Summary(pl.UTF-8):	Biblioteki dzielone Network Managera
 Group:		Libraries
-Requires:	dbus-glib >= 0.75
+Requires:	dbus-glib >= 0.94
 Requires:	glib2 >= 1:2.24.0
 Requires:	nss >= 3.11
 Requires:	udev-glib >= 1:147
@@ -110,7 +111,7 @@ Summary:	Network Manager includes and more
 Summary(pl.UTF-8):	Pliki nagłówkowe Network Managera
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{epoch}:%{version}-%{release}
-Requires:	dbus-glib-devel >= 0.75
+Requires:	dbus-glib-devel >= 0.94
 Requires:	glib2-devel >= 1:2.24.0
 Requires:	libuuid-devel
 Requires:	nss-devel >= 3.11
