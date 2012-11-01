@@ -10,9 +10,8 @@ diff -u -Nr NetworkManager-0.9.3.995/configure.ac NetworkManager-0.9.3.995-syste
          ;;
      *)
  	AC_MSG_ERROR(--with-session-tracking must be one of [none, ck, systemd])
-diff -u -Nr NetworkManager-0.9.3.995/src/nm-session-monitor-systemd.c NetworkManager-0.9.3.995-systemd-fallback/src/nm-session-monitor-systemd.c
---- NetworkManager-0.9.3.995/src/nm-session-monitor-systemd.c	2012-02-27 16:57:16.000000000 +0100
-+++ NetworkManager-0.9.3.995-systemd-fallback/src/nm-session-monitor-systemd.c	2012-03-06 16:55:01.285264295 +0100
+--- NetworkManager-0.9.6.4/src/nm-session-monitor-systemd.c.orig	2012-09-12 22:37:01.000000000 +0200
++++ NetworkManager-0.9.6.4/src/nm-session-monitor-systemd.c	2012-11-01 08:58:24.084129513 +0100
 @@ -28,6 +28,10 @@
  #include <glib/gstdio.h>
  #include <systemd/sd-login.h>
@@ -24,7 +23,7 @@ diff -u -Nr NetworkManager-0.9.3.995/src/nm-session-monitor-systemd.c NetworkMan
  
  #include "nm-session-utils.h"
  #include "nm-session-monitor.h"
-@@ -107,10 +111,20 @@
+@@ -108,10 +112,20 @@
  	return source;
  }
  
@@ -45,7 +44,7 @@ diff -u -Nr NetworkManager-0.9.3.995/src/nm-session-monitor-systemd.c NetworkMan
  };
  
  struct _NMSessionMonitorClass {
-@@ -130,6 +144,215 @@
+@@ -131,6 +145,215 @@
  
  /* ---------------------------------------------------------------------------------------------------- */
  
@@ -261,7 +260,7 @@ diff -u -Nr NetworkManager-0.9.3.995/src/nm-session-monitor-systemd.c NetworkMan
  static gboolean
  sessions_changed (gpointer user_data)
  {
-@@ -143,9 +366,50 @@
+@@ -144,9 +367,50 @@
  static void
  nm_session_monitor_init (NMSessionMonitor *monitor)
  {
@@ -315,7 +314,7 @@ diff -u -Nr NetworkManager-0.9.3.995/src/nm-session-monitor-systemd.c NetworkMan
  }
  
  static void
-@@ -158,6 +422,12 @@
+@@ -159,6 +423,12 @@
  		g_source_unref (monitor->sd_source);
  	}
  
@@ -328,7 +327,7 @@ diff -u -Nr NetworkManager-0.9.3.995/src/nm-session-monitor-systemd.c NetworkMan
  	if (G_OBJECT_CLASS (nm_session_monitor_parent_class)->finalize != NULL)
  		G_OBJECT_CLASS (nm_session_monitor_parent_class)->finalize (object);
  }
-@@ -206,15 +476,36 @@
+@@ -207,15 +477,36 @@
                                       uid_t *out_uid,
                                       GError **error)
  {
@@ -371,7 +370,7 @@ diff -u -Nr NetworkManager-0.9.3.995/src/nm-session-monitor-systemd.c NetworkMan
  }
  
  gboolean
-@@ -222,12 +513,31 @@
+@@ -223,12 +514,31 @@
                                  const char *username,
                                  GError **error)
  {
@@ -383,7 +382,8 @@ diff -u -Nr NetworkManager-0.9.3.995/src/nm-session-monitor-systemd.c NetworkMan
 -		return FALSE;
 +		if (!nm_session_user_to_uid (username, &uid, error))
 +			return FALSE;
-+
+ 
+-	return nm_session_monitor_uid_active (monitor, uid, error);
 +		return nm_session_monitor_uid_active (monitor, uid, error);
 +	} else {
 +		Session *s;
@@ -400,25 +400,34 @@ diff -u -Nr NetworkManager-0.9.3.995/src/nm-session-monitor-systemd.c NetworkMan
 +				     username);
 +			return FALSE;
 +		}
- 
--	return nm_session_monitor_uid_active (monitor, uid, error);
++
 +		return s->active;
 +	}
  }
  
  gboolean
-@@ -236,10 +546,31 @@
-                                     const char **out_user,
-                                     GError **error)
+@@ -239,16 +549,37 @@
  {
+ 	int ret;
+ 
 -	if (!nm_session_uid_to_user (uid, out_user, error))
 -		return FALSE;
 +	if (monitor->sd_source != NULL) {
 +		if (!nm_session_uid_to_user (uid, out_user, error))
 +			return FALSE;
  
--	return sd_uid_get_sessions (uid, FALSE, NULL) > 0;
-+		return sd_uid_get_sessions (uid, FALSE, NULL) > 0;
+-	ret = sd_uid_get_sessions (uid, FALSE, NULL) > 0;
+-	if (ret < 0) {
+-		nm_log_warn (LOGD_CORE, "Failed to get systemd sessions for uid %d: %d",
+-		             uid, ret);
+-		return FALSE;
++		ret = sd_uid_get_sessions (uid, FALSE, NULL) > 0;
++		if (ret < 0) {
++			nm_log_warn (LOGD_CORE, "Failed to get systemd sessions for uid %d: %d",
++				     uid, ret);
++			return FALSE;
++		}
++		return ret > 0 ? TRUE : FALSE;
 +	} else {
 +		Session *s;
 +
@@ -438,18 +447,29 @@ diff -u -Nr NetworkManager-0.9.3.995/src/nm-session-monitor-systemd.c NetworkMan
 +		if (out_user)
 +			*out_user = s->user;
 +		return TRUE;
-+	}
+ 	}
+-	return ret > 0 ? TRUE : FALSE;
  }
  
  gboolean
-@@ -247,5 +578,24 @@
-                                uid_t uid,
-                                GError **error)
+@@ -258,11 +589,30 @@
  {
--	return sd_uid_get_sessions (uid, TRUE, NULL) > 0;
-+	if (monitor->sd_source != NULL)
-+		return sd_uid_get_sessions (uid, TRUE, NULL) > 0;
-+	else {
+ 	int ret;
+ 
+-	ret = sd_uid_get_sessions (uid, TRUE, NULL) > 0;
+-	if (ret < 0) {
+-		nm_log_warn (LOGD_CORE, "Failed to get active systemd sessions for uid %d: %d",
+-		             uid, ret);
+-		return FALSE;
++	if (monitor->sd_source != NULL) {
++		ret = sd_uid_get_sessions (uid, TRUE, NULL) > 0;
++		if (ret < 0) {
++			nm_log_warn (LOGD_CORE, "Failed to get active systemd sessions for uid %d: %d",
++				     uid, ret);
++			return FALSE;
++		}
++		return ret > 0 ? TRUE : FALSE;
++	} else {
 +		Session *s;
 +
 +		if (!ensure_database (monitor, error))
@@ -466,5 +486,6 @@ diff -u -Nr NetworkManager-0.9.3.995/src/nm-session-monitor-systemd.c NetworkMan
 +		}
 +
 +		return s->active;
-+	}
+ 	}
+-	return ret > 0 ? TRUE : FALSE;
  }

@@ -1,19 +1,19 @@
-# TODO: Vala binding (BR: vala >= 0.17.1.24)
 #
 # Conditional build
 %bcond_without	systemd # use systemd for session tracking instead of ConsoleKit (fallback to ConsoleKit on runtime)
+%bcond_without	vala	# Vala API
 %bcond_with	wimax	# enable wimax support
-
+#
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	0.9.6.0
+Version:	0.9.6.4
 Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.9/%{name}-%{version}.tar.xz
-# Source0-md5:	85f9ed7fe08533a33c5117488f81e7ac
+# Source0-md5:	54ca5200edeb5155086ced43d00b0cad
 Source1:	%{name}.conf
 Source2:	%{name}.upstart
 Source3:	%{name}.tmpfiles
@@ -50,6 +50,7 @@ BuildRequires:	sed >= 4.0
 BuildRequires:	tar >= 1:1.22
 BuildRequires:	udev-devel
 BuildRequires:	udev-glib-devel >= 1:147
+%{?with_vala:BuildRequires:	vala >= 2:0.17.1.24}
 %{?with_wimax:BuildRequires:	wimax-devel >= 1.5.1}
 BuildRequires:	xz
 Requires(post,preun):	/sbin/chkconfig
@@ -135,6 +136,19 @@ Network Manager static libraries.
 %description static -l pl.UTF-8
 Statyczne biblioteki Network Managera.
 
+%package -n vala-NetworkManager
+Summary:	Vala API for NetworkManager libraries
+Summary(pl.UTF-8):	API języka Vala do bibliotek NetworkManagera
+Group:		Development/Libraries
+Requires:	%{name}-devel = %{epoch}:%{version}-%{release}
+Requires:	vala >= 2:0.17.1.24
+
+%description -n vala-NetworkManager
+Vala API for NetworkManager libraries.
+
+%description -n vala-NetworkManager -l pl.UTF-8
+API języka Vala do bibliotek NetworkManagera.
+
 %prep
 %setup -q
 %patch0 -p1
@@ -165,7 +179,8 @@ Statyczne biblioteki Network Managera.
 	--with-dist-version=%{version}-%{release} \
 	--with-docs \
 	%{__enable_disable wimax} \
-	--enable-static
+	--enable-static \
+	%{!?with_vala:--disable-vala}
 
 %{__make}
 
@@ -309,3 +324,12 @@ exit 0
 %{_libdir}/libnm-util.a
 %{_libdir}/libnm-glib.a
 %{_libdir}/libnm-glib-vpn.a
+
+%if %{with vala}
+%files -n vala-NetworkManager
+%defattr(644,root,root,755)
+%{_datadir}/vala/vapi/libnm-glib.deps
+%{_datadir}/vala/vapi/libnm-glib.vapi
+%{_datadir}/vala/vapi/libnm-util.deps
+%{_datadir}/vala/vapi/libnm-util.vapi
+%endif
