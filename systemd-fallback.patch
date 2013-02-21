@@ -1,15 +1,14 @@
-diff -u -Nr NetworkManager-0.9.3.995/configure.ac NetworkManager-0.9.3.995-systemd-fallback/configure.ac
---- NetworkManager-0.9.3.995/configure.ac	2012-03-02 01:05:21.000000000 +0100
-+++ NetworkManager-0.9.3.995-systemd-fallback/configure.ac	2012-03-06 16:55:58.294793902 +0100
-@@ -344,7 +344,7 @@
- case $with_session_tracking in
-     ck|none) ;;
-     systemd)
--        PKG_CHECK_MODULES(SYSTEMD, [libsystemd-login])
-+        PKG_CHECK_MODULES(SYSTEMD, [libsystemd-daemon libsystemd-login])
-         ;;
-     *)
- 	AC_MSG_ERROR(--with-session-tracking must be one of [none, ck, systemd])
+--- NetworkManager-0.9.8.0/configure.ac~	2013-02-21 14:04:19.582661393 +0100
++++ NetworkManager-0.9.8.0/configure.ac	2013-02-21 14:23:32.286416661 +0100
+@@ -283,7 +283,7 @@
+ AM_CONDITIONAL(SESSION_TRACKING_CK, test "$with_session_tracking" = "consolekit")
+ AM_CONDITIONAL(SESSION_TRACKING_SYSTEMD, test "xwith_session_tracking" = "systemd")
+ if test "$with_session_tracking" = "systemd"; then
+-	PKG_CHECK_MODULES(SYSTEMD_LOGIN, [libsystemd-login])
++	PKG_CHECK_MODULES(SYSTEMD_LOGIN, [libsystemd-daemon libsystemd-login])
+ 	AC_SUBST(SYSTEMD_LOGIN_CFLAGS)
+ 	AC_SUBST(SYSTEMD_LOGIN_LIBS)
+ fi
 --- NetworkManager-0.9.6.4/src/nm-session-monitor-systemd.c.orig	2012-09-12 22:37:01.000000000 +0200
 +++ NetworkManager-0.9.6.4/src/nm-session-monitor-systemd.c	2012-11-01 08:58:24.084129513 +0100
 @@ -28,6 +28,10 @@
@@ -489,3 +488,109 @@ diff -u -Nr NetworkManager-0.9.3.995/configure.ac NetworkManager-0.9.3.995-syste
  	}
 -	return ret > 0 ? TRUE : FALSE;
  }
+
+--- NetworkManager-0.9.8.0/src/nm-sleep-monitor-systemd.c.new	2013-02-21 15:01:09.404910471 +0100
++++ NetworkManager-0.9.8.0/src/nm-sleep-monitor-systemd.c	2013-02-21 15:10:58.429453872 +0100
+@@ -25,6 +25,7 @@
+ #include <dbus/dbus-glib.h>
+ #include <gio/gio.h>
+ #include <gio/gunixfdlist.h>
++#include <systemd/sd-daemon.h>
+ 
+ #include "nm-logging.h"
+ #include "nm-dbus-manager.h"
+@@ -35,6 +36,8 @@
+ #define SD_PATH              "/org/freedesktop/login1"
+ #define SD_INTERFACE         "org.freedesktop.login1.Manager"
+ 
++#define UPOWER_DBUS_SERVICE "org.freedesktop.UPower"
++
+ /* Do we have GDBus (glib >= 2.26) and GUnixFDList (glib >= 2.30) support ? */
+ #if GLIB_CHECK_VERSION(2,30,0)
+ #define IS_GDBUS_UNIXFD_AVAILABLE 1
+@@ -50,6 +53,8 @@ struct _NMSleepMonitor {
+ 	DBusGProxy *sd_proxy;
+ #endif
+ 	gint inhibit_fd;
++	
++	DBusGProxy *upower_proxy;
+ };
+ 
+ struct _NMSleepMonitorClass {
+@@ -71,6 +76,20 @@ G_DEFINE_TYPE (NMSleepMonitor, nm_sleep_
+ 
+ /********************************************************************/
+ 
++static void
++upower_sleeping_cb (DBusGProxy *proxy, gpointer user_data)
++{
++        nm_log_dbg (LOGD_SUSPEND, "Received UPower sleeping signal");
++        g_signal_emit (user_data, signals[SLEEPING], 0);
++}
++
++static void
++upower_resuming_cb (DBusGProxy *proxy, gpointer user_data)
++{
++        nm_log_dbg (LOGD_SUSPEND, "Received UPower resuming signal");
++        g_signal_emit (user_data, signals[RESUMING], 0);
++}
++
+ static gboolean
+ drop_inhibitor (NMSleepMonitor *self)
+ {
+@@ -304,9 +323,34 @@ sleep_setup (NMSleepMonitor *self)
+ static void
+ nm_sleep_monitor_init (NMSleepMonitor *self)
+ {
+-	self->inhibit_fd = -1;
+-	sleep_setup (self);
+-	take_inhibitor (self);
++	if (sd_booted () > 0) {
++		self->inhibit_fd = -1;
++		sleep_setup (self);
++		take_inhibitor (self);
++	} else {
++		NMDBusManager *dbus_mgr;
++		DBusGConnection *bus;
++
++		dbus_mgr = nm_dbus_manager_get ();
++        bus = nm_dbus_manager_get_connection (dbus_mgr);
++        self->upower_proxy = dbus_g_proxy_new_for_name (bus,
++                                                        UPOWER_DBUS_SERVICE,
++                                                        "/org/freedesktop/UPower",
++                                                        "org.freedesktop.UPower");
++        if (self->upower_proxy) {
++			dbus_g_proxy_add_signal (self->upower_proxy, "Sleeping", G_TYPE_INVALID);
++			dbus_g_proxy_connect_signal (self->upower_proxy, "Sleeping",
++										 G_CALLBACK (upower_sleeping_cb),
++										 self, NULL);
++
++			dbus_g_proxy_add_signal (self->upower_proxy, "Resuming", G_TYPE_INVALID);
++			dbus_g_proxy_connect_signal (self->upower_proxy, "Resuming",
++										 G_CALLBACK (upower_resuming_cb),
++										 self, NULL);
++        } else
++				nm_log_warn (LOGD_SUSPEND, "could not initialize UPower D-Bus proxy");
++        g_object_unref (dbus_mgr);
++	}
+ }
+ 
+ static void
+@@ -314,9 +358,14 @@ finalize (GObject *object)
+ {
+ 	NMSleepMonitor *self = NM_SLEEP_MONITOR (object);
+ 
+-	drop_inhibitor (self);
+-	if (self->sd_proxy)
+-		g_object_unref (self->sd_proxy);
++	if (sd_booted () > 0) {
++		drop_inhibitor (self);
++		if (self->sd_proxy)
++			g_object_unref (self->sd_proxy);
++	} else {
++		if (self->upower_proxy)
++			g_object_unref (self->upower_proxy);
++	}
+ 
+ 	if (G_OBJECT_CLASS (nm_sleep_monitor_parent_class)->finalize != NULL)
+ 		G_OBJECT_CLASS (nm_sleep_monitor_parent_class)->finalize (object);

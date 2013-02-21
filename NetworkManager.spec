@@ -7,21 +7,21 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	0.9.6.4
-Release:	3
+Version:	0.9.8.0
+Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.9/%{name}-%{version}.tar.xz
-# Source0-md5:	54ca5200edeb5155086ced43d00b0cad
+# Source0-md5:	38d28f6bd9220d85dfff47210706195c
 Source1:	%{name}.conf
 Source2:	%{name}.upstart
 Source3:	%{name}.tmpfiles
-Patch0:		%{name}-pld.patch
-Patch1:		ifcfg-path.patch
-Patch2:		systemd-fallback.patch
-Patch3:		llh340.patch
-Patch4:		11-initialize-nm-remote-settings.patch
+Source4:	%{name}.init
+Patch0:		ifcfg-path.patch
+Patch1:		systemd-fallback.patch
+Patch2:		llh340.patch
+Patch3:		11-initialize-nm-remote-settings.patch
 URL:		http://projects.gnome.org/NetworkManager/
 BuildRequires:	autoconf >= 2.63
 BuildRequires:	automake >= 1:1.10
@@ -35,7 +35,7 @@ BuildRequires:	gtk-doc >= 1.0
 BuildRequires:	gtk-doc-automake >= 1.0
 BuildRequires:	intltool >= 0.40.0
 BuildRequires:	libiw-devel >= 1:28-0.pre9.1
-BuildRequires:	libnl-devel >= 3.0
+BuildRequires:	libnl-devel >= 3.2.7
 BuildRequires:	libsoup-devel >= 2.26.0
 BuildRequires:	libtool >= 2:2.2
 BuildRequires:	libuuid-devel
@@ -46,17 +46,21 @@ BuildRequires:	ppp-plugin-devel >= 3:2.4.5
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.629
 BuildRequires:	sed >= 4.0
-%{?with_systemd:BuildRequires:	systemd-devel}
+%{?with_systemd:BuildRequires:	systemd-devel >= 183}
 BuildRequires:	tar >= 1:1.22
 BuildRequires:	udev-devel
-BuildRequires:	udev-glib-devel >= 1:147
+BuildRequires:	udev-glib-devel >= 1:165
 %{?with_vala:BuildRequires:	vala >= 2:0.17.1.24}
 %{?with_wimax:BuildRequires:	wimax-devel >= 1.5.1}
 BuildRequires:	xz
 Requires(post,preun):	/sbin/chkconfig
 Requires(post,preun,postun):	systemd-units >= 38
 Requires:	%{name}-libs = %{epoch}:%{version}-%{release}
+%if %{with systemd}
+Suggests:	ConsoleKit-x11
+%else
 Requires:	ConsoleKit-x11
+%endif
 Requires:	dhcp-client
 Requires:	filesystem >= 3.0-37
 Requires:	polkit >= 0.97
@@ -98,7 +102,7 @@ Group:		Libraries
 Requires:	dbus-glib >= 0.94
 Requires:	glib2 >= 1:2.24.0
 Requires:	nss >= 3.11
-Requires:	udev-glib >= 1:147
+Requires:	udev-glib >= 1:165
 Conflicts:	NetworkManager < 0.6.4-0.2
 
 %description libs
@@ -116,7 +120,7 @@ Requires:	dbus-glib-devel >= 0.94
 Requires:	glib2-devel >= 1:2.24.0
 Requires:	libuuid-devel
 Requires:	nss-devel >= 3.11
-Requires:	udev-glib-devel >= 1:147
+Requires:	udev-glib-devel >= 1:165
 
 %description devel
 Network Manager includes and more.
@@ -152,10 +156,9 @@ API języka Vala do bibliotek NetworkManagera.
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p1
-%{?with_systemd:%patch2 -p1}
+%{?with_systemd:%patch1 -p1}
+%patch2 -p1
 %patch3 -p1
-%patch4 -p1
 
 %build
 %{__gtkdocize}
@@ -168,13 +171,14 @@ API języka Vala do bibliotek NetworkManagera.
 %configure \
 	--disable-silent-rules \
 	--with-html-dir=%{_gtkdocdir} \
-	--with-distro=pld \
+	--enable-ifcfg-rh \
 	--enable-more-warnings=yes \
 	--with-dhclient=/sbin/dhclient \
 	--with-iptables=/usr/sbin/iptables \
 	--with-system-ca-path=/etc/certs \
 	--with-systemdsystemunitdir=%{systemdunitdir} \
 	--with-session-tracking=%{?with_systemd:systemd}%{!?with_systemd:ck} \
+	--with-suspend-resume=%{?with_systemd:systemd}%{!?with_systemd:upower} \
 	--with-pppd-plugin-dir=%{_libdir}/pppd/plugins \
 	--with-dist-version=%{version}-%{release} \
 	--with-docs \
@@ -191,6 +195,8 @@ install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},%{systemdtmpfilesdi
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
+
+install -p %{SOURCE4} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 
 cp -p %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 
@@ -257,7 +263,6 @@ exit 0
 %attr(755,root,root) %{_libexecdir}/nm-avahi-autoipd.action
 %attr(755,root,root) %{_libexecdir}/nm-dhcp-client.action
 %attr(755,root,root) %{_libexecdir}/nm-dispatcher.action
-%attr(755,root,root) %{_libexecdir}/nm-crash-logger
 %attr(755,root,root) %{_libdir}/pppd/plugins/nm-pppd-plugin.so
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
 %config(noreplace) %verify(not md5 mtime size) /etc/init/NetworkManager.conf
@@ -265,8 +270,6 @@ exit 0
 %{systemdunitdir}/NetworkManager-wait-online.service
 %{_datadir}/dbus-1/system-services/org.freedesktop.NetworkManager.service
 %{systemdtmpfilesdir}/%{name}.conf
-%dir %{_datadir}/%{name}
-%{_datadir}/%{name}/gdb-cmd
 %{_datadir}/dbus-1/system-services/org.freedesktop.nm_dispatcher.service
 %{_datadir}/polkit-1/actions/org.freedesktop.NetworkManager.policy
 /lib/udev/rules.d/77-nm-olpc-mesh.rules
@@ -283,6 +286,7 @@ exit 0
 %{_mandir}/man1/nm-online.1*
 %{_mandir}/man1/nm-tool.1*
 %{_mandir}/man1/nmcli.1*
+%{_mandir}/man5/nm-settings.5*
 %{_mandir}/man5/nm-system-settings.conf.5*
 %{_mandir}/man5/NetworkManager.conf.5*
 %{_mandir}/man8/NetworkManager.8*
