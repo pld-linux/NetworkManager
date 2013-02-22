@@ -24,7 +24,7 @@ Patch2:		llh340.patch
 Patch3:		11-initialize-nm-remote-settings.patch
 URL:		http://projects.gnome.org/NetworkManager/
 BuildRequires:	autoconf >= 2.63
-BuildRequires:	automake >= 1:1.10
+BuildRequires:	automake >= 1:1.11
 BuildRequires:	dbus-devel >= 1.1.0
 BuildRequires:	dbus-glib-devel >= 0.94
 BuildRequires:	docbook-dtd412-xml
@@ -63,7 +63,9 @@ Requires:	ConsoleKit-x11
 %endif
 Requires:	dhcp-client
 Requires:	filesystem >= 3.0-37
+Requires:	libnl >= 3.2.7
 Requires:	polkit >= 0.97
+Requires:	libsoup >= 2.26.0
 Requires:	rc-scripts >= 0.4.3.0
 Requires:	systemd-units >= 38
 Requires:	wpa_supplicant >= 0.7.3-4
@@ -152,6 +154,19 @@ Vala API for NetworkManager libraries.
 
 %description -n vala-NetworkManager -l pl.UTF-8
 API języka Vala do bibliotek NetworkManagera.
+
+%package -n bash-completion-NetworkManager
+Summary:	Bash completion for NetworkManager command (nmcli)
+Summary(pl.UTF-8):	Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli)
+Group:		Applications/Shells
+Requires:	%{name} = %{epoch}:%{version}-%{release}
+Requires:	bash-completion >= 2.0
+
+%description -n bash-completion-NetworkManager
+Bash completion for NetworkManager command (nmcli).
+
+%description -n bash-completion-NetworkManager -l pl.UTF-8
+Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 
 %prep
 %setup -q
@@ -337,3 +352,7 @@ exit 0
 %{_datadir}/vala/vapi/libnm-util.deps
 %{_datadir}/vala/vapi/libnm-util.vapi
 %endif
+
+%files -n bash-completion-NetworkManager
+%defattr(644,root,root,755)
+%{_datadir}/bash-completion/completions/nmcli
