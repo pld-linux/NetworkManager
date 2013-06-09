@@ -7,13 +7,13 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	0.9.8.0
+Version:	0.9.8.2
 Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.9/%{name}-%{version}.tar.xz
-# Source0-md5:	38d28f6bd9220d85dfff47210706195c
+# Source0-md5:	7ac4ee1652e77ba064a5e18dc7af7e25
 Source1:	%{name}.conf
 Source2:	%{name}.upstart
 Source3:	%{name}.tmpfiles
@@ -21,7 +21,6 @@ Source4:	%{name}.init
 Patch0:		ifcfg-path.patch
 Patch1:		systemd-fallback.patch
 Patch2:		llh340.patch
-Patch3:		11-initialize-nm-remote-settings.patch
 URL:		http://projects.gnome.org/NetworkManager/
 BuildRequires:	autoconf >= 2.63
 BuildRequires:	automake >= 1:1.11
@@ -173,7 +172,6 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 %patch0 -p1
 %{?with_systemd:%patch1 -p1}
 %patch2 -p1
-%patch3 -p1
 
 %build
 %{__gtkdocize}
@@ -282,6 +280,7 @@ exit 0
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
 %config(noreplace) %verify(not md5 mtime size) /etc/init/NetworkManager.conf
 %{systemdunitdir}/NetworkManager.service
+%{systemdunitdir}/NetworkManager-dispatcher.service
 %{systemdunitdir}/NetworkManager-wait-online.service
 %{_datadir}/dbus-1/system-services/org.freedesktop.NetworkManager.service
 %{systemdtmpfilesdir}/%{name}.conf
