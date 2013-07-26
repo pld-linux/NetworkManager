@@ -8,7 +8,7 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.9.8.2
-Release:	1
+Release:	2
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
@@ -22,6 +22,7 @@ Patch0:		ifcfg-path.patch
 Patch1:		systemd-fallback.patch
 Patch2:		llh340.patch
 URL:		http://projects.gnome.org/NetworkManager/
+BuildRequires:	ModemManager-devel >= 1.0.0
 BuildRequires:	autoconf >= 2.63
 BuildRequires:	automake >= 1:1.11
 BuildRequires:	dbus-devel >= 1.1.0
@@ -68,7 +69,7 @@ Requires:	libsoup >= 2.26.0
 Requires:	rc-scripts >= 0.4.3.0
 Requires:	systemd-units >= 38
 Requires:	wpa_supplicant >= 0.7.3-4
-Suggests:	ModemManager
+Suggests:	ModemManager >= 1.0.0
 Suggests:	mobile-broadband-provider-info
 Obsoletes:	NetworkManager-systemd
 Obsoletes:	dhcdbd < 3.0-1
