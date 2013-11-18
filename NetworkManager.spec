@@ -8,7 +8,7 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.9.8.8
-Release:	1
+Release:	2
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
@@ -71,6 +71,7 @@ Requires:	systemd-units >= 38
 Requires:	wpa_supplicant >= 0.7.3-4
 Suggests:	ModemManager >= 1.0.0
 Suggests:	mobile-broadband-provider-info
+Suggests:	resolvconf
 Obsoletes:	NetworkManager-systemd
 Obsoletes:	dhcdbd < 3.0-1
 # sr@Latn vs. sr@latin
@@ -194,6 +195,7 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 	--with-session-tracking=%{?with_systemd:systemd}%{!?with_systemd:ck} \
 	--with-suspend-resume=%{?with_systemd:systemd}%{!?with_systemd:upower} \
 	--with-pppd-plugin-dir=%{_libdir}/pppd/plugins \
+	--with-resolvconf=/sbin/resolvconf \
 	--with-dist-version=%{version}-%{release} \
 	--with-docs \
 	%{__enable_disable wimax} \
