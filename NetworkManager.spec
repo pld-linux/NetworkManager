@@ -8,7 +8,7 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.9.8.8
-Release:	2
+Release:	3
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
@@ -42,7 +42,7 @@ BuildRequires:	libuuid-devel
 BuildRequires:	nss-devel >= 3.11
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.97
-BuildRequires:	ppp-plugin-devel >= 3:2.4.5
+BuildRequires:	ppp-plugin-devel >= 3:2.4.6
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.629
 BuildRequires:	sed >= 4.0
