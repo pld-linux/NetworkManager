@@ -8,7 +8,7 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	0.9.8.10
-Release:	1
+Release:	2
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
@@ -64,8 +64,8 @@ Requires:	ConsoleKit-x11
 Requires:	dhcp-client
 Requires:	filesystem >= 3.0-37
 Requires:	libnl >= 3.2.7
-Requires:	polkit >= 0.97
 Requires:	libsoup >= 2.26.0
+Requires:	polkit >= 0.97
 Requires:	rc-scripts >= 0.4.3.0
 Requires:	systemd-units >= 38
 Requires:	wpa_supplicant >= 0.7.3-4
@@ -222,7 +222,7 @@ cp -p %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 install -d $RPM_BUILD_ROOT/etc/init
 cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/init/NetworkManager.conf
 
-install %{SOURCE3} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
+cp -p %{SOURCE3} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
 
 # Cleanup
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/*.la
@@ -234,6 +234,9 @@ install %{SOURCE3} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
 # examples
 install -d $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 cp -a examples/* $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
+%{__make} clean \
+	top_builddir=$(pwd) \
+	-C $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 find $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version} -name 'Makefile*' | xargs rm
 
 %clean
