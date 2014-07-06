@@ -7,38 +7,41 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	0.9.8.10
-Release:	2
+Version:	0.9.10.0
+Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.9/%{name}-%{version}.tar.xz
-# Source0-md5:	aad2558887e25417c52eb2deaade2f85
+# Source0-md5:	21b9051dbbd6434df4624a90ca9d71b6
 Source1:	%{name}.conf
 Source2:	%{name}.upstart
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
 Patch0:		ifcfg-path.patch
 Patch1:		systemd-fallback.patch
-Patch2:		llh340.patch
 URL:		http://projects.gnome.org/NetworkManager/
 BuildRequires:	ModemManager-devel >= 1.0.0
 BuildRequires:	autoconf >= 2.63
 BuildRequires:	automake >= 1:1.11
 BuildRequires:	dbus-devel >= 1.1.0
-BuildRequires:	dbus-glib-devel >= 0.94
+BuildRequires:	dbus-glib-devel >= 0.100
 BuildRequires:	docbook-dtd412-xml
 BuildRequires:	gettext-devel >= 0.17
-BuildRequires:	glib2-devel >= 1:2.24.0
+BuildRequires:	glib2-devel >= 1:2.32
 BuildRequires:	gobject-introspection-devel >= 0.10.0
 BuildRequires:	gtk-doc >= 1.0
 BuildRequires:	gtk-doc-automake >= 1.0
 BuildRequires:	intltool >= 0.40.0
 BuildRequires:	libiw-devel >= 1:28-0.pre9.1
-BuildRequires:	libnl-devel >= 3.2.7
+BuildRequires:	libndp-devel
+BuildRequires:	libnl-devel >= 3.2.8
+BuildRequires:	libselinux-devel
 BuildRequires:	libsoup-devel >= 2.26.0
+BuildRequires:	libteam-devel >= 1.9
 BuildRequires:	libtool >= 2:2.2
 BuildRequires:	libuuid-devel
+BuildRequires:	newt-devel >= 0.52.15
 BuildRequires:	nss-devel >= 3.11
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.97
@@ -63,8 +66,9 @@ Requires:	ConsoleKit-x11
 %endif
 Requires:	dhcp-client
 Requires:	filesystem >= 3.0-37
-Requires:	libnl >= 3.2.7
+Requires:	libnl >= 3.2.8
 Requires:	libsoup >= 2.26.0
+Requires:	libteam >= 1.9
 Requires:	polkit >= 0.97
 Requires:	rc-scripts >= 0.4.3.0
 Requires:	systemd-units >= 38
@@ -102,8 +106,8 @@ Dokumentacja API biblioteki libnm-glib.
 Summary:	Network Manager shared libraries
 Summary(pl.UTF-8):	Biblioteki dzielone Network Managera
 Group:		Libraries
-Requires:	dbus-glib >= 0.94
-Requires:	glib2 >= 1:2.24.0
+Requires:	dbus-glib >= 0.100
+Requires:	glib2 >= 1:2.32
 Requires:	nss >= 3.11
 Requires:	udev-glib >= 1:165
 Conflicts:	NetworkManager < 0.6.4-0.2
@@ -119,8 +123,8 @@ Summary:	Network Manager includes and more
 Summary(pl.UTF-8):	Pliki nagłówkowe Network Managera
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{epoch}:%{version}-%{release}
-Requires:	dbus-glib-devel >= 0.94
-Requires:	glib2-devel >= 1:2.24.0
+Requires:	dbus-glib-devel >= 0.100
+Requires:	glib2-devel >= 1:2.32
 Requires:	libuuid-devel
 Requires:	nss-devel >= 3.11
 Requires:	udev-glib-devel >= 1:165
@@ -176,7 +180,6 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 %setup -q
 %patch0 -p1
 %{?with_systemd:%patch1 -p1}
-%patch2 -p1
 
 %build
 %{__gtkdocize}
@@ -192,12 +195,15 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 	--enable-ifcfg-rh \
 	--enable-more-warnings=yes \
 	--with-dhclient=/sbin/dhclient \
+	--with-dhcpcd=/sbin/dhcpcd \
 	--with-iptables=/usr/sbin/iptables \
 	--with-system-ca-path=/etc/certs \
 	--with-systemdsystemunitdir=%{systemdunitdir} \
 	--with-session-tracking=%{?with_systemd:systemd}%{!?with_systemd:ck} \
 	--with-suspend-resume=%{?with_systemd:systemd}%{!?with_systemd:upower} \
+	--with-pppd=/usr/sbin/pppd \
 	--with-pppd-plugin-dir=%{_libdir}/pppd/plugins \
+	--with-pppoe=/usr/sbin/pppoe \
 	--with-resolvconf=/sbin/resolvconf \
 	--with-dist-version=%{version}-%{release} \
 	--with-docs \
@@ -277,20 +283,31 @@ exit 0
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS README TODO
 %attr(755,root,root) %{_bindir}/nm-online
-%attr(755,root,root) %{_bindir}/nm-tool
 %attr(755,root,root) %{_bindir}/nmcli
+%attr(755,root,root) %{_bindir}/nmtui
+%attr(755,root,root) %{_bindir}/nmtui-connect
+%attr(755,root,root) %{_bindir}/nmtui-edit
+%attr(755,root,root) %{_bindir}/nmtui-hostname
 %attr(755,root,root) %{_sbindir}/NetworkManager
 %dir %{_libdir}/NetworkManager
+%attr(755,root,root) %{_libdir}/NetworkManager/libnm-device-plugin-adsl.so
+%attr(755,root,root) %{_libdir}/NetworkManager/libnm-device-plugin-bluetooth.so
+%attr(755,root,root) %{_libdir}/NetworkManager/libnm-device-plugin-wifi.so
+%attr(755,root,root) %{_libdir}/NetworkManager/libnm-device-plugin-wwan.so
 %attr(755,root,root) %{_libdir}/NetworkManager/libnm-settings-plugin-ifcfg-rh.so
+%attr(755,root,root) %{_libdir}/NetworkManager/libnm-wwan.so
 %attr(755,root,root) %{_libexecdir}/nm-avahi-autoipd.action
-%attr(755,root,root) %{_libexecdir}/nm-dhcp-client.action
-%attr(755,root,root) %{_libexecdir}/nm-dispatcher.action
+%attr(755,root,root) %{_libexecdir}/nm-dhcp-helper
+%attr(755,root,root) %{_libexecdir}/nm-dispatcher
 %attr(755,root,root) %{_libdir}/pppd/plugins/nm-pppd-plugin.so
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
 %config(noreplace) %verify(not md5 mtime size) /etc/init/NetworkManager.conf
 %{systemdunitdir}/NetworkManager.service
 %{systemdunitdir}/NetworkManager-dispatcher.service
 %{systemdunitdir}/NetworkManager-wait-online.service
+# XXX: dir here or add to systemd-units?
+%dir %{systemdunitdir}/network-online.target.wants
+%{systemdunitdir}/network-online.target.wants/NetworkManager-wait-online.service
 %{_datadir}/dbus-1/system-services/org.freedesktop.NetworkManager.service
 %{systemdtmpfilesdir}/%{name}.conf
 %{_datadir}/dbus-1/system-services/org.freedesktop.nm_dispatcher.service
@@ -299,7 +316,6 @@ exit 0
 %dir %{_sysconfdir}/%{name}/VPN
 %dir %{_sysconfdir}/%{name}/system-connections
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/%{name}.conf
-%config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-dhcp-client.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-avahi-autoipd.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-dispatcher.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-ifcfg-rh.conf
@@ -307,11 +323,11 @@ exit 0
 %attr(700,root,root) %dir /var/run/%{name}
 %attr(700,root,root) %dir /var/lib/%{name}
 %{_mandir}/man1/nm-online.1*
-%{_mandir}/man1/nm-tool.1*
 %{_mandir}/man1/nmcli.1*
+%{_mandir}/man5/NetworkManager.conf.5*
 %{_mandir}/man5/nm-settings.5*
 %{_mandir}/man5/nm-system-settings.conf.5*
-%{_mandir}/man5/NetworkManager.conf.5*
+%{_mandir}/man5/nmcli-examples.5*
 %{_mandir}/man8/NetworkManager.8*
 %{_examplesdir}/%{name}-%{version}
 

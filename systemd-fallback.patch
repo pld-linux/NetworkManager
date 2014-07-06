@@ -9,8 +9,8 @@
  	AC_SUBST(SYSTEMD_LOGIN_CFLAGS)
  	AC_SUBST(SYSTEMD_LOGIN_LIBS)
  fi
---- NetworkManager-0.9.6.4/src/nm-session-monitor-systemd.c.orig	2012-09-12 22:37:01.000000000 +0200
-+++ NetworkManager-0.9.6.4/src/nm-session-monitor-systemd.c	2012-11-01 08:58:24.084129513 +0100
+--- NetworkManager-0.9.10.0/src/nm-session-monitor-systemd.c.orig	2014-07-04 02:44:13.000000000 +0200
++++ NetworkManager-0.9.10.0/src/nm-session-monitor-systemd.c	2014-07-05 09:46:03.260229549 +0200
 @@ -28,6 +28,10 @@
  #include <glib/gstdio.h>
  #include <systemd/sd-login.h>
@@ -22,7 +22,7 @@
  
  #include "nm-session-utils.h"
  #include "nm-session-monitor.h"
-@@ -108,10 +112,20 @@
+@@ -108,10 +112,20 @@ sd_source_new (void)
  	return source;
  }
  
@@ -43,7 +43,7 @@
  };
  
  struct _NMSessionMonitorClass {
-@@ -131,6 +145,215 @@
+@@ -131,6 +145,215 @@ G_DEFINE_TYPE (NMSessionMonitor, nm_sess
  
  /* ---------------------------------------------------------------------------------------------------- */
  
@@ -259,7 +259,7 @@
  static gboolean
  sessions_changed (gpointer user_data)
  {
-@@ -144,9 +367,50 @@
+@@ -144,9 +367,50 @@ sessions_changed (gpointer user_data)
  static void
  nm_session_monitor_init (NMSessionMonitor *monitor)
  {
@@ -313,7 +313,7 @@
  }
  
  static void
-@@ -159,6 +423,12 @@
+@@ -159,6 +423,12 @@ nm_session_monitor_finalize (GObject *ob
  		g_source_unref (monitor->sd_source);
  	}
  
@@ -326,7 +326,7 @@
  	if (G_OBJECT_CLASS (nm_session_monitor_parent_class)->finalize != NULL)
  		G_OBJECT_CLASS (nm_session_monitor_parent_class)->finalize (object);
  }
-@@ -207,15 +477,36 @@
+@@ -204,15 +474,36 @@ nm_session_monitor_user_has_session (NMS
                                       uid_t *out_uid,
                                       GError **error)
  {
@@ -369,7 +369,7 @@
  }
  
  gboolean
-@@ -223,12 +514,31 @@
+@@ -220,12 +511,31 @@ nm_session_monitor_user_active (NMSessio
                                  const char *username,
                                  GError **error)
  {
@@ -405,28 +405,33 @@
  }
  
  gboolean
-@@ -239,16 +549,37 @@
+@@ -234,19 +544,40 @@ nm_session_monitor_uid_has_session (NMSe
+                                     const char **out_user,
+                                     GError **error)
  {
- 	int ret;
+-	int num_sessions;
++	if (monitor->sd_source != NULL) {
++		int num_sessions;
  
 -	if (!nm_session_uid_to_user (uid, out_user, error))
 -		return FALSE;
-+	if (monitor->sd_source != NULL) {
 +		if (!nm_session_uid_to_user (uid, out_user, error))
 +			return FALSE;
  
--	ret = sd_uid_get_sessions (uid, FALSE, NULL) > 0;
--	if (ret < 0) {
+-	/* Get all sessions (including inactive ones) for the user */
+-	num_sessions = sd_uid_get_sessions (uid, 0, NULL);
+-	if (num_sessions < 0) {
 -		nm_log_warn (LOGD_CORE, "Failed to get systemd sessions for uid %d: %d",
--		             uid, ret);
+-		             uid, num_sessions);
 -		return FALSE;
-+		ret = sd_uid_get_sessions (uid, FALSE, NULL) > 0;
-+		if (ret < 0) {
++		/* Get all sessions (including inactive ones) for the user */
++		num_sessions = sd_uid_get_sessions (uid, 0, NULL);
++		if (num_sessions < 0) {
 +			nm_log_warn (LOGD_CORE, "Failed to get systemd sessions for uid %d: %d",
-+				     uid, ret);
++				     uid, num_sessions);
 +			return FALSE;
 +		}
-+		return ret > 0 ? TRUE : FALSE;
++		return num_sessions > 0;
 +	} else {
 +		Session *s;
 +
@@ -447,27 +452,32 @@
 +			*out_user = s->user;
 +		return TRUE;
  	}
--	return ret > 0 ? TRUE : FALSE;
+-	return num_sessions > 0;
  }
  
  gboolean
-@@ -258,11 +589,30 @@
+@@ -254,14 +585,33 @@ nm_session_monitor_uid_active (NMSession
+                                uid_t uid,
+                                GError **error)
  {
- 	int ret;
- 
--	ret = sd_uid_get_sessions (uid, TRUE, NULL) > 0;
--	if (ret < 0) {
--		nm_log_warn (LOGD_CORE, "Failed to get active systemd sessions for uid %d: %d",
--		             uid, ret);
--		return FALSE;
+-	int num_sessions;
 +	if (monitor->sd_source != NULL) {
-+		ret = sd_uid_get_sessions (uid, TRUE, NULL) > 0;
-+		if (ret < 0) {
++		int num_sessions;
+ 
+-	/* Get active sessions for the user */
+-	num_sessions = sd_uid_get_sessions (uid, 1, NULL);
+-	if (num_sessions < 0) {
+-		nm_log_warn (LOGD_CORE, "Failed to get active systemd sessions for uid %d: %d",
+-		             uid, num_sessions);
+-		return FALSE;
++		/* Get active sessions for the user */
++		num_sessions = sd_uid_get_sessions (uid, 1, NULL);
++		if (num_sessions < 0) {
 +			nm_log_warn (LOGD_CORE, "Failed to get active systemd sessions for uid %d: %d",
-+				     uid, ret);
++				     uid, num_sessions);
 +			return FALSE;
 +		}
-+		return ret > 0 ? TRUE : FALSE;
++		return num_sessions > 0;
 +	} else {
 +		Session *s;
 +
@@ -486,38 +496,35 @@
 +
 +		return s->active;
  	}
--	return ret > 0 ? TRUE : FALSE;
+-	return num_sessions > 0;
  }
-
---- NetworkManager-0.9.8.0/src/nm-sleep-monitor-systemd.c.new	2013-02-21 15:01:09.404910471 +0100
-+++ NetworkManager-0.9.8.0/src/nm-sleep-monitor-systemd.c	2013-02-21 15:10:58.429453872 +0100
-@@ -25,6 +25,7 @@
- #include <dbus/dbus-glib.h>
+--- NetworkManager-0.9.10.0/src/nm-sleep-monitor-systemd.c.orig	2014-07-04 02:44:13.000000000 +0200
++++ NetworkManager-0.9.10.0/src/nm-sleep-monitor-systemd.c	2014-07-05 09:49:32.623554089 +0200
+@@ -26,6 +26,7 @@
+ #include <glib/gi18n.h>
  #include <gio/gio.h>
  #include <gio/gunixfdlist.h>
 +#include <systemd/sd-daemon.h>
  
  #include "nm-logging.h"
  #include "nm-dbus-manager.h"
-@@ -35,6 +36,8 @@
+@@ -36,12 +37,15 @@
  #define SD_PATH              "/org/freedesktop/login1"
  #define SD_INTERFACE         "org.freedesktop.login1.Manager"
  
 +#define UPOWER_DBUS_SERVICE "org.freedesktop.UPower"
-+
- /* Do we have GDBus (glib >= 2.26) and GUnixFDList (glib >= 2.30) support ? */
- #if GLIB_CHECK_VERSION(2,30,0)
- #define IS_GDBUS_UNIXFD_AVAILABLE 1
-@@ -50,6 +53,8 @@ struct _NMSleepMonitor {
- 	DBusGProxy *sd_proxy;
- #endif
+ 
+ struct _NMSleepMonitor {
+ 	GObject parent_instance;
+ 
+ 	GDBusProxy *sd_proxy;
  	gint inhibit_fd;
 +	
 +	DBusGProxy *upower_proxy;
  };
  
  struct _NMSleepMonitorClass {
-@@ -71,6 +76,20 @@ G_DEFINE_TYPE (NMSleepMonitor, nm_sleep_
+@@ -63,6 +67,20 @@ G_DEFINE_TYPE (NMSleepMonitor, nm_sleep_
  
  /********************************************************************/
  
@@ -538,7 +545,7 @@
  static gboolean
  drop_inhibitor (NMSleepMonitor *self)
  {
-@@ -304,9 +323,34 @@ sleep_setup (NMSleepMonitor *self)
+@@ -164,9 +182,34 @@ sleep_setup (NMSleepMonitor *self)
  static void
  nm_sleep_monitor_init (NMSleepMonitor *self)
  {
@@ -576,7 +583,7 @@
  }
  
  static void
-@@ -314,9 +358,14 @@ finalize (GObject *object)
+@@ -174,9 +217,14 @@ finalize (GObject *object)
  {
  	NMSleepMonitor *self = NM_SLEEP_MONITOR (object);
  
