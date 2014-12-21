@@ -7,13 +7,13 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	0.9.10.0
+Version:	1.0.0
 Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/0.9/%{name}-%{version}.tar.xz
-# Source0-md5:	21b9051dbbd6434df4624a90ca9d71b6
+Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.0/%{name}-%{version}.tar.xz
+# Source0-md5:	71cae8707a90fa92e28cafbc9262b548
 Source1:	%{name}.conf
 Source2:	%{name}.upstart
 Source3:	%{name}.tmpfiles
@@ -24,6 +24,7 @@ URL:		http://projects.gnome.org/NetworkManager/
 BuildRequires:	ModemManager-devel >= 1.0.0
 BuildRequires:	autoconf >= 2.63
 BuildRequires:	automake >= 1:1.11
+BuildRequires:	bluez-libs-devel >= 5.0
 BuildRequires:	dbus-devel >= 1.1.0
 BuildRequires:	dbus-glib-devel >= 0.100
 BuildRequires:	docbook-dtd412-xml
@@ -49,7 +50,7 @@ BuildRequires:	ppp-plugin-devel >= 3:2.4.6
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.629
 BuildRequires:	sed >= 4.0
-%{?with_systemd:BuildRequires:	systemd-devel >= 183}
+%{?with_systemd:BuildRequires:	systemd-devel >= 200}
 BuildRequires:	tar >= 1:1.22
 BuildRequires:	udev-devel
 BuildRequires:	udev-glib-devel >= 1:165
@@ -294,11 +295,14 @@ exit 0
 %attr(755,root,root) %{_libdir}/NetworkManager/libnm-device-plugin-bluetooth.so
 %attr(755,root,root) %{_libdir}/NetworkManager/libnm-device-plugin-wifi.so
 %attr(755,root,root) %{_libdir}/NetworkManager/libnm-device-plugin-wwan.so
+%attr(755,root,root) %{_libdir}/NetworkManager/libnm-device-plugin-team.so
+%attr(755,root,root) %{_libdir}/NetworkManager/libnm-settings-plugin-ibft.so
 %attr(755,root,root) %{_libdir}/NetworkManager/libnm-settings-plugin-ifcfg-rh.so
 %attr(755,root,root) %{_libdir}/NetworkManager/libnm-wwan.so
 %attr(755,root,root) %{_libexecdir}/nm-avahi-autoipd.action
 %attr(755,root,root) %{_libexecdir}/nm-dhcp-helper
 %attr(755,root,root) %{_libexecdir}/nm-dispatcher
+%attr(755,root,root) %{_libexecdir}/nm-iface-helper
 %attr(755,root,root) %{_libdir}/pppd/plugins/nm-pppd-plugin.so
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
 %config(noreplace) %verify(not md5 mtime size) /etc/init/NetworkManager.conf
@@ -324,7 +328,13 @@ exit 0
 %attr(700,root,root) %dir /var/lib/%{name}
 %{_mandir}/man1/nm-online.1*
 %{_mandir}/man1/nmcli.1*
+%{_mandir}/man1/nmtui-connect.1*
+%{_mandir}/man1/nmtui-edit.1*
+%{_mandir}/man1/nmtui-hostname.1*
+%{_mandir}/man1/nmtui.1*
 %{_mandir}/man5/NetworkManager.conf.5*
+%{_mandir}/man5/nm-settings-ifcfg-rh.5*
+%{_mandir}/man5/nm-settings-keyfile.5*
 %{_mandir}/man5/nm-settings.5*
 %{_mandir}/man5/nm-system-settings.conf.5*
 %{_mandir}/man5/nmcli-examples.5*
@@ -334,36 +344,45 @@ exit 0
 %files apidocs
 %defattr(644,root,root,755)
 %{_gtkdocdir}/NetworkManager
+%{_gtkdocdir}/libnm
 %{_gtkdocdir}/libnm-glib
 %{_gtkdocdir}/libnm-util
 
 %files libs
 %defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/libnm.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libnm.so.0
 %attr(755,root,root) %{_libdir}/libnm-util.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libnm-util.so.2
 %attr(755,root,root) %{_libdir}/libnm-glib.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libnm-glib.so.4
 %attr(755,root,root) %{_libdir}/libnm-glib-vpn.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libnm-glib-vpn.so.1
+%{_libdir}/girepository-1.0/NM-1.0.typelib
 %{_libdir}/girepository-1.0/NMClient-1.0.typelib
 %{_libdir}/girepository-1.0/NetworkManager-1.0.typelib
 
 %files devel
 %defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/libnm.so
 %attr(755,root,root) %{_libdir}/libnm-util.so
 %attr(755,root,root) %{_libdir}/libnm-glib.so
 %attr(755,root,root) %{_libdir}/libnm-glib-vpn.so
 %{_includedir}/NetworkManager
+%{_includedir}/libnm
 %{_includedir}/libnm-glib
 %{_pkgconfigdir}/NetworkManager.pc
+%{_pkgconfigdir}/libnm.pc
 %{_pkgconfigdir}/libnm-util.pc
 %{_pkgconfigdir}/libnm-glib-vpn.pc
 %{_pkgconfigdir}/libnm-glib.pc
+%{_datadir}/gir-1.0/NM-1.0.gir
 %{_datadir}/gir-1.0/NMClient-1.0.gir
 %{_datadir}/gir-1.0/NetworkManager-1.0.gir
 
 %files static
 %defattr(644,root,root,755)
+%{_libdir}/libnm.a
 %{_libdir}/libnm-util.a
 %{_libdir}/libnm-glib.a
 %{_libdir}/libnm-glib-vpn.a

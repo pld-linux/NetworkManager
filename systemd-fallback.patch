@@ -1,33 +1,35 @@
---- NetworkManager-0.9.8.0/configure.ac~	2013-02-21 14:04:19.582661393 +0100
-+++ NetworkManager-0.9.8.0/configure.ac	2013-02-21 14:23:32.286416661 +0100
-@@ -283,7 +283,7 @@
- AM_CONDITIONAL(SESSION_TRACKING_CK, test "$with_session_tracking" = "consolekit")
- AM_CONDITIONAL(SESSION_TRACKING_SYSTEMD, test "xwith_session_tracking" = "systemd")
+--- NetworkManager-1.0.0/configure.ac.orig	2014-12-19 23:27:36.133692361 +0100
++++ NetworkManager-1.0.0/configure.ac	2014-12-19 23:29:57.159595024 +0100
+@@ -348,7 +348,7 @@ AM_CONDITIONAL(SESSION_TRACKING_CK, test
+ AM_CONDITIONAL(SESSION_TRACKING_SYSTEMD, test "$with_session_tracking" = "systemd")
  if test "$with_session_tracking" = "systemd"; then
--	PKG_CHECK_MODULES(SYSTEMD_LOGIN, [libsystemd-login])
-+	PKG_CHECK_MODULES(SYSTEMD_LOGIN, [libsystemd-daemon libsystemd-login])
+ 	PKG_CHECK_MODULES(SYSTEMD_LOGIN, [libsystemd],,
+-	                  [PKG_CHECK_MODULES(SYSTEMD_LOGIN, [libsystemd-login])])
++	                  [PKG_CHECK_MODULES(SYSTEMD_LOGIN, [libsystemd-daemon libsystemd-login])])
  	AC_SUBST(SYSTEMD_LOGIN_CFLAGS)
  	AC_SUBST(SYSTEMD_LOGIN_LIBS)
  fi
---- NetworkManager-0.9.10.0/src/nm-session-monitor-systemd.c.orig	2014-07-04 02:44:13.000000000 +0200
-+++ NetworkManager-0.9.10.0/src/nm-session-monitor-systemd.c	2014-07-05 09:46:03.260229549 +0200
-@@ -28,6 +28,10 @@
+--- NetworkManager-1.0.0/src/nm-session-monitor-systemd.c.orig	2014-12-11 22:28:51.000000000 +0100
++++ NetworkManager-1.0.0/src/nm-session-monitor-systemd.c	2014-12-21 11:30:09.859311469 +0100
+@@ -29,10 +29,14 @@
  #include <glib/gstdio.h>
  #include <systemd/sd-login.h>
  #include <stdlib.h>
 +#include <systemd/sd-daemon.h>
 +#include <sys/stat.h>
 +#include <gio/gio.h>
-+#include "nm-logging.h"
  
  #include "nm-session-utils.h"
  #include "nm-session-monitor.h"
-@@ -108,10 +112,20 @@ sd_source_new (void)
+ #include "nm-logging.h"
++#include "nm-errors.h"
+ 
+ /********************************************************************/
+ 
+@@ -109,10 +113,18 @@ sd_source_new (void)
  	return source;
  }
  
-+/********************************************************************/
-+
 +#define CKDB_PATH "/var/run/ConsoleKit/database"
 +
  struct _NMSessionMonitor {
@@ -43,7 +45,7 @@
  };
  
  struct _NMSessionMonitorClass {
-@@ -131,6 +145,215 @@ G_DEFINE_TYPE (NMSessionMonitor, nm_sess
+@@ -132,6 +144,215 @@ G_DEFINE_TYPE (NMSessionMonitor, nm_sess
  
  /* ---------------------------------------------------------------------------------------------------- */
  
@@ -70,8 +72,8 @@
 +
 +	if (!error) {
 +		g_set_error (error,
-+			         NM_SESSION_MONITOR_ERROR,
-+			         NM_SESSION_MONITOR_ERROR_MALFORMED_DATABASE,
++			         NM_MANAGER_ERROR,
++			         NM_MANAGER_ERROR_FAILED,
 +			         "ConsoleKit database " CKDB_PATH " group '%s' had no '%s' key",
 +			         group, key);
 +	}
@@ -159,8 +161,8 @@
 +	errno = 0;
 +	if (stat (CKDB_PATH, &statbuf) != 0) {
 +		g_set_error (error,
-+		             NM_SESSION_MONITOR_ERROR,
-+		             errno == ENOENT ? NM_SESSION_MONITOR_ERROR_NO_DATABASE : NM_SESSION_MONITOR_ERROR_IO_ERROR,
++		             NM_MANAGER_ERROR,
++		             NM_MANAGER_ERROR_FAILED,
 +		             "Error statting file " CKDB_PATH ": %s",
 +		             strerror (errno));
 +		goto error;
@@ -174,8 +176,8 @@
 +	groups = g_key_file_get_groups (self->database, &len);
 +	if (!groups) {
 +		g_set_error_literal (error,
-+		                     NM_SESSION_MONITOR_ERROR,
-+		                     NM_SESSION_MONITOR_ERROR_IO_ERROR,
++		                     NM_MANAGER_ERROR,
++		                     NM_MANAGER_ERROR_FAILED,
 +		                     "Could not load groups from " CKDB_PATH "");
 +		goto error;
 +	}
@@ -222,8 +224,8 @@
 +		errno = 0;
 +		if (stat (CKDB_PATH, &statbuf) != 0) {
 +			g_set_error (error,
-+			             NM_SESSION_MONITOR_ERROR,
-+			             errno == ENOENT ? NM_SESSION_MONITOR_ERROR_NO_DATABASE : NM_SESSION_MONITOR_ERROR_IO_ERROR,
++			             NM_MANAGER_ERROR,
++			             NM_MANAGER_ERROR_FAILED,
 +			             "Error statting file " CKDB_PATH " to check timestamp: %s",
 +			             strerror (errno));
 +			goto out;
@@ -259,7 +261,7 @@
  static gboolean
  sessions_changed (gpointer user_data)
  {
-@@ -144,9 +367,50 @@ sessions_changed (gpointer user_data)
+@@ -145,9 +366,46 @@ sessions_changed (gpointer user_data)
  static void
  nm_session_monitor_init (NMSessionMonitor *monitor)
  {
@@ -274,29 +276,25 @@
 +		monitor->database_monitor = NULL;
 +		monitor->database = NULL;
 +	} else {
-+		monitor->sd_source = NULL;
-+
 +		GError *error = NULL;
 +		GFile *file;
 +
++		monitor->sd_source = NULL;
++
 +		/* Sessions-by-user is responsible for destroying the Session objects */
 +		monitor->sessions_by_user = g_hash_table_new_full (g_str_hash, g_str_equal,
-+								NULL, (GDestroyNotify) session_free);
++			                                            NULL, (GDestroyNotify) session_free);
 +		monitor->sessions_by_uid = g_hash_table_new (g_direct_hash, g_direct_equal);
 +
 +
-+		error = NULL;
 +		if (!ensure_database (monitor, &error)) {
-+			/* Ignore the first error if the CK database isn't found yet */
-+			if (g_error_matches (error,
-+					     NM_SESSION_MONITOR_ERROR,
-+					     NM_SESSION_MONITOR_ERROR_NO_DATABASE) == FALSE) {
-+				nm_log_err (LOGD_CORE, "Error loading " CKDB_PATH ": %s", error->message);
-+			}
++			nm_log_dbg (LOGD_CORE, "Error loading " CKDB_PATH ": %s", error->message);
++
++			/* Ignore the first error, the CK database might not exist yet */
 +			g_error_free (error);
++			error = NULL;
 +		}
 +
-+		error = NULL;
 +		file = g_file_new_for_path (CKDB_PATH);
 +		monitor->database_monitor = g_file_monitor_file (file, G_FILE_MONITOR_NONE, NULL, &error);
 +		g_object_unref (file);
@@ -305,33 +303,43 @@
 +			g_error_free (error);
 +		} else {
 +			g_signal_connect (monitor->database_monitor,
-+					  "changed",
-+					  G_CALLBACK (on_file_monitor_changed),
-+					  monitor);
++				              "changed",
++				              G_CALLBACK (on_file_monitor_changed),
++				              monitor);
 +		}
 +	}
  }
  
  static void
-@@ -159,6 +423,12 @@ nm_session_monitor_finalize (GObject *ob
- 		g_source_unref (monitor->sd_source);
+@@ -155,11 +413,19 @@ nm_session_monitor_finalize (GObject *ob
+ {
+ 	NMSessionMonitor *monitor = NM_SESSION_MONITOR (object);
+ 
+-	if (monitor->sd_source != NULL) {
+-		g_source_destroy (monitor->sd_source);
+-		g_source_unref (monitor->sd_source);
++	if (sd_booted () > 0) {
++		if (monitor->sd_source != NULL) {
++			g_source_destroy (monitor->sd_source);
++			g_source_unref (monitor->sd_source);
++		}
++	} else {
++		if (monitor->database_monitor != NULL)
++			g_object_unref (monitor->database_monitor);
++
++		free_database (monitor);
  	}
  
-+	if (monitor->database_monitor != NULL)
-+		g_object_unref (monitor->database_monitor);
-+
-+	if (monitor->database != NULL)
-+		free_database (monitor);
 +
  	if (G_OBJECT_CLASS (nm_session_monitor_parent_class)->finalize != NULL)
  		G_OBJECT_CLASS (nm_session_monitor_parent_class)->finalize (object);
  }
-@@ -204,15 +474,36 @@ nm_session_monitor_user_has_session (NMS
+@@ -205,15 +471,36 @@ nm_session_monitor_user_has_session (NMS
                                       uid_t *out_uid,
                                       GError **error)
  {
 -	uid_t uid;
-+	if (monitor->sd_source != NULL) {
++	if (sd_booted () > 0) {
 +		uid_t uid;
  
 -	if (!nm_session_user_to_uid (username, &uid, error))
@@ -355,10 +363,10 @@
 +		s = g_hash_table_lookup (monitor->sessions_by_user, (gpointer) username);
 +		if (!s) {
 +			g_set_error (error,
-+				     NM_SESSION_MONITOR_ERROR,
-+				     NM_SESSION_MONITOR_ERROR_UNKNOWN_USER,
-+				     "No session found for user '%s'",
-+				     username);
++				         NM_MANAGER_ERROR,
++				         NM_MANAGER_ERROR_FAILED,
++				         "No session found for user '%s'",
++				         username);
 +			return FALSE;
 +		}
 +
@@ -369,20 +377,19 @@
  }
  
  gboolean
-@@ -220,12 +511,31 @@ nm_session_monitor_user_active (NMSessio
+@@ -221,12 +508,31 @@ nm_session_monitor_user_active (NMSessio
                                  const char *username,
                                  GError **error)
  {
 -	uid_t uid;
-+	if (monitor->sd_source != NULL) {
++	if (sd_booted () > 0) {
 +		uid_t uid;
  
 -	if (!nm_session_user_to_uid (username, &uid, error))
 -		return FALSE;
 +		if (!nm_session_user_to_uid (username, &uid, error))
 +			return FALSE;
- 
--	return nm_session_monitor_uid_active (monitor, uid, error);
++
 +		return nm_session_monitor_uid_active (monitor, uid, error);
 +	} else {
 +		Session *s;
@@ -393,24 +400,25 @@
 +		s = g_hash_table_lookup (monitor->sessions_by_user, (gpointer) username);
 +		if (!s) {
 +			g_set_error (error,
-+				     NM_SESSION_MONITOR_ERROR,
-+				     NM_SESSION_MONITOR_ERROR_UNKNOWN_USER,
-+				     "No session found for user '%s'",
-+				     username);
++				         NM_MANAGER_ERROR,
++				         NM_MANAGER_ERROR_FAILED,
++				         "No session found for user '%s'",
++				         username);
 +			return FALSE;
 +		}
-+
+ 
+-	return nm_session_monitor_uid_active (monitor, uid, error);
 +		return s->active;
 +	}
  }
  
  gboolean
-@@ -234,19 +544,40 @@ nm_session_monitor_uid_has_session (NMSe
+@@ -235,19 +541,40 @@ nm_session_monitor_uid_has_session (NMSe
                                      const char **out_user,
                                      GError **error)
  {
 -	int num_sessions;
-+	if (monitor->sd_source != NULL) {
++	if (sd_booted () > 0) {
 +		int num_sessions;
  
 -	if (!nm_session_uid_to_user (uid, out_user, error))
@@ -428,7 +436,7 @@
 +		num_sessions = sd_uid_get_sessions (uid, 0, NULL);
 +		if (num_sessions < 0) {
 +			nm_log_warn (LOGD_CORE, "Failed to get systemd sessions for uid %d: %d",
-+				     uid, num_sessions);
++				         uid, num_sessions);
 +			return FALSE;
 +		}
 +		return num_sessions > 0;
@@ -441,10 +449,10 @@
 +		s = g_hash_table_lookup (monitor->sessions_by_uid, GUINT_TO_POINTER (uid));
 +		if (!s) {
 +			g_set_error (error,
-+				     NM_SESSION_MONITOR_ERROR,
-+				     NM_SESSION_MONITOR_ERROR_UNKNOWN_USER,
-+				     "No session found for uid %d",
-+				     uid);
++				         NM_MANAGER_ERROR,
++				         NM_MANAGER_ERROR_FAILED,
++				         "No session found for uid %d",
++				         uid);
 +			return FALSE;
 +		}
 +
@@ -456,12 +464,12 @@
  }
  
  gboolean
-@@ -254,14 +585,33 @@ nm_session_monitor_uid_active (NMSession
+@@ -255,14 +582,33 @@ nm_session_monitor_uid_active (NMSession
                                 uid_t uid,
                                 GError **error)
  {
 -	int num_sessions;
-+	if (monitor->sd_source != NULL) {
++	if (sd_booted () > 0) {
 +		int num_sessions;
  
 -	/* Get active sessions for the user */
@@ -474,7 +482,7 @@
 +		num_sessions = sd_uid_get_sessions (uid, 1, NULL);
 +		if (num_sessions < 0) {
 +			nm_log_warn (LOGD_CORE, "Failed to get active systemd sessions for uid %d: %d",
-+				     uid, num_sessions);
++				         uid, num_sessions);
 +			return FALSE;
 +		}
 +		return num_sessions > 0;
@@ -487,10 +495,10 @@
 +		s = g_hash_table_lookup (monitor->sessions_by_uid, GUINT_TO_POINTER (uid));
 +		if (!s) {
 +			g_set_error (error,
-+				     NM_SESSION_MONITOR_ERROR,
-+				     NM_SESSION_MONITOR_ERROR_UNKNOWN_USER,
-+				     "No session found for uid '%d'",
-+				     uid);
++				         NM_MANAGER_ERROR,
++				         NM_MANAGER_ERROR_FAILED,
++				         "No session found for uid '%d'",
++				         uid);
 +			return FALSE;
 +		}
 +
@@ -498,17 +506,9 @@
  	}
 -	return num_sessions > 0;
  }
---- NetworkManager-0.9.10.0/src/nm-sleep-monitor-systemd.c.orig	2014-07-04 02:44:13.000000000 +0200
-+++ NetworkManager-0.9.10.0/src/nm-sleep-monitor-systemd.c	2014-07-05 09:49:32.623554089 +0200
-@@ -26,6 +26,7 @@
- #include <glib/gi18n.h>
- #include <gio/gio.h>
- #include <gio/gunixfdlist.h>
-+#include <systemd/sd-daemon.h>
- 
- #include "nm-logging.h"
- #include "nm-dbus-manager.h"
-@@ -36,12 +37,15 @@
+--- NetworkManager-1.0.0/src/nm-sleep-monitor-systemd.c.orig	2014-12-19 23:32:53.481973137 +0100
++++ NetworkManager-1.0.0/src/nm-sleep-monitor-systemd.c	2014-12-20 00:12:04.572281013 +0100
+@@ -35,12 +35,15 @@
  #define SD_PATH              "/org/freedesktop/login1"
  #define SD_INTERFACE         "org.freedesktop.login1.Manager"
  
@@ -519,12 +519,12 @@
  
  	GDBusProxy *sd_proxy;
  	gint inhibit_fd;
-+	
++
 +	DBusGProxy *upower_proxy;
  };
  
  struct _NMSleepMonitorClass {
-@@ -63,6 +67,20 @@ G_DEFINE_TYPE (NMSleepMonitor, nm_sleep_
+@@ -62,6 +65,20 @@ G_DEFINE_TYPE (NMSleepMonitor, nm_sleep_
  
  /********************************************************************/
  
@@ -545,45 +545,53 @@
  static gboolean
  drop_inhibitor (NMSleepMonitor *self)
  {
-@@ -164,9 +182,34 @@ sleep_setup (NMSleepMonitor *self)
+@@ -193,14 +210,37 @@ on_proxy_acquired (GObject *object,
  static void
  nm_sleep_monitor_init (NMSleepMonitor *self)
  {
 -	self->inhibit_fd = -1;
--	sleep_setup (self);
--	take_inhibitor (self);
+-	g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,
+-	                          G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START |
+-	                          G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
+-	                          NULL,
+-	                          SD_NAME, SD_PATH, SD_INTERFACE,
+-	                          NULL,
+-	                          (GAsyncReadyCallback) on_proxy_acquired, self);
 +	if (sd_booted () > 0) {
 +		self->inhibit_fd = -1;
-+		sleep_setup (self);
-+		take_inhibitor (self);
++		g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,
++			                      G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START |
++			                      G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
++			                      NULL,
++			                      SD_NAME, SD_PATH, SD_INTERFACE,
++			                      NULL,
++			                      (GAsyncReadyCallback) on_proxy_acquired, self);
 +	} else {
-+		NMDBusManager *dbus_mgr;
 +		DBusGConnection *bus;
 +
-+		dbus_mgr = nm_dbus_manager_get ();
-+        bus = nm_dbus_manager_get_connection (dbus_mgr);
++        bus = nm_dbus_manager_get_connection (nm_dbus_manager_get ());
 +        self->upower_proxy = dbus_g_proxy_new_for_name (bus,
 +                                                        UPOWER_DBUS_SERVICE,
 +                                                        "/org/freedesktop/UPower",
 +                                                        "org.freedesktop.UPower");
 +        if (self->upower_proxy) {
-+			dbus_g_proxy_add_signal (self->upower_proxy, "Sleeping", G_TYPE_INVALID);
-+			dbus_g_proxy_connect_signal (self->upower_proxy, "Sleeping",
-+										 G_CALLBACK (upower_sleeping_cb),
-+										 self, NULL);
++            dbus_g_proxy_add_signal (self->upower_proxy, "Sleeping", G_TYPE_INVALID);
++            dbus_g_proxy_connect_signal (self->upower_proxy, "Sleeping",
++                                         G_CALLBACK (upower_sleeping_cb),
++                                         self, NULL);
 +
-+			dbus_g_proxy_add_signal (self->upower_proxy, "Resuming", G_TYPE_INVALID);
-+			dbus_g_proxy_connect_signal (self->upower_proxy, "Resuming",
-+										 G_CALLBACK (upower_resuming_cb),
-+										 self, NULL);
-+        } else
-+				nm_log_warn (LOGD_SUSPEND, "could not initialize UPower D-Bus proxy");
-+        g_object_unref (dbus_mgr);
++            dbus_g_proxy_add_signal (self->upower_proxy, "Resuming", G_TYPE_INVALID);
++            dbus_g_proxy_connect_signal (self->upower_proxy, "Resuming",
++                                         G_CALLBACK (upower_resuming_cb),
++                                         self, NULL);
++        } else {
++    		nm_log_warn (LOGD_SUSPEND, "could not initialize UPower D-Bus proxy");
++		}
 +	}
  }
  
  static void
-@@ -174,9 +217,14 @@ finalize (GObject *object)
+@@ -208,9 +248,14 @@ finalize (GObject *object)
  {
  	NMSleepMonitor *self = NM_SLEEP_MONITOR (object);
  
@@ -596,7 +604,7 @@
 +			g_object_unref (self->sd_proxy);
 +	} else {
 +		if (self->upower_proxy)
-+			g_object_unref (self->upower_proxy);
++    		g_object_unref (self->upower_proxy);
 +	}
  
  	if (G_OBJECT_CLASS (nm_sleep_monitor_parent_class)->finalize != NULL)
