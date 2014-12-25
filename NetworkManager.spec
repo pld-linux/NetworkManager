@@ -30,6 +30,7 @@ BuildRequires:	dbus-glib-devel >= 0.100
 BuildRequires:	docbook-dtd412-xml
 BuildRequires:	gettext-devel >= 0.17
 BuildRequires:	glib2-devel >= 1:2.32
+BuildRequires:	gnome-common
 BuildRequires:	gobject-introspection-devel >= 0.10.0
 BuildRequires:	gtk-doc >= 1.0
 BuildRequires:	gtk-doc-automake >= 1.0
@@ -50,7 +51,7 @@ BuildRequires:	ppp-plugin-devel >= 3:2.4.6
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.629
 BuildRequires:	sed >= 4.0
-%{?with_systemd:BuildRequires:	systemd-devel >= 200}
+%{?with_systemd:BuildRequires:	systemd-devel >= 1:200}
 BuildRequires:	tar >= 1:1.22
 BuildRequires:	udev-devel
 BuildRequires:	udev-glib-devel >= 1:165
