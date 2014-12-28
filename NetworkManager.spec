@@ -28,7 +28,7 @@ BuildRequires:	bluez-libs-devel >= 5.0
 BuildRequires:	dbus-devel >= 1.1.0
 BuildRequires:	dbus-glib-devel >= 0.100
 BuildRequires:	docbook-dtd412-xml
-BuildRequires:	gettext-devel >= 0.17
+BuildRequires:	gettext-tools >= 0.17
 BuildRequires:	glib2-devel >= 1:2.32
 BuildRequires:	gnome-common
 BuildRequires:	gobject-introspection-devel >= 0.10.0
