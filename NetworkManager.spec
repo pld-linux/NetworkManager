@@ -7,13 +7,13 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.0.0
-Release:	2
+Version:	1.0.2
+Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.0/%{name}-%{version}.tar.xz
-# Source0-md5:	71cae8707a90fa92e28cafbc9262b548
+# Source0-md5:	5a4899f89edcbdd1ac46d2d947e8d6eb
 Source1:	%{name}.conf
 Source2:	%{name}.upstart
 Source3:	%{name}.tmpfiles
