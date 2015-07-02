@@ -3,12 +3,12 @@
 %bcond_without	systemd # use systemd for session tracking instead of ConsoleKit (fallback to ConsoleKit on runtime)
 %bcond_without	vala	# Vala API
 %bcond_with	wimax	# enable wimax support
-#
+
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	1.0.2
-Release:	1
+Release:	2
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
@@ -49,7 +49,7 @@ BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.97
 BuildRequires:	ppp-plugin-devel >= 3:2.4.6
 BuildRequires:	rpm-pythonprov
-BuildRequires:	rpmbuild(macros) >= 1.629
+BuildRequires:	rpmbuild(macros) >= 1.673
 BuildRequires:	sed >= 4.0
 %{?with_systemd:BuildRequires:	systemd-devel >= 1:200}
 BuildRequires:	tar >= 1:1.22
@@ -97,6 +97,9 @@ Summary:	libnm-glib library API documentation
 Summary(pl.UTF-8):	Dokumentacja API biblioteki libnm-glib
 Group:		Documentation
 Requires:	gtk-doc-common
+%if "%{_rpmversion}" >= "5"
+BuildArch:	noarch
+%endif
 
 %description apidocs
 libnm-glib library API documentation.
@@ -399,4 +402,4 @@ exit 0
 
 %files -n bash-completion-NetworkManager
 %defattr(644,root,root,755)
-%{_datadir}/bash-completion/completions/nmcli
+%{bash_compdir}/nmcli
