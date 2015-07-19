@@ -7,13 +7,13 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.0.2
-Release:	2
+Version:	1.0.4
+Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.0/%{name}-%{version}.tar.xz
-# Source0-md5:	5a4899f89edcbdd1ac46d2d947e8d6eb
+# Source0-md5:	7eabef7bd3bbdd6dc0473dd32aeac924
 Source1:	%{name}.conf
 Source2:	%{name}.upstart
 Source3:	%{name}.tmpfiles
@@ -29,7 +29,7 @@ BuildRequires:	dbus-devel >= 1.1.0
 BuildRequires:	dbus-glib-devel >= 0.100
 BuildRequires:	docbook-dtd412-xml
 BuildRequires:	gettext-tools >= 0.17
-BuildRequires:	glib2-devel >= 1:2.32
+BuildRequires:	glib2-devel >= 1:2.37.2
 BuildRequires:	gnome-common
 BuildRequires:	gobject-introspection-devel >= 0.10.0
 BuildRequires:	gtk-doc >= 1.0
@@ -112,7 +112,7 @@ Summary:	Network Manager shared libraries
 Summary(pl.UTF-8):	Biblioteki dzielone Network Managera
 Group:		Libraries
 Requires:	dbus-glib >= 0.100
-Requires:	glib2 >= 1:2.32
+Requires:	glib2 >= 1:2.37.2
 Requires:	nss >= 3.11
 Requires:	udev-glib >= 1:165
 Conflicts:	NetworkManager < 0.6.4-0.2
@@ -129,7 +129,7 @@ Summary(pl.UTF-8):	Pliki nagłówkowe Network Managera
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{epoch}:%{version}-%{release}
 Requires:	dbus-glib-devel >= 0.100
-Requires:	glib2-devel >= 1:2.32
+Requires:	glib2-devel >= 1:2.37.2
 Requires:	libuuid-devel
 Requires:	nss-devel >= 3.11
 Requires:	udev-glib-devel >= 1:165
@@ -320,7 +320,7 @@ exit 0
 %{systemdtmpfilesdir}/%{name}.conf
 %{_datadir}/dbus-1/system-services/org.freedesktop.nm_dispatcher.service
 %{_datadir}/polkit-1/actions/org.freedesktop.NetworkManager.policy
-/lib/udev/rules.d/77-nm-olpc-mesh.rules
+/lib/udev/rules.d/85-nm-unmanaged.rules
 %dir %{_sysconfdir}/%{name}/VPN
 %dir %{_sysconfdir}/%{name}/system-connections
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/%{name}.conf
