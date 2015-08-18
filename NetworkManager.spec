@@ -8,14 +8,13 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	1.0.4
-Release:	1
+Release:	2
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.0/%{name}-%{version}.tar.xz
 # Source0-md5:	7eabef7bd3bbdd6dc0473dd32aeac924
 Source1:	%{name}.conf
-Source2:	%{name}.upstart
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
 Patch0:		ifcfg-path.patch
@@ -230,9 +229,6 @@ install -p %{SOURCE4} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 
 cp -p %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 
-install -d $RPM_BUILD_ROOT/etc/init
-cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/init/NetworkManager.conf
-
 cp -p %{SOURCE3} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
 
 # Cleanup
@@ -309,7 +305,6 @@ exit 0
 %attr(755,root,root) %{_libexecdir}/nm-iface-helper
 %attr(755,root,root) %{_libdir}/pppd/plugins/nm-pppd-plugin.so
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
-%config(noreplace) %verify(not md5 mtime size) /etc/init/NetworkManager.conf
 %{systemdunitdir}/NetworkManager.service
 %{systemdunitdir}/NetworkManager-dispatcher.service
 %{systemdunitdir}/NetworkManager-wait-online.service
