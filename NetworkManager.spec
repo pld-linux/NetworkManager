@@ -34,7 +34,6 @@ BuildRequires:	gobject-introspection-devel >= 0.10.0
 BuildRequires:	gtk-doc >= 1.0
 BuildRequires:	gtk-doc-automake >= 1.0
 BuildRequires:	intltool >= 0.40.0
-BuildRequires:	libiw-devel >= 1:28-0.pre9.1
 BuildRequires:	libndp-devel
 BuildRequires:	libnl-devel >= 3.2.8
 BuildRequires:	libselinux-devel
