@@ -19,7 +19,7 @@ Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
 Patch0:		ifcfg-path.patch
 Patch1:		systemd-fallback.patch
-URL:		http://projects.gnome.org/NetworkManager/
+URL:		https://wiki.gnome.org/Projects/NetworkManager
 BuildRequires:	ModemManager-devel >= 1.0.0
 BuildRequires:	autoconf >= 2.63
 BuildRequires:	automake >= 1:1.11
