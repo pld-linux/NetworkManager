@@ -2,18 +2,17 @@
 # Conditional build
 %bcond_without	systemd # use systemd for session tracking instead of ConsoleKit (fallback to ConsoleKit on runtime)
 %bcond_without	vala	# Vala API
-%bcond_with	wimax	# enable wimax support
 
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.0.12
+Version:	1.2.2
 Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.0/%{name}-%{version}.tar.xz
-# Source0-md5:	ebb273456a81ccf9dfaf2461061b0e96
+Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.2/%{name}-%{version}.tar.xz
+# Source0-md5:	a922bf20c2243c9014fb14c4427ad035
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
@@ -21,14 +20,15 @@ Patch0:		ifcfg-path.patch
 Patch1:		systemd-fallback.patch
 URL:		https://wiki.gnome.org/Projects/NetworkManager
 BuildRequires:	ModemManager-devel >= 1.0.0
+BuildRequires:	audit-libs-devel
 BuildRequires:	autoconf >= 2.63
-BuildRequires:	automake >= 1:1.11
+BuildRequires:	automake >= 1:1.12
 BuildRequires:	bluez-libs-devel >= 5.0
 BuildRequires:	dbus-devel >= 1.1.0
 BuildRequires:	dbus-glib-devel >= 0.100
 BuildRequires:	docbook-dtd412-xml
 BuildRequires:	gettext-tools >= 0.17
-BuildRequires:	glib2-devel >= 1:2.37.2
+BuildRequires:	glib2-devel >= 1:2.38.0
 BuildRequires:	gnome-common
 BuildRequires:	gobject-introspection-devel >= 0.10.0
 BuildRequires:	gtk-doc >= 1.0
@@ -37,7 +37,7 @@ BuildRequires:	intltool >= 0.40.0
 BuildRequires:	libndp-devel
 BuildRequires:	libnl-devel >= 3.2.8
 BuildRequires:	libselinux-devel
-BuildRequires:	libsoup-devel >= 2.26.0
+BuildRequires:	libsoup-devel >= 2.40.0
 BuildRequires:	libteam-devel >= 1.9
 BuildRequires:	libtool >= 2:2.2
 BuildRequires:	libuuid-devel
@@ -49,12 +49,11 @@ BuildRequires:	ppp-plugin-devel >= 3:2.4.6
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.673
 BuildRequires:	sed >= 4.0
-%{?with_systemd:BuildRequires:	systemd-devel >= 1:200}
+%{?with_systemd:BuildRequires:	systemd-devel >= 1:209}
 BuildRequires:	tar >= 1:1.22
 BuildRequires:	udev-devel
 BuildRequires:	udev-glib-devel >= 1:165
 %{?with_vala:BuildRequires:	vala >= 2:0.17.1.24}
-%{?with_wimax:BuildRequires:	wimax-devel >= 1.5.1}
 BuildRequires:	xz
 Requires(post,preun):	/sbin/chkconfig
 Requires(post,preun,postun):	systemd-units >= 38
@@ -211,9 +210,9 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 	--with-pppd-plugin-dir=%{_libdir}/pppd/plugins \
 	--with-pppoe=/usr/sbin/pppoe \
 	--with-resolvconf=/sbin/resolvconf \
+	--with-udev-dir=/lib/udev \
 	--with-dist-version=%{version}-%{release} \
 	--with-docs \
-	%{__enable_disable wimax} \
 	--enable-static \
 	%{!?with_vala:--disable-vala}
 
@@ -301,7 +300,6 @@ exit 0
 %attr(755,root,root) %{_libdir}/NetworkManager/libnm-settings-plugin-ibft.so
 %attr(755,root,root) %{_libdir}/NetworkManager/libnm-settings-plugin-ifcfg-rh.so
 %attr(755,root,root) %{_libdir}/NetworkManager/libnm-wwan.so
-%attr(755,root,root) %{_libexecdir}/nm-avahi-autoipd.action
 %attr(755,root,root) %{_libexecdir}/nm-dhcp-helper
 %attr(755,root,root) %{_libexecdir}/nm-dispatcher
 %attr(755,root,root) %{_libexecdir}/nm-iface-helper
@@ -322,7 +320,6 @@ exit 0
 %dir %{_sysconfdir}/%{name}/VPN
 %dir %{_sysconfdir}/%{name}/system-connections
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/%{name}.conf
-%config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-avahi-autoipd.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-dispatcher.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-ifcfg-rh.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/org.freedesktop.NetworkManager.conf
@@ -339,7 +336,7 @@ exit 0
 %{_mandir}/man5/nm-settings-keyfile.5*
 %{_mandir}/man5/nm-settings.5*
 %{_mandir}/man5/nm-system-settings.conf.5*
-%{_mandir}/man5/nmcli-examples.5*
+%{_mandir}/man7/nmcli-examples.7*
 %{_mandir}/man8/NetworkManager.8*
 %{_examplesdir}/%{name}-%{version}
 
