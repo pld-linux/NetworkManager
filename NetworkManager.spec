@@ -221,7 +221,8 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},%{systemdtmpfilesdir}} \
-	$RPM_BUILD_ROOT%{_sysconfdir}/%{name}/{VPN,dispatcher.d,system-connections}
+	$RPM_BUILD_ROOT%{_sysconfdir}/%{name}/{VPN,dispatcher.d,system-connections} \
+	$RPM_BUILD_ROOT%{_libdir}/%{name}/VPN
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -305,6 +306,7 @@ exit 0
 %attr(755,root,root) %{_libexecdir}/nm-iface-helper
 %attr(755,root,root) %{_libdir}/pppd/plugins/nm-pppd-plugin.so
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
+%dir %{_libdir}/NetworkManager/VPN
 %{systemdunitdir}/NetworkManager.service
 %{systemdunitdir}/NetworkManager-dispatcher.service
 %{systemdunitdir}/NetworkManager-wait-online.service
