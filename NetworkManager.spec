@@ -7,7 +7,7 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	1.2.2
-Release:	1
+Release:	2
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
@@ -222,7 +222,7 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},%{systemdtmpfilesdir}} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/%{name}/{VPN,dispatcher.d,system-connections} \
-	$RPM_BUILD_ROOT%{_libdir}/%{name}/VPN
+	$RPM_BUILD_ROOT%{_prefix}/lib/%{name}/{VPN,conf.d}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -306,7 +306,11 @@ exit 0
 %attr(755,root,root) %{_libexecdir}/nm-iface-helper
 %attr(755,root,root) %{_libdir}/pppd/plugins/nm-pppd-plugin.so
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
-%dir %{_libdir}/NetworkManager/VPN
+%if "%{_lib}" != "lib"
+%dir %{_prefix}/lib/NetworkManager
+%endif
+%dir %{_prefix}/lib/NetworkManager/VPN
+%dir %{_prefix}/lib/NetworkManager/conf.d
 %{systemdunitdir}/NetworkManager.service
 %{systemdunitdir}/NetworkManager-dispatcher.service
 %{systemdunitdir}/NetworkManager-wait-online.service
