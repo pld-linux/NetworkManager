@@ -68,6 +68,7 @@ Requires:	filesystem >= 3.0-37
 Requires:	libnl >= 3.2.8
 Requires:	libsoup >= 2.26.0
 Requires:	libteam >= 1.9
+Requires:	newt >= 0.52.15
 Requires:	polkit >= 0.97
 Requires:	rc-scripts >= 0.4.3.0
 Requires:	systemd-units >= 38
@@ -109,7 +110,7 @@ Summary:	Network Manager shared libraries
 Summary(pl.UTF-8):	Biblioteki dzielone Network Managera
 Group:		Libraries
 Requires:	dbus-glib >= 0.100
-Requires:	glib2 >= 1:2.37.2
+Requires:	glib2 >= 1:2.38.0
 Requires:	nss >= 3.11
 Requires:	udev-glib >= 1:165
 Conflicts:	NetworkManager < 0.6.4-0.2
@@ -126,7 +127,7 @@ Summary(pl.UTF-8):	Pliki nagłówkowe Network Managera
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{epoch}:%{version}-%{release}
 Requires:	dbus-glib-devel >= 0.100
-Requires:	glib2-devel >= 1:2.37.2
+Requires:	glib2-devel >= 1:2.38.0
 Requires:	libuuid-devel
 Requires:	nss-devel >= 3.11
 Requires:	udev-glib-devel >= 1:165
