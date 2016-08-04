@@ -330,7 +330,7 @@ exit 0
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-dispatcher.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-ifcfg-rh.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/org.freedesktop.NetworkManager.conf
-%attr(700,root,root) %dir /var/run/%{name}
+%attr(711,root,root) %dir /var/run/%{name}
 %attr(700,root,root) %dir /var/lib/%{name}
 %{_mandir}/man1/nm-online.1*
 %{_mandir}/man1/nmcli.1*
