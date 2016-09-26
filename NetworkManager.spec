@@ -38,7 +38,7 @@ BuildRequires:	libndp-devel
 BuildRequires:	libnl-devel >= 3.2.8
 BuildRequires:	libselinux-devel
 BuildRequires:	libsoup-devel >= 2.40.0
-BuildRequires:	libteam-devel >= 1.9
+BuildRequires:	libteamdctl-devel >= 1.9
 BuildRequires:	libtool >= 2:2.2
 BuildRequires:	libuuid-devel
 BuildRequires:	newt-devel >= 0.52.15
