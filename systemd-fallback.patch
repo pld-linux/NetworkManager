@@ -122,9 +122,9 @@
  #endif
  
  	if (G_OBJECT_CLASS (nm_session_monitor_parent_class)->finalize != NULL)
---- NetworkManager-1.2.2/src/nm-sleep-monitor-systemd.c.systemd	2016-05-17 23:14:52.878336245 +0200
-+++ NetworkManager-1.2.2/src/nm-sleep-monitor-systemd.c	2016-05-17 23:19:33.924628324 +0200
-@@ -24,6 +24,10 @@
+--- NetworkManager-1.4.0/src/nm-sleep-monitor.c.orig	2016-08-24 15:09:03.000000000 +0200
++++ NetworkManager-1.4.0/src/nm-sleep-monitor.c	2016-09-27 16:43:07.397044526 +0200
+@@ -26,6 +26,10 @@
  #include <sys/stat.h>
  #include <gio/gunixfdlist.h>
  
@@ -135,66 +135,62 @@
  #include "nm-core-internal.h"
  #include "NetworkManagerUtils.h"
  
-@@ -33,23 +37,18 @@
- #error either define SUSPEND_RESUME_SYSTEMD or SUSPEND_RESUME_CONSOLEKIT
- #endif
+@@ -40,13 +44,24 @@
  
--#ifdef SUSPEND_RESUME_SYSTEMD
--
- #define SUSPEND_DBUS_NAME               "org.freedesktop.login1"
- #define SUSPEND_DBUS_PATH               "/org/freedesktop/login1"
- #define SUSPEND_DBUS_INTERFACE          "org.freedesktop.login1.Manager"
+ #elif defined (SUSPEND_RESUME_SYSTEMD)
  
--#else
+-#define SUSPEND_DBUS_NAME               "org.freedesktop.login1"
+-#define SUSPEND_DBUS_PATH               "/org/freedesktop/login1"
+-#define SUSPEND_DBUS_INTERFACE          "org.freedesktop.login1.Manager"
++#define SD_SUSPEND_DBUS_NAME               "org.freedesktop.login1"
++#define SD_SUSPEND_DBUS_PATH               "/org/freedesktop/login1"
++#define SD_SUSPEND_DBUS_INTERFACE          "org.freedesktop.login1.Manager"
+ #define USE_UPOWER                      0
+ #define _NMLOG_PREFIX_NAME              "sleep-monitor-sd"
+ 
+ #elif defined(SUSPEND_RESUME_CONSOLEKIT)
++
++#define USE_UPOWER                      0
++#define _NMLOG_PREFIX_NAME              "sleep-monitor-ck"
++
++#else
++
++#error define one of SUSPEND_RESUME_SYSTEMD, SUSPEND_RESUME_CONSOLEKIT, or SUSPEND_RESUME_UPOWER
++
++#endif
++
++#if defined (SUSPEND_RESUME_SYSTEMD) || defined(SUSPEND_RESUME_CONSOLEKIT)
  
  /* ConsoleKit2 has added the same suspend/resume DBUS API that Systemd
   * uses. http://consolekit2.github.io/ConsoleKit2/#Manager.Inhibit
-  */
- 
--#define SUSPEND_DBUS_NAME               "org.freedesktop.ConsoleKit"
--#define SUSPEND_DBUS_PATH               "/org/freedesktop/ConsoleKit/Manager"
--#define SUSPEND_DBUS_INTERFACE          "org.freedesktop.ConsoleKit.Manager"
+@@ -55,12 +70,6 @@
+ #define SUSPEND_DBUS_NAME               "org.freedesktop.ConsoleKit"
+ #define SUSPEND_DBUS_PATH               "/org/freedesktop/ConsoleKit/Manager"
+ #define SUSPEND_DBUS_INTERFACE          "org.freedesktop.ConsoleKit.Manager"
+-#define USE_UPOWER                      0
+-#define _NMLOG_PREFIX_NAME              "sleep-monitor-ck"
 -
--#endif
-+#define CK_SUSPEND_DBUS_NAME               "org.freedesktop.ConsoleKit"
-+#define CK_SUSPEND_DBUS_PATH               "/org/freedesktop/ConsoleKit/Manager"
-+#define CK_SUSPEND_DBUS_INTERFACE          "org.freedesktop.ConsoleKit.Manager"
+-#else
+-
+-#error define one of SUSPEND_RESUME_SYSTEMD, SUSPEND_RESUME_CONSOLEKIT, or SUSPEND_RESUME_UPOWER
  
- struct _NMSleepMonitor {
- 	GObject parent_instance;
-@@ -204,13 +203,28 @@ static void
- nm_sleep_monitor_init (NMSleepMonitor *self)
+ #endif
+ 
+@@ -342,6 +351,17 @@
  {
  	self->inhibit_fd = -1;
--	g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,
--	                          G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START |
--	                          G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
--	                          NULL,
--	                          SUSPEND_DBUS_NAME, SUSPEND_DBUS_PATH, SUSPEND_DBUS_INTERFACE,
--	                          NULL,
--	                          (GAsyncReadyCallback) on_proxy_acquired, self);
-+
+ 	self->cancellable = g_cancellable_new ();
 +#ifdef SUSPEND_RESUME_SYSTEMD
-+	if (sd_booted () > 0) {
++	if (sd_booted () > 0)
 +		g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,
 +			                      G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START |
 +			                      G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
 +			                      NULL,
-+			                      SUSPEND_DBUS_NAME, SUSPEND_DBUS_PATH, SUSPEND_DBUS_INTERFACE,
-+			                      NULL,
++			                      SD_SUSPEND_DBUS_NAME, SD_SUSPEND_DBUS_PATH, SD_SUSPEND_DBUS_INTERFACE,
++			                      self->cancellable,
 +			                      (GAsyncReadyCallback) on_proxy_acquired, self);
-+	} else {
++	else
 +#endif
-+		g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,
-+			                      G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START |
-+			                      G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
-+			                      NULL,
-+			                      CK_SUSPEND_DBUS_NAME, CK_SUSPEND_DBUS_PATH, CK_SUSPEND_DBUS_INTERFACE,
-+			                      NULL,
-+			                      (GAsyncReadyCallback) on_proxy_acquired, self);
-+#ifdef SUSPEND_RESUME_SYSTEMD
-+	}
-+#endif
- }
- 
- static void
+ 	g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,
+ 	                          G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START |
+ 	                          G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,

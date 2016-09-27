@@ -6,13 +6,13 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.2.2
-Release:	3
+Version:	1.4.0
+Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.2/%{name}-%{version}.tar.xz
-# Source0-md5:	a922bf20c2243c9014fb14c4427ad035
+Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.4/%{name}-%{version}.tar.xz
+# Source0-md5:	337e676261ca94af08f8e9b6f9b09a5b
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
@@ -34,6 +34,7 @@ BuildRequires:	gobject-introspection-devel >= 0.10.0
 BuildRequires:	gtk-doc >= 1.0
 BuildRequires:	gtk-doc-automake >= 1.0
 BuildRequires:	intltool >= 0.40.0
+BuildRequires:	jansson-devel
 BuildRequires:	libndp-devel
 BuildRequires:	libnl-devel >= 3.2.8
 BuildRequires:	libselinux-devel
@@ -66,8 +67,8 @@ Requires:	ConsoleKit-x11
 Requires:	dhcp-client
 Requires:	filesystem >= 3.0-37
 Requires:	libnl >= 3.2.8
-Requires:	libsoup >= 2.26.0
-Requires:	libteam >= 1.9
+Requires:	libsoup >= 2.40.0
+Requires:	libteamdctl >= 1.9
 Requires:	newt >= 0.52.15
 Requires:	polkit >= 0.97
 Requires:	rc-scripts >= 0.4.3.0
@@ -76,6 +77,7 @@ Requires:	wpa_supplicant >= 0.7.3-4
 Suggests:	ModemManager >= 1.0.0
 Suggests:	mobile-broadband-provider-info
 Suggests:	resolvconf
+Suggests:	teamd >= 1.9
 Obsoletes:	NetworkManager-systemd
 Obsoletes:	dhcdbd < 3.0-1
 # sr@Latn vs. sr@latin
