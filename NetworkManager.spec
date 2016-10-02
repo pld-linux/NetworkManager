@@ -6,21 +6,18 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.4.0
-Release:	2
+Version:	1.4.2
+Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.4/%{name}-%{version}.tar.xz
-# Source0-md5:	337e676261ca94af08f8e9b6f9b09a5b
+# Source0-md5:	59b5b5585467756787c6cb535cbd306e
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
 Patch0:		ifcfg-path.patch
 Patch1:		systemd-fallback.patch
-Patch2:		0001-wifi-set-mac-addr-workaround-rh1371478.patch
-Patch3:		0002-dhcp-helper-sync-notify-rh1372854.patch
-Patch4:		0003-wifi-set-mac-addr-workaround-rh1371478-v2.patch
 URL:		https://wiki.gnome.org/Projects/NetworkManager
 BuildRequires:	ModemManager-devel >= 1.0.0
 BuildRequires:	audit-libs-devel
@@ -191,9 +188,6 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 %setup -q
 %patch0 -p1
 %{?with_systemd:%patch1 -p1}
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
 
 %build
 %{__gtkdocize}
