@@ -47,6 +47,7 @@ BuildRequires:	nss-devel >= 3.11
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.97
 BuildRequires:	ppp-plugin-devel >= 3:2.4.6
+BuildRequires:	readline-devel
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.673
 BuildRequires:	sed >= 4.0
@@ -205,6 +206,7 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 	--with-dhclient=/sbin/dhclient \
 	--with-dhcpcd=/sbin/dhcpcd \
 	--with-iptables=/usr/sbin/iptables \
+	--with-nmcli=yes \
 	--with-system-ca-path=/etc/certs \
 	--with-systemdsystemunitdir=%{systemdunitdir} \
 	--with-session-tracking=%{?with_systemd:systemd}%{!?with_systemd:ck} \
