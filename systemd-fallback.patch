@@ -25,8 +25,8 @@
  AC_ARG_WITH(suspend-resume, AS_HELP_STRING([--with-suspend-resume=upower|systemd|consolekit], [Build NetworkManager with specific suspend/resume support]))
  if test "z$with_suspend_resume" = "z"; then
      PKG_CHECK_EXISTS([libsystemd >= 209], [have_systemd_inhibit=yes],
---- NetworkManager-1.2.2/src/nm-session-monitor.c.systemd	2016-04-25 16:46:58.000000000 +0200
-+++ NetworkManager-1.2.2/src/nm-session-monitor.c	2016-05-28 23:23:37.337347753 +0200
+--- NetworkManager-1.4.4/src/nm-session-monitor.c.orig	2016-12-15 20:38:53.000000000 +0100
++++ NetworkManager-1.4.4/src/nm-session-monitor.c	2016-12-18 20:44:54.507822307 +0100
 @@ -30,6 +30,7 @@
  #include "NetworkManagerUtils.h"
  
@@ -49,7 +49,7 @@
  };
  
  struct _NMSessionMonitorClass {
-@@ -138,7 +137,6 @@ st_sd_finalize (NMSessionMonitor *monito
+@@ -150,7 +149,6 @@ st_sd_finalize (NMSessionMonitor *monito
  
  /********************************************************************/
  
@@ -57,7 +57,7 @@
  typedef struct {
  	gboolean active;
  } CkSession;
-@@ -272,7 +270,6 @@ ck_finalize (NMSessionMonitor *monitor)
+@@ -284,7 +282,6 @@ ck_finalize (NMSessionMonitor *monitor)
  	g_clear_pointer (&monitor->ck.cache, g_hash_table_unref);
  	g_clear_object (&monitor->ck.monitor);
  }
@@ -65,7 +65,7 @@
  
  /********************************************************************/
  
-@@ -383,13 +380,16 @@ nm_session_monitor_session_exists (NMSes
+@@ -356,13 +353,16 @@ nm_session_monitor_session_exists (NMSes
  	g_return_val_if_fail (NM_IS_SESSION_MONITOR (self), FALSE);
  
  #ifdef SESSION_TRACKING_SYSTEMD
@@ -86,25 +86,25 @@
  #endif
  
  	return FALSE;
-@@ -401,11 +401,15 @@ static void
+@@ -374,25 +374,31 @@ static void
  nm_session_monitor_init (NMSessionMonitor *monitor)
  {
  #ifdef SESSION_TRACKING_SYSTEMD
--	st_sd_init (monitor);
 +	if (sd_booted () > 0) {
-+		st_sd_init (monitor);
-+	} else {
+ 	st_sd_init (monitor);
+ 	_LOGD ("using systemd-logind session tracking");
++	} else
  #endif
  
 -#ifdef SESSION_TRACKING_CONSOLEKIT
++	{
  	ck_init (monitor);
-+
-+#ifdef SESSION_TRACKING_SYSTEMD
+ 	_LOGD ("using ConsoleKit session tracking");
+-#endif
 +	}
- #endif
  }
  
-@@ -413,11 +417,15 @@ static void
+ static void
  nm_session_monitor_finalize (GObject *object)
  {
  #ifdef SESSION_TRACKING_SYSTEMD
