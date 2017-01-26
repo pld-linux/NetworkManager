@@ -6,18 +6,19 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.4.4
+Version:	1.6.0
 Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.4/%{name}-%{version}.tar.xz
-# Source0-md5:	63f1e0d6d7e9099499d062c84c927a75
+Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.6/%{name}-%{version}.tar.xz
+# Source0-md5:	ccdac1d03133a59065cbb93a09fa54b0
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
 Patch0:		ifcfg-path.patch
-Patch1:		systemd-fallback.patch
+Patch1:		%{name}-sh.patch
+Patch2:		systemd-fallback.patch
 URL:		https://wiki.gnome.org/Projects/NetworkManager
 BuildRequires:	ModemManager-devel >= 1.0.0
 BuildRequires:	audit-libs-devel
@@ -41,8 +42,10 @@ BuildRequires:	libsoup-devel >= 2.40.0
 BuildRequires:	libteamdctl-devel >= 1.9
 BuildRequires:	libtool >= 2:2.2
 BuildRequires:	libuuid-devel
+BuildRequires:	libxslt-progs
 BuildRequires:	newt-devel >= 0.52.15
 BuildRequires:	nss-devel >= 3.11
+BuildRequires:	perl-base
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.97
 BuildRequires:	ppp-plugin-devel >= 3:2.4.6
@@ -186,7 +189,8 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 %prep
 %setup -q
 %patch0 -p1
-%{?with_systemd:%patch1 -p1}
+%patch1 -p1
+%{?with_systemd:%patch2 -p1}
 
 %build
 %{__gtkdocize}
@@ -199,12 +203,13 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 %configure \
 	--disable-silent-rules \
 	--with-html-dir=%{_gtkdocdir} \
+	--enable-gtk-doc \
 	--enable-ifcfg-rh \
-	--enable-more-warnings=yes \
+	--enable-more-warnings \
 	--with-dhclient=/sbin/dhclient \
 	--with-dhcpcd=/sbin/dhcpcd \
 	--with-iptables=/usr/sbin/iptables \
-	--with-nmcli=yes \
+	--with-nmcli \
 	--with-system-ca-path=/etc/certs \
 	--with-systemdsystemunitdir=%{systemdunitdir} \
 	--with-session-tracking=%{?with_systemd:systemd}%{!?with_systemd:ck} \
@@ -215,7 +220,6 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 	--with-resolvconf=/sbin/resolvconf \
 	--with-udev-dir=/lib/udev \
 	--with-dist-version=%{version}-%{release} \
-	--with-docs \
 	--enable-static \
 	%{!?with_vala:--disable-vala}
 
@@ -244,12 +248,10 @@ cp -p %{SOURCE3} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
 %find_lang %{name}
 
 # examples
+%{__make} clean-checkPROGRAMS
+
 install -d $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 cp -a examples/* $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
-%{__make} clean \
-	top_builddir=$(pwd) \
-	-C $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
-find $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version} -name 'Makefile*' | xargs rm
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -301,6 +303,7 @@ exit 0
 %attr(755,root,root) %{_libdir}/NetworkManager/libnm-device-plugin-wifi.so
 %attr(755,root,root) %{_libdir}/NetworkManager/libnm-device-plugin-wwan.so
 %attr(755,root,root) %{_libdir}/NetworkManager/libnm-device-plugin-team.so
+%attr(755,root,root) %{_libdir}/NetworkManager/libnm-ppp-plugin.so
 %attr(755,root,root) %{_libdir}/NetworkManager/libnm-settings-plugin-ibft.so
 %attr(755,root,root) %{_libdir}/NetworkManager/libnm-settings-plugin-ifcfg-rh.so
 %attr(755,root,root) %{_libdir}/NetworkManager/libnm-wwan.so
@@ -384,6 +387,8 @@ exit 0
 %{_pkgconfigdir}/libnm-util.pc
 %{_pkgconfigdir}/libnm-glib-vpn.pc
 %{_pkgconfigdir}/libnm-glib.pc
+%{_datadir}/dbus-1/interfaces/org.freedesktop.NetworkManager.xml
+%{_datadir}/dbus-1/interfaces/org.freedesktop.NetworkManager.*.xml
 %{_datadir}/gir-1.0/NM-1.0.gir
 %{_datadir}/gir-1.0/NMClient-1.0.gir
 %{_datadir}/gir-1.0/NetworkManager-1.0.gir
@@ -398,6 +403,8 @@ exit 0
 %if %{with vala}
 %files -n vala-NetworkManager
 %defattr(644,root,root,755)
+%{_datadir}/vala/vapi/libnm.deps
+%{_datadir}/vala/vapi/libnm.vapi
 %{_datadir}/vala/vapi/libnm-glib.deps
 %{_datadir}/vala/vapi/libnm-glib.vapi
 %{_datadir}/vala/vapi/libnm-util.deps

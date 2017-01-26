@@ -25,17 +25,17 @@
  AC_ARG_WITH(suspend-resume, AS_HELP_STRING([--with-suspend-resume=upower|systemd|consolekit], [Build NetworkManager with specific suspend/resume support]))
  if test "z$with_suspend_resume" = "z"; then
      PKG_CHECK_EXISTS([libsystemd >= 209], [have_systemd_inhibit=yes],
---- NetworkManager-1.4.4/src/nm-session-monitor.c.orig	2016-12-15 20:38:53.000000000 +0100
-+++ NetworkManager-1.4.4/src/nm-session-monitor.c	2016-12-18 20:44:54.507822307 +0100
-@@ -30,6 +30,7 @@
- #include "NetworkManagerUtils.h"
+--- NetworkManager-1.6.0/src/nm-session-monitor.c.orig	2017-01-16 15:08:37.000000000 +0100
++++ NetworkManager-1.6.0/src/nm-session-monitor.c	2017-01-26 20:00:57.570052887 +0100
+@@ -29,6 +29,7 @@
+ #include <sys/stat.h>
  
  #ifdef SESSION_TRACKING_SYSTEMD
 +#include <systemd/sd-daemon.h>
  #include <systemd/sd-login.h>
  #endif
  
-@@ -52,13 +53,11 @@ struct _NMSessionMonitor {
+@@ -53,13 +54,11 @@ struct _NMSessionMonitor {
  	} sd;
  #endif
  
@@ -49,23 +49,23 @@
  };
  
  struct _NMSessionMonitorClass {
-@@ -150,7 +149,6 @@ st_sd_finalize (NMSessionMonitor *monito
+@@ -132,7 +131,6 @@ st_sd_finalize (NMSessionMonitor *monito
  
- /********************************************************************/
+ /*****************************************************************************/
  
 -#ifdef SESSION_TRACKING_CONSOLEKIT
  typedef struct {
  	gboolean active;
  } CkSession;
-@@ -284,7 +282,6 @@ ck_finalize (NMSessionMonitor *monitor)
+@@ -266,7 +264,6 @@ ck_finalize (NMSessionMonitor *monitor)
  	g_clear_pointer (&monitor->ck.cache, g_hash_table_unref);
  	g_clear_object (&monitor->ck.monitor);
  }
 -#endif /* SESSION_TRACKING_CONSOLEKIT */
  
- /********************************************************************/
+ /*****************************************************************************/
  
-@@ -356,13 +353,16 @@ nm_session_monitor_session_exists (NMSes
+@@ -338,13 +335,16 @@ nm_session_monitor_session_exists (NMSes
  	g_return_val_if_fail (NM_IS_SESSION_MONITOR (self), FALSE);
  
  #ifdef SESSION_TRACKING_SYSTEMD
@@ -86,7 +86,7 @@
  #endif
  
  	return FALSE;
-@@ -374,25 +374,31 @@ static void
+@@ -356,26 +356,27 @@ static void
  nm_session_monitor_init (NMSessionMonitor *monitor)
  {
  #ifdef SESSION_TRACKING_SYSTEMD
@@ -105,23 +105,20 @@
  }
  
  static void
- nm_session_monitor_finalize (GObject *object)
+ finalize (GObject *object)
  {
  #ifdef SESSION_TRACKING_SYSTEMD
--	st_sd_finalize (NM_SESSION_MONITOR (object));
-+	if (sd_booted () > 0) {
-+		st_sd_finalize (NM_SESSION_MONITOR (object));
-+	} else {
++	if (sd_booted () > 0)
+ 	st_sd_finalize (NM_SESSION_MONITOR (object));
++	else
  #endif
- 
+-
 -#ifdef SESSION_TRACKING_CONSOLEKIT
  	ck_finalize (NM_SESSION_MONITOR (object));
-+
-+#ifdef SESSION_TRACKING_SYSTEMD
-+	}
- #endif
+-#endif
  
- 	if (G_OBJECT_CLASS (nm_session_monitor_parent_class)->finalize != NULL)
+ 	G_OBJECT_CLASS (nm_session_monitor_parent_class)->finalize (object);
+ }
 --- NetworkManager-1.4.0/src/nm-sleep-monitor.c.orig	2016-08-24 15:09:03.000000000 +0200
 +++ NetworkManager-1.4.0/src/nm-sleep-monitor.c	2016-09-27 16:43:07.397044526 +0200
 @@ -26,6 +26,10 @@
