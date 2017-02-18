@@ -6,13 +6,13 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.6.0
+Version:	1.6.2
 Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.6/%{name}-%{version}.tar.xz
-# Source0-md5:	ccdac1d03133a59065cbb93a09fa54b0
+# Source0-md5:	89c975afe19fbac854191edb6e9bcd3b
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
@@ -49,6 +49,7 @@ BuildRequires:	perl-base
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.97
 BuildRequires:	ppp-plugin-devel >= 3:2.4.6
+BuildRequires:	python-pygobject3
 BuildRequires:	readline-devel
 BuildRequires:	rpmbuild(macros) >= 1.673
 BuildRequires:	sed >= 4.0
@@ -228,7 +229,8 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},%{systemdtmpfilesdir}} \
-	$RPM_BUILD_ROOT%{_sysconfdir}/%{name}/{VPN,dispatcher.d,system-connections} \
+	$RPM_BUILD_ROOT%{_sysconfdir}/%{name}/{VPN,conf.d,dispatcher.d,dnsmasq.d,dnsmasq-shared.d,system-connections} \
+	$RPM_BUILD_ROOT%{_sysconfdir}/%{name}/dispatcher.d/{pre-down.d,pre-up.d,no-wait.d} \
 	$RPM_BUILD_ROOT%{_prefix}/lib/%{name}/{VPN,conf.d}
 
 %{__make} install \
@@ -330,6 +332,13 @@ exit 0
 /lib/udev/rules.d/84-nm-drivers.rules
 /lib/udev/rules.d/85-nm-unmanaged.rules
 %dir %{_sysconfdir}/%{name}/VPN
+%dir %{_sysconfdir}/%{name}/conf.d
+%dir %{_sysconfdir}/%{name}/dispatcher.d
+%dir %{_sysconfdir}/%{name}/dispatcher.d/pre-down.d
+%dir %{_sysconfdir}/%{name}/dispatcher.d/pre-up.d
+%dir %{_sysconfdir}/%{name}/dispatcher.d/no-wait.d
+%dir %{_sysconfdir}/%{name}/dnsmasq.d
+%dir %{_sysconfdir}/%{name}/dnsmasq-shared.d
 %dir %{_sysconfdir}/%{name}/system-connections
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/%{name}.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-dispatcher.conf
