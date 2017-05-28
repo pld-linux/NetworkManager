@@ -6,13 +6,13 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.6.2
+Version:	1.8.0
 Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.6/%{name}-%{version}.tar.xz
-# Source0-md5:	89c975afe19fbac854191edb6e9bcd3b
+Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.8/%{name}-%{version}.tar.xz
+# Source0-md5:	de0e70933a17ee6a682e8440015c9b1e
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
@@ -25,6 +25,7 @@ BuildRequires:	audit-libs-devel
 BuildRequires:	autoconf >= 2.63
 BuildRequires:	automake >= 1:1.12
 BuildRequires:	bluez-libs-devel >= 5.0
+BuildRequires:	curl-devel >= 7.24.0
 BuildRequires:	dbus-devel >= 1.1.0
 BuildRequires:	dbus-glib-devel >= 0.100
 BuildRequires:	gettext-tools >= 0.17
@@ -37,8 +38,8 @@ BuildRequires:	intltool >= 0.40.0
 BuildRequires:	jansson-devel
 BuildRequires:	libndp-devel
 BuildRequires:	libnl-devel >= 3.2.8
+BuildRequires:	libpsl-devel >= 0.1
 BuildRequires:	libselinux-devel
-BuildRequires:	libsoup-devel >= 2.40.0
 BuildRequires:	libteamdctl-devel >= 1.9
 BuildRequires:	libtool >= 2:2.2
 BuildRequires:	libuuid-devel
@@ -55,8 +56,7 @@ BuildRequires:	rpmbuild(macros) >= 1.673
 BuildRequires:	sed >= 4.0
 %{?with_systemd:BuildRequires:	systemd-devel >= 1:209}
 BuildRequires:	tar >= 1:1.22
-BuildRequires:	udev-devel
-BuildRequires:	udev-glib-devel >= 1:165
+BuildRequires:	udev-devel >= 1:175
 %{?with_vala:BuildRequires:	vala >= 2:0.17.1.24}
 BuildRequires:	xz
 Requires(post,preun):	/sbin/chkconfig
@@ -67,10 +67,11 @@ Suggests:	ConsoleKit-x11
 %else
 Requires:	ConsoleKit-x11
 %endif
+Requires:	curl-libs >= 7.24.0
 Requires:	dhcp-client
 Requires:	filesystem >= 3.0-37
 Requires:	libnl >= 3.2.8
-Requires:	libsoup >= 2.40.0
+Requires:	libpsl >= 0.1
 Requires:	libteamdctl >= 1.9
 Requires:	newt >= 0.52.15
 Requires:	polkit >= 0.97
@@ -117,7 +118,7 @@ Group:		Libraries
 Requires:	dbus-glib >= 0.100
 Requires:	glib2 >= 1:2.38.0
 Requires:	nss >= 3.11
-Requires:	udev-glib >= 1:165
+Requires:	udev-libs >= 1:175
 Conflicts:	NetworkManager < 0.6.4-0.2
 
 %description libs
@@ -135,7 +136,6 @@ Requires:	dbus-glib-devel >= 0.100
 Requires:	glib2-devel >= 1:2.38.0
 Requires:	libuuid-devel
 Requires:	nss-devel >= 3.11
-Requires:	udev-glib-devel >= 1:165
 
 %description devel
 Network Manager includes and more.
@@ -202,13 +202,15 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 %{__autoheader}
 %{__automake}
 %configure \
-	--disable-silent-rules \
-	--with-html-dir=%{_gtkdocdir} \
 	--enable-gtk-doc \
 	--enable-ifcfg-rh \
 	--enable-more-warnings \
+	--disable-silent-rules \
+	--enable-static \
+	%{!?with_vala:--disable-vala} \
 	--with-dhclient=/sbin/dhclient \
 	--with-dhcpcd=/sbin/dhcpcd \
+	--with-html-dir=%{_gtkdocdir} \
 	--with-iptables=/usr/sbin/iptables \
 	--with-nmcli \
 	--with-system-ca-path=/etc/certs \
@@ -220,9 +222,7 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 	--with-pppoe=/usr/sbin/pppoe \
 	--with-resolvconf=/sbin/resolvconf \
 	--with-udev-dir=/lib/udev \
-	--with-dist-version=%{version}-%{release} \
-	--enable-static \
-	%{!?with_vala:--disable-vala}
+	--with-dist-version=%{version}-%{release}
 
 %{__make}
 

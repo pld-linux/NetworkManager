@@ -1,6 +1,6 @@
---- NetworkManager-1.2.2/configure.ac.systemd	2016-05-17 22:29:49.567521947 +0200
-+++ NetworkManager-1.2.2/configure.ac	2016-05-17 23:14:31.594510933 +0200
-@@ -435,7 +435,7 @@ AS_IF([test -z "$use_consolekit"], [use_
+--- NetworkManager-1.8.0/configure.ac.orig	2017-05-27 22:30:22.001467624 +0200
++++ NetworkManager-1.8.0/configure.ac	2017-05-27 22:57:15.061449204 +0200
+@@ -447,7 +447,7 @@
  # output
  session_tracking=
  if test "$use_systemd_logind" = "yes" -o "$use_systemd_logind" = "auto"; then
@@ -9,33 +9,31 @@
  else
      have_systemd_logind=no
  fi
-@@ -447,12 +447,13 @@ if test "$have_systemd_logind" = "yes";
- 	session_tracking="$session_tracking, systemd-logind"
- fi
+@@ -477,11 +477,12 @@
+ 
  if test "$use_consolekit" = "yes"; then
--	AC_DEFINE([SESSION_TRACKING_CONSOLEKIT], 1, [Define to 1 if ConsoleKit is available])
+ 	AC_DEFINE([SESSION_TRACKING_CONSOLEKIT], 1, [Define to 1 if ConsoleKit is available])
 -	AC_DEFINE([CKDB_PATH], "/var/run/ConsoleKit/database", [Path to ConsoleKit database])
-+	AC_DEFINE([SESSION_TRACKING_CONSOLEKIT], 1, [Define to 1 if ConsoleKit is available])	
  	session_tracking="$session_tracking, consolekit"
  fi
  session_tracking="$(printf '%s' "${session_tracking}" | sed 's/^, //')"
  
 +AC_DEFINE([CKDB_PATH], "/var/run/ConsoleKit/database", [Path to ConsoleKit database])
 +
- AC_ARG_WITH(suspend-resume, AS_HELP_STRING([--with-suspend-resume=upower|systemd|consolekit], [Build NetworkManager with specific suspend/resume support]))
+ AC_ARG_WITH(suspend-resume, AS_HELP_STRING([--with-suspend-resume=upower|systemd|elogind|consolekit], [Build NetworkManager with specific suspend/resume support]))
  if test "z$with_suspend_resume" = "z"; then
      PKG_CHECK_EXISTS([libsystemd >= 209], [have_systemd_inhibit=yes],
---- NetworkManager-1.6.0/src/nm-session-monitor.c.orig	2017-01-16 15:08:37.000000000 +0100
-+++ NetworkManager-1.6.0/src/nm-session-monitor.c	2017-01-26 20:00:57.570052887 +0100
-@@ -29,6 +29,7 @@
- #include <sys/stat.h>
+--- NetworkManager-1.8.0/src/nm-session-monitor.c.orig	2017-05-10 10:59:08.000000000 +0200
++++ NetworkManager-1.8.0/src/nm-session-monitor.c	2017-05-27 23:07:26.988108884 +0200
+@@ -33,6 +33,7 @@
+ #endif
  
  #ifdef SESSION_TRACKING_SYSTEMD
 +#include <systemd/sd-daemon.h>
  #include <systemd/sd-login.h>
+ #define LOGIND_NAME "systemd-logind"
  #endif
- 
-@@ -53,13 +54,11 @@ struct _NMSessionMonitor {
+@@ -65,13 +66,11 @@ struct _NMSessionMonitor {
  	} sd;
  #endif
  
@@ -49,7 +47,7 @@
  };
  
  struct _NMSessionMonitorClass {
-@@ -132,7 +131,6 @@ st_sd_finalize (NMSessionMonitor *monito
+@@ -144,7 +143,6 @@ st_sd_finalize (NMSessionMonitor *monito
  
  /*****************************************************************************/
  
@@ -57,7 +55,7 @@
  typedef struct {
  	gboolean active;
  } CkSession;
-@@ -266,7 +264,6 @@ ck_finalize (NMSessionMonitor *monitor)
+@@ -278,7 +276,6 @@ ck_finalize (NMSessionMonitor *monitor)
  	g_clear_pointer (&monitor->ck.cache, g_hash_table_unref);
  	g_clear_object (&monitor->ck.monitor);
  }
@@ -65,7 +63,7 @@
  
  /*****************************************************************************/
  
-@@ -338,13 +335,16 @@ nm_session_monitor_session_exists (NMSes
+@@ -350,13 +347,16 @@ nm_session_monitor_session_exists (NMSes
  	g_return_val_if_fail (NM_IS_SESSION_MONITOR (self), FALSE);
  
  #ifdef SESSION_TRACKING_SYSTEMD
@@ -86,13 +84,13 @@
  #endif
  
  	return FALSE;
-@@ -356,26 +356,27 @@ static void
+@@ -368,26 +368,28 @@ static void
  nm_session_monitor_init (NMSessionMonitor *monitor)
  {
  #ifdef SESSION_TRACKING_SYSTEMD
 +	if (sd_booted () > 0) {
  	st_sd_init (monitor);
- 	_LOGD ("using systemd-logind session tracking");
+ 	_LOGD ("using "LOGIND_NAME" session tracking");
 +	} else
  #endif
  
@@ -112,15 +110,15 @@
  	st_sd_finalize (NM_SESSION_MONITOR (object));
 +	else
  #endif
--
+ 
 -#ifdef SESSION_TRACKING_CONSOLEKIT
  	ck_finalize (NM_SESSION_MONITOR (object));
 -#endif
  
  	G_OBJECT_CLASS (nm_session_monitor_parent_class)->finalize (object);
  }
---- NetworkManager-1.4.0/src/nm-sleep-monitor.c.orig	2016-08-24 15:09:03.000000000 +0200
-+++ NetworkManager-1.4.0/src/nm-sleep-monitor.c	2016-09-27 16:43:07.397044526 +0200
+--- NetworkManager-1.8.0/src/nm-sleep-monitor.c.orig	2017-05-10 10:59:08.000000000 +0200
++++ NetworkManager-1.8.0/src/nm-sleep-monitor.c	2017-05-27 23:22:47.011431711 +0200
 @@ -26,6 +26,10 @@
  #include <sys/stat.h>
  #include <gio/gunixfdlist.h>
@@ -132,9 +130,9 @@
  #include "nm-core-internal.h"
  #include "NetworkManagerUtils.h"
  
-@@ -40,13 +44,24 @@
+@@ -40,9 +44,9 @@
  
- #elif defined (SUSPEND_RESUME_SYSTEMD)
+ #elif defined (SUSPEND_RESUME_SYSTEMD) || defined (SUSPEND_RESUME_ELOGIND)
  
 -#define SUSPEND_DBUS_NAME               "org.freedesktop.login1"
 -#define SUSPEND_DBUS_PATH               "/org/freedesktop/login1"
@@ -143,24 +141,27 @@
 +#define SD_SUSPEND_DBUS_PATH               "/org/freedesktop/login1"
 +#define SD_SUSPEND_DBUS_INTERFACE          "org.freedesktop.login1.Manager"
  #define USE_UPOWER                      0
+ #if defined (SUSPEND_RESUME_SYSTEMD)
  #define _NMLOG_PREFIX_NAME              "sleep-monitor-sd"
+@@ -52,6 +56,17 @@
  
  #elif defined(SUSPEND_RESUME_CONSOLEKIT)
-+
+ 
 +#define USE_UPOWER                      0
 +#define _NMLOG_PREFIX_NAME              "sleep-monitor-ck"
 +
 +#else
 +
-+#error define one of SUSPEND_RESUME_SYSTEMD, SUSPEND_RESUME_CONSOLEKIT, or SUSPEND_RESUME_UPOWER
++#error define one of SUSPEND_RESUME_SYSTEMD, SUSPEND_RESUME_ELOGIND, SUSPEND_RESUME_CONSOLEKIT, or SUSPEND_RESUME_UPOWER
 +
 +#endif
 +
 +#if defined (SUSPEND_RESUME_SYSTEMD) || defined(SUSPEND_RESUME_CONSOLEKIT)
- 
++ 
  /* ConsoleKit2 has added the same suspend/resume DBUS API that Systemd
   * uses. http://consolekit2.github.io/ConsoleKit2/#Manager.Inhibit
-@@ -55,12 +70,6 @@
+  */
+@@ -59,12 +74,6 @@
  #define SUSPEND_DBUS_NAME               "org.freedesktop.ConsoleKit"
  #define SUSPEND_DBUS_PATH               "/org/freedesktop/ConsoleKit/Manager"
  #define SUSPEND_DBUS_INTERFACE          "org.freedesktop.ConsoleKit.Manager"
@@ -169,11 +170,11 @@
 -
 -#else
 -
--#error define one of SUSPEND_RESUME_SYSTEMD, SUSPEND_RESUME_CONSOLEKIT, or SUSPEND_RESUME_UPOWER
+-#error define one of SUSPEND_RESUME_SYSTEMD, SUSPEND_RESUME_ELOGIND, SUSPEND_RESUME_CONSOLEKIT, or SUSPEND_RESUME_UPOWER
  
  #endif
  
-@@ -342,6 +351,17 @@
+@@ -347,6 +356,17 @@ nm_sleep_monitor_init (NMSleepMonitor *s
  {
  	self->inhibit_fd = -1;
  	self->cancellable = g_cancellable_new ();
