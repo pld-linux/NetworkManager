@@ -6,13 +6,13 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.8.2
+Version:	1.10.0
 Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.8/%{name}-%{version}.tar.xz
-# Source0-md5:	1acf7a551905ae85d9987aadbb5f7205
+Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.10/%{name}-%{version}.tar.xz
+# Source0-md5:	c4308b83f77a7cb8c6e0e0ec1a30c89f
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
@@ -302,6 +302,7 @@ exit 0
 %dir %{_libdir}/NetworkManager
 %attr(755,root,root) %{_libdir}/NetworkManager/libnm-device-plugin-adsl.so
 %attr(755,root,root) %{_libdir}/NetworkManager/libnm-device-plugin-bluetooth.so
+%attr(755,root,root) %{_libdir}/NetworkManager/libnm-device-plugin-ovs.so
 %attr(755,root,root) %{_libdir}/NetworkManager/libnm-device-plugin-wifi.so
 %attr(755,root,root) %{_libdir}/NetworkManager/libnm-device-plugin-wwan.so
 %attr(755,root,root) %{_libdir}/NetworkManager/libnm-device-plugin-team.so
@@ -322,9 +323,8 @@ exit 0
 %{systemdunitdir}/NetworkManager.service
 %{systemdunitdir}/NetworkManager-dispatcher.service
 %{systemdunitdir}/NetworkManager-wait-online.service
-# XXX: dir here or add to systemd-units?
-%dir %{systemdunitdir}/network-online.target.wants
-%{systemdunitdir}/network-online.target.wants/NetworkManager-wait-online.service
+%dir %{systemdunitdir}/NetworkManager.service.d
+%{systemdunitdir}/NetworkManager.service.d/NetworkManager-ovs.conf
 %{_datadir}/dbus-1/system-services/org.freedesktop.NetworkManager.service
 %{systemdtmpfilesdir}/%{name}.conf
 %{_datadir}/dbus-1/system-services/org.freedesktop.nm_dispatcher.service
@@ -357,6 +357,7 @@ exit 0
 %{_mandir}/man5/nm-settings-keyfile.5*
 %{_mandir}/man5/nm-settings.5*
 %{_mandir}/man5/nm-system-settings.conf.5*
+%{_mandir}/man7/nm-openvswitch.7*
 %{_mandir}/man7/nmcli-examples.7*
 %{_mandir}/man8/NetworkManager.8*
 %{_examplesdir}/%{name}-%{version}
