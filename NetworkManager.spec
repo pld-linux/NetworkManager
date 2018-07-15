@@ -6,13 +6,13 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.10.10
+Version:	1.12.0
 Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.10/%{name}-%{version}.tar.xz
-# Source0-md5:	8c67fc286150ed357b6c833b9e015330
+Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.12/%{name}-%{version}.tar.xz
+# Source0-md5:	f728a42310c85b53386b172b15d7fc20
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
@@ -88,7 +88,8 @@ Obsoletes:	dhcdbd < 3.0-1
 Conflicts:	glibc-misc < 6:2.7
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		_libexecdir	%{_libdir}/%{name}
+%define		plugindir	%{_libdir}/NetworkManager
+%define		distplugindir	%{plugindir}/%{version}-%{release}
 
 %description
 Network Manager for GNOME.
@@ -212,6 +213,7 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 	--with-dhcpcd=/sbin/dhcpcd \
 	--with-html-dir=%{_gtkdocdir} \
 	--with-iptables=/usr/sbin/iptables \
+	--with-libnm-glib \
 	--with-nmcli \
 	--with-system-ca-path=/etc/certs \
 	--with-systemdsystemunitdir=%{systemdunitdir} \
@@ -244,7 +246,7 @@ cp -p %{SOURCE3} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
 
 # Cleanup
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/*.la
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/NetworkManager/*.{a,la}
+%{__rm} $RPM_BUILD_ROOT%{distplugindir}/*.{a,la}
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/pppd/plugins/*.{a,la}
 
 %find_lang %{name}
@@ -299,20 +301,23 @@ exit 0
 %attr(755,root,root) %{_bindir}/nmtui-edit
 %attr(755,root,root) %{_bindir}/nmtui-hostname
 %attr(755,root,root) %{_sbindir}/NetworkManager
-%dir %{_libdir}/NetworkManager
-%attr(755,root,root) %{_libdir}/NetworkManager/libnm-device-plugin-adsl.so
-%attr(755,root,root) %{_libdir}/NetworkManager/libnm-device-plugin-bluetooth.so
-%attr(755,root,root) %{_libdir}/NetworkManager/libnm-device-plugin-ovs.so
-%attr(755,root,root) %{_libdir}/NetworkManager/libnm-device-plugin-wifi.so
-%attr(755,root,root) %{_libdir}/NetworkManager/libnm-device-plugin-wwan.so
-%attr(755,root,root) %{_libdir}/NetworkManager/libnm-device-plugin-team.so
-%attr(755,root,root) %{_libdir}/NetworkManager/libnm-ppp-plugin.so
-%attr(755,root,root) %{_libdir}/NetworkManager/libnm-settings-plugin-ibft.so
-%attr(755,root,root) %{_libdir}/NetworkManager/libnm-settings-plugin-ifcfg-rh.so
-%attr(755,root,root) %{_libdir}/NetworkManager/libnm-wwan.so
+%dir %{plugindir}
+%dir %{distplugindir}
+%attr(755,root,root) %{distplugindir}/libnm-device-plugin-adsl.so
+%attr(755,root,root) %{distplugindir}/libnm-device-plugin-bluetooth.so
+%attr(755,root,root) %{distplugindir}/libnm-device-plugin-ovs.so
+%attr(755,root,root) %{distplugindir}/libnm-device-plugin-wifi.so
+%attr(755,root,root) %{distplugindir}/libnm-device-plugin-wwan.so
+%attr(755,root,root) %{distplugindir}/libnm-device-plugin-team.so
+%attr(755,root,root) %{distplugindir}/libnm-ppp-plugin.so
+%attr(755,root,root) %{distplugindir}/libnm-settings-plugin-ibft.so
+%attr(755,root,root) %{distplugindir}/libnm-settings-plugin-ifcfg-rh.so
+%attr(755,root,root) %{distplugindir}/libnm-wwan.so
 %attr(755,root,root) %{_libexecdir}/nm-dhcp-helper
 %attr(755,root,root) %{_libexecdir}/nm-dispatcher
 %attr(755,root,root) %{_libexecdir}/nm-iface-helper
+%attr(755,root,root) %{_libexecdir}/nm-ifdown
+%attr(755,root,root) %{_libexecdir}/nm-ifup
 %attr(755,root,root) %{_libdir}/pppd/plugins/nm-pppd-plugin.so
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
 %if "%{_lib}" != "lib"
@@ -331,6 +336,7 @@ exit 0
 %{_datadir}/polkit-1/actions/org.freedesktop.NetworkManager.policy
 /lib/udev/rules.d/84-nm-drivers.rules
 /lib/udev/rules.d/85-nm-unmanaged.rules
+/lib/udev/rules.d/90-nm-thunderbolt.rules
 %dir %{_sysconfdir}/%{name}/VPN
 %dir %{_sysconfdir}/%{name}/conf.d
 %dir %{_sysconfdir}/%{name}/dispatcher.d
