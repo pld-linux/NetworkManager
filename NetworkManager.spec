@@ -7,7 +7,7 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	1.12.2
-Release:	2
+Release:	3
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
@@ -215,6 +215,7 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 	--with-dhcpcd=/sbin/dhcpcd \
 	--with-html-dir=%{_gtkdocdir} \
 	--with-iptables=/usr/sbin/iptables \
+	--with-iwd=yes \
 	--with-libnm-glib \
 	--with-nmcli \
 	--with-system-ca-path=/etc/certs \
