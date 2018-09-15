@@ -9,26 +9,12 @@
  else
  	have_systemd_logind=no
  fi
-@@ -477,11 +477,12 @@
- 
- if test "$use_consolekit" = "yes"; then
- 	AC_DEFINE([SESSION_TRACKING_CONSOLEKIT], 1, [Define to 1 if ConsoleKit is available])
--	AC_DEFINE([CKDB_PATH], "/var/run/ConsoleKit/database", [Path to ConsoleKit database])
- 	session_tracking="$session_tracking, consolekit"
- fi
- session_tracking="$(printf '%s' "${session_tracking}" | sed 's/^, //')"
- 
-+AC_DEFINE([CKDB_PATH], "/var/run/ConsoleKit/database", [Path to ConsoleKit database])
-+
- AC_ARG_WITH(suspend-resume,
-             AS_HELP_STRING([--with-suspend-resume=upower|systemd|elogind|consolekit],
-                            [Build NetworkManager with specific suspend/resume support]))
 --- NetworkManager-1.8.0/src/nm-session-monitor.c.orig	2017-05-10 10:59:08.000000000 +0200
 +++ NetworkManager-1.8.0/src/nm-session-monitor.c	2017-05-27 23:07:26.988108884 +0200
 @@ -33,6 +33,7 @@
  #endif
  
- #ifdef SESSION_TRACKING_SYSTEMD
+ #if SESSION_TRACKING_SYSTEMD
 +#include <systemd/sd-daemon.h>
  #include <systemd/sd-login.h>
  #define LOGIND_NAME "systemd-logind"
@@ -37,7 +23,7 @@
  	} sd;
  #endif
  
--#ifdef SESSION_TRACKING_CONSOLEKIT
+-#if SESSION_TRACKING_CONSOLEKIT
  	struct {
  		GFileMonitor *monitor;
  		GHashTable *cache;
@@ -51,7 +37,7 @@
  
  /*****************************************************************************/
  
--#ifdef SESSION_TRACKING_CONSOLEKIT
+-#if SESSION_TRACKING_CONSOLEKIT
  typedef struct {
  	gboolean active;
  } CkSession;
@@ -66,7 +52,7 @@
 @@ -350,13 +347,16 @@ nm_session_monitor_session_exists (NMSes
  	g_return_val_if_fail (NM_IS_SESSION_MONITOR (self), FALSE);
  
- #ifdef SESSION_TRACKING_SYSTEMD
+ #if SESSION_TRACKING_XLOGIND
 -	if (st_sd_session_exists (self, uid, active))
 -		return TRUE;
 +	if (sd_booted () > 0) {
@@ -75,11 +61,11 @@
 +	} else {
  #endif
 -
--#ifdef SESSION_TRACKING_CONSOLEKIT
+-#if SESSION_TRACKING_CONSOLEKIT
  	if (ck_session_exists (self, uid, active))
  		return TRUE;
 +
-+#ifdef SESSION_TRACKING_SYSTEMD
++#if SESSION_TRACKING_XLOGIND
 +	}
  #endif
  
@@ -87,14 +73,14 @@
 @@ -368,26 +368,28 @@ static void
  nm_session_monitor_init (NMSessionMonitor *monitor)
  {
- #ifdef SESSION_TRACKING_SYSTEMD
+ #if SESSION_TRACKING_XLOGIND
 +	if (sd_booted () > 0) {
  	st_sd_init (monitor);
  	_LOGD ("using "LOGIND_NAME" session tracking");
 +	} else
  #endif
  
--#ifdef SESSION_TRACKING_CONSOLEKIT
+-#if SESSION_TRACKING_CONSOLEKIT
 +	{
  	ck_init (monitor);
  	_LOGD ("using ConsoleKit session tracking");
@@ -105,13 +91,13 @@
  static void
  finalize (GObject *object)
  {
- #ifdef SESSION_TRACKING_SYSTEMD
+ #if SESSION_TRACKING_XLOGIND
 +	if (sd_booted () > 0)
  	st_sd_finalize (NM_SESSION_MONITOR (object));
 +	else
  #endif
  
--#ifdef SESSION_TRACKING_CONSOLEKIT
+-#if SESSION_TRACKING_CONSOLEKIT
  	ck_finalize (NM_SESSION_MONITOR (object));
 -#endif
  
