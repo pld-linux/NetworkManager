@@ -6,13 +6,13 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.14.0
+Version:	1.14.4
 Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.14/%{name}-%{version}.tar.xz
-# Source0-md5:	bedae3bb29bc68825b6c616a68cc6ba9
+# Source0-md5:	54ce62f0aa18ef6c5e754eaac47494ac
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
@@ -204,6 +204,7 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 %{__autoheader}
 %{__automake}
 %configure \
+	--enable-config-plugin-ibft \
 	--enable-gtk-doc \
 	--enable-ifcfg-rh \
 	--enable-more-warnings \
@@ -320,6 +321,7 @@ exit 0
 %attr(755,root,root) %{_libexecdir}/nm-iface-helper
 %attr(755,root,root) %{_libexecdir}/nm-ifdown
 %attr(755,root,root) %{_libexecdir}/nm-ifup
+%attr(755,root,root) %{_libexecdir}/nm-initrd-generator
 %attr(755,root,root) %{_libdir}/pppd/plugins/nm-pppd-plugin.so
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
 %if "%{_lib}" != "lib"
@@ -368,6 +370,7 @@ exit 0
 %{_mandir}/man7/nm-openvswitch.7*
 %{_mandir}/man7/nmcli-examples.7*
 %{_mandir}/man8/NetworkManager.8*
+%{_mandir}/man8/nm-initrd-generator.8*
 %{_examplesdir}/%{name}-%{version}
 
 %files apidocs
