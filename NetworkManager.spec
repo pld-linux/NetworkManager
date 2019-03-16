@@ -6,13 +6,13 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.14.6
+Version:	1.16.0
 Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.14/%{name}-%{version}.tar.xz
-# Source0-md5:	6881d04fe72e09a98bd9bfb26813544b
+Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.16/%{name}-%{version}.tar.xz
+# Source0-md5:	10abacaafb162a67d2942adf03e7e9e4
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
@@ -334,7 +334,6 @@ exit 0
 %{systemdunitdir}/NetworkManager-wait-online.service
 %dir %{systemdunitdir}/NetworkManager.service.d
 %{systemdunitdir}/NetworkManager.service.d/NetworkManager-ovs.conf
-%{_datadir}/dbus-1/system-services/org.freedesktop.NetworkManager.service
 %{systemdtmpfilesdir}/%{name}.conf
 %{_datadir}/dbus-1/system-services/org.freedesktop.nm_dispatcher.service
 %{_datadir}/polkit-1/actions/org.freedesktop.NetworkManager.policy
