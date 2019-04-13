@@ -45,6 +45,7 @@ BuildRequires:	libtool >= 2:2.2
 BuildRequires:	libuuid-devel
 BuildRequires:	libxslt-progs
 BuildRequires:	newt-devel >= 0.52.15
+# also gnutls (>= 2.12) possible (--with-crypto=gnutls)
 BuildRequires:	nss-devel >= 3.11
 BuildRequires:	perl-base
 BuildRequires:	pkgconfig
