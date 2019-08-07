@@ -6,13 +6,13 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.18.2
+Version:	1.20.0
 Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.18/%{name}-%{version}.tar.xz
-# Source0-md5:	ca1e6175c6ba97ca1adf65a67861ccd9
+Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.20/%{name}-%{version}.tar.xz
+# Source0-md5:	109df9b0813755a98735206f5b2d68da
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
@@ -100,8 +100,8 @@ Network Manager for GNOME.
 Zarządca sieci dla GNOME.
 
 %package apidocs
-Summary:	libnm-glib library API documentation
-Summary(pl.UTF-8):	Dokumentacja API biblioteki libnm-glib
+Summary:	libnm library API documentation
+Summary(pl.UTF-8):	Dokumentacja API biblioteki libnm
 Group:		Documentation
 Requires:	gtk-doc-common
 %if "%{_rpmversion}" >= "5"
@@ -109,10 +109,10 @@ BuildArch:	noarch
 %endif
 
 %description apidocs
-libnm-glib library API documentation.
+libnm library API documentation.
 
 %description apidocs -l pl.UTF-8
-Dokumentacja API biblioteki libnm-glib.
+Dokumentacja API biblioteki libnm.
 
 %package libs
 Summary:	Network Manager shared libraries
@@ -205,7 +205,6 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 %{__autoheader}
 %{__automake}
 %configure \
-	--enable-config-plugin-ibft \
 	--enable-gtk-doc \
 	--enable-ifcfg-rh \
 	--enable-more-warnings \
@@ -217,7 +216,6 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 	--with-html-dir=%{_gtkdocdir} \
 	--with-iptables=/usr/sbin/iptables \
 	--with-iwd=yes \
-	--with-libnm-glib \
 	--with-nmcli \
 	--with-system-ca-path=/etc/certs \
 	--with-systemdsystemunitdir=%{systemdunitdir} \
@@ -225,7 +223,6 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 	--with-suspend-resume=%{?with_systemd:systemd}%{!?with_systemd:upower} \
 	--with-pppd=/usr/sbin/pppd \
 	--with-pppd-plugin-dir=%{_libdir}/pppd/plugins \
-	--with-pppoe=/usr/sbin/pppoe \
 	--with-resolvconf=/sbin/resolvconf \
 	--with-udev-dir=/lib/udev \
 	--with-dist-version=%{version}-%{release}
@@ -314,7 +311,6 @@ exit 0
 %attr(755,root,root) %{distplugindir}/libnm-device-plugin-wwan.so
 %attr(755,root,root) %{distplugindir}/libnm-device-plugin-team.so
 %attr(755,root,root) %{distplugindir}/libnm-ppp-plugin.so
-%attr(755,root,root) %{distplugindir}/libnm-settings-plugin-ibft.so
 %attr(755,root,root) %{distplugindir}/libnm-settings-plugin-ifcfg-rh.so
 %attr(755,root,root) %{distplugindir}/libnm-wwan.so
 %attr(755,root,root) %{_libexecdir}/nm-dhcp-helper
@@ -377,59 +373,31 @@ exit 0
 %defattr(644,root,root,755)
 %{_gtkdocdir}/NetworkManager
 %{_gtkdocdir}/libnm
-%{_gtkdocdir}/libnm-glib
-%{_gtkdocdir}/libnm-util
 
 %files libs
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libnm.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libnm.so.0
-%attr(755,root,root) %{_libdir}/libnm-util.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libnm-util.so.2
-%attr(755,root,root) %{_libdir}/libnm-glib.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libnm-glib.so.4
-%attr(755,root,root) %{_libdir}/libnm-glib-vpn.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libnm-glib-vpn.so.1
 %{_libdir}/girepository-1.0/NM-1.0.typelib
-%{_libdir}/girepository-1.0/NMClient-1.0.typelib
-%{_libdir}/girepository-1.0/NetworkManager-1.0.typelib
 
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libnm.so
-%attr(755,root,root) %{_libdir}/libnm-util.so
-%attr(755,root,root) %{_libdir}/libnm-glib.so
-%attr(755,root,root) %{_libdir}/libnm-glib-vpn.so
-%{_includedir}/NetworkManager
 %{_includedir}/libnm
-%{_includedir}/libnm-glib
-%{_pkgconfigdir}/NetworkManager.pc
 %{_pkgconfigdir}/libnm.pc
-%{_pkgconfigdir}/libnm-util.pc
-%{_pkgconfigdir}/libnm-glib-vpn.pc
-%{_pkgconfigdir}/libnm-glib.pc
 %{_datadir}/dbus-1/interfaces/org.freedesktop.NetworkManager.xml
 %{_datadir}/dbus-1/interfaces/org.freedesktop.NetworkManager.*.xml
 %{_datadir}/gir-1.0/NM-1.0.gir
-%{_datadir}/gir-1.0/NMClient-1.0.gir
-%{_datadir}/gir-1.0/NetworkManager-1.0.gir
 
 %files static
 %defattr(644,root,root,755)
 %{_libdir}/libnm.a
-%{_libdir}/libnm-util.a
-%{_libdir}/libnm-glib.a
-%{_libdir}/libnm-glib-vpn.a
 
 %if %{with vala}
 %files -n vala-NetworkManager
 %defattr(644,root,root,755)
 %{_datadir}/vala/vapi/libnm.deps
 %{_datadir}/vala/vapi/libnm.vapi
-%{_datadir}/vala/vapi/libnm-glib.deps
-%{_datadir}/vala/vapi/libnm-glib.vapi
-%{_datadir}/vala/vapi/libnm-util.deps
-%{_datadir}/vala/vapi/libnm-util.vapi
 %endif
 
 %files -n bash-completion-NetworkManager
