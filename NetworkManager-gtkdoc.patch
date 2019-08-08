@@ -1,0 +1,11 @@
+--- NetworkManager-1.20.0/docs/libnm/Makefile.am.orig	2019-08-06 12:22:08.000000000 +0200
++++ NetworkManager-1.20.0/docs/libnm/Makefile.am	2019-08-08 20:48:19.932061834 +0200
+@@ -19,7 +19,7 @@
+ 	$(top_builddir)/libnm
+ 
+ # Extra options to supply to gtkdoc-scan.
+-SCAN_OPTIONS=--rebuild-types --rebuild-sections
++SCAN_OPTIONS=--rebuild-types --rebuild-sections --ignore-decorators='NM_DEPRECATED_IN_1_2|NM_AVAILABLE_IN_1_2'
+ 
+ # Extra options to supply to gtkdoc-mkdb.
+ MKDB_OPTIONS=--sgml-mode --output-format=xml
