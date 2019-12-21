@@ -6,13 +6,13 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.20.8
+Version:	1.22.0
 Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.20/%{name}-%{version}.tar.xz
-# Source0-md5:	c0ceb5ab14bfdfeee07536d94cc5c548
+Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.22/%{name}-%{version}.tar.xz
+# Source0-md5:	749a2f2f457c55eaf05087a2b4b0ccb7
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
@@ -313,6 +313,7 @@ exit 0
 %attr(755,root,root) %{distplugindir}/libnm-ppp-plugin.so
 %attr(755,root,root) %{distplugindir}/libnm-settings-plugin-ifcfg-rh.so
 %attr(755,root,root) %{distplugindir}/libnm-wwan.so
+%attr(755,root,root) %{_libexecdir}/nm-cloud-setup
 %attr(755,root,root) %{_libexecdir}/nm-dhcp-helper
 %attr(755,root,root) %{_libexecdir}/nm-dispatcher
 %attr(755,root,root) %{_libexecdir}/nm-iface-helper
@@ -326,9 +327,15 @@ exit 0
 %endif
 %dir %{_prefix}/lib/NetworkManager/VPN
 %dir %{_prefix}/lib/NetworkManager/conf.d
+%dir %{_prefix}/lib/NetworkManager/dispatcher.d
+%{_prefix}/lib/NetworkManager/dispatcher.d/90-nm-cloud-setup.sh
+%dir %{_prefix}/lib/NetworkManager/dispatcher.d/no-wait.d
+%{_prefix}/lib/NetworkManager/dispatcher.d/no-wait.d/90-nm-cloud-setup.sh
 %{systemdunitdir}/NetworkManager.service
 %{systemdunitdir}/NetworkManager-dispatcher.service
 %{systemdunitdir}/NetworkManager-wait-online.service
+%{systemdunitdir}/nm-cloud-setup.service
+%{systemdunitdir}/nm-cloud-setup.timer
 %dir %{systemdunitdir}/NetworkManager.service.d
 %{systemdunitdir}/NetworkManager.service.d/NetworkManager-ovs.conf
 %{systemdtmpfilesdir}/%{name}.conf
