@@ -196,6 +196,14 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 %patch1 -p1
 %{?with_systemd:%patch2 -p1}
 
+grep -rl /usr/bin/env examples | xargs sed -i -e '1{
+	s,^#!.*bin/env gjs,#!/usr/bin/gjs,
+	s,^#!.*bin/env lua,#!%{__lua},
+	s,^#!.*bin/env python,#!%{__python},
+	s,^#!.*bin/env ruby,#!%{__ruby},
+}'
+
+
 %build
 %{__gtkdocize}
 %{__intltoolize}
