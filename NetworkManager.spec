@@ -11,7 +11,7 @@ Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.22/%{name}-%{version}.tar.xz
+Source0:	https://download.gnome.org/sources/NetworkManager/1.22/%{name}-%{version}.tar.xz
 # Source0-md5:	14e4933253b2135ccfb6adc97d322fab
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
