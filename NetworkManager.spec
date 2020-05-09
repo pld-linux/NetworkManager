@@ -6,18 +6,17 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.22.10
+Version:	1.24.0
 Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	https://download.gnome.org/sources/NetworkManager/1.22/%{name}-%{version}.tar.xz
-# Source0-md5:	b7b8875c3ef1db0989f78351ba3e8ad8
+Source0:	https://download.gnome.org/sources/NetworkManager/1.24/%{name}-%{version}.tar.xz
+# Source0-md5:	7e2bda987e5b8c2e004d9bdb5cb0dc62
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
 Patch0:		ifcfg-path.patch
-Patch1:		%{name}-sh.patch
 Patch2:		systemd-fallback.patch
 URL:		https://wiki.gnome.org/Projects/NetworkManager
 BuildRequires:	ModemManager-devel >= 1.0.0
@@ -27,7 +26,6 @@ BuildRequires:	automake >= 1:1.12
 BuildRequires:	bluez-libs-devel >= 5.0
 BuildRequires:	curl-devel >= 7.24.0
 BuildRequires:	dbus-devel >= 1.1.0
-BuildRequires:	dbus-glib-devel >= 0.100
 BuildRequires:	gettext-tools >= 0.17
 BuildRequires:	glib2-devel >= 1:2.38.0
 BuildRequires:	gnome-common
@@ -118,7 +116,6 @@ Dokumentacja API biblioteki libnm.
 Summary:	Network Manager shared libraries
 Summary(pl.UTF-8):	Biblioteki dzielone Network Managera
 Group:		Libraries
-Requires:	dbus-glib >= 0.100
 Requires:	glib2 >= 1:2.38.0
 Requires:	nss >= 3.11
 Requires:	udev-libs >= 1:175
@@ -135,7 +132,6 @@ Summary:	Network Manager includes and more
 Summary(pl.UTF-8):	Pliki nagłówkowe Network Managera
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{epoch}:%{version}-%{release}
-Requires:	dbus-glib-devel >= 0.100
 Requires:	glib2-devel >= 1:2.38.0
 Requires:	libuuid-devel
 Requires:	nss-devel >= 3.11
@@ -193,7 +189,6 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p1
 %{?with_systemd:%patch2 -p1}
 
 grep -rl /usr/bin/env examples | xargs sed -i -e '1{
