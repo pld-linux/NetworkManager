@@ -1,3 +1,4 @@
+# TODO: unpackaged /usr/lib/firewalld/zones/nm-shared.xml
 #
 # Conditional build
 %bcond_without	systemd # use systemd for session tracking instead of ConsoleKit (fallback to ConsoleKit on runtime)
@@ -6,13 +7,13 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.24.0
+Version:	1.24.2
 Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	https://download.gnome.org/sources/NetworkManager/1.24/%{name}-%{version}.tar.xz
-# Source0-md5:	7e2bda987e5b8c2e004d9bdb5cb0dc62
+Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.24/%{name}-%{version}.tar.xz
+# Source0-md5:	f3203a45ea1a7170740b70b763a9217d
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
