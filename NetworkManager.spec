@@ -1,19 +1,20 @@
-# TODO: unpackaged /usr/lib/firewalld/zones/nm-shared.xml
+# TODO: package /usr/lib/firewalld/zones/nm-shared.xml for firewalld support
 #
 # Conditional build
-%bcond_without	systemd # use systemd for session tracking instead of ConsoleKit (fallback to ConsoleKit on runtime)
-%bcond_without	vala	# Vala API
+%bcond_without	systemd		# use systemd for session tracking instead of ConsoleKit (fallback to ConsoleKit on runtime)
+%bcond_without	vala		# Vala API
+%bcond_with	firewalld	# Firewalld zone for shared mode
 
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.24.2
+Version:	1.26.0
 Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.24/%{name}-%{version}.tar.xz
-# Source0-md5:	f3203a45ea1a7170740b70b763a9217d
+Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.26/%{name}-%{version}.tar.xz
+# Source0-md5:	c0edbbf98a1ec81eed5a03539610d324
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
@@ -103,7 +104,7 @@ Summary:	libnm library API documentation
 Summary(pl.UTF-8):	Dokumentacja API biblioteki libnm
 Group:		Documentation
 Requires:	gtk-doc-common
-%if "%{_rpmversion}" >= "5"
+%if "%{_rpmversion}" >= "4.6"
 BuildArch:	noarch
 %endif
 
@@ -161,7 +162,7 @@ Summary(pl.UTF-8):	API języka Vala do bibliotek NetworkManagera
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{epoch}:%{version}-%{release}
 Requires:	vala >= 2:0.17.1.24
-%if "%{_rpmversion}" >= "5"
+%if "%{_rpmversion}" >= "4.6"
 BuildArch:	noarch
 %endif
 
@@ -177,7 +178,7 @@ Summary(pl.UTF-8):	Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmc
 Group:		Applications/Shells
 Requires:	%{name} = %{epoch}:%{version}-%{release}
 Requires:	bash-completion >= 2.0
-%if "%{_rpmversion}" >= "5"
+%if "%{_rpmversion}" >= "4.6"
 BuildArch:	noarch
 %endif
 
@@ -217,6 +218,7 @@ grep -rl /usr/bin/env examples | xargs sed -i -e '1{
 	%{!?with_vala:--disable-vala} \
 	--with-dhclient=/sbin/dhclient \
 	--with-dhcpcd=/sbin/dhcpcd \
+	%{!?with_firewalld:--disable-firewalld-zone} \
 	--with-html-dir=%{_gtkdocdir} \
 	--with-iptables=/usr/sbin/iptables \
 	--with-iwd=yes \
@@ -370,9 +372,11 @@ exit 0
 %{_mandir}/man1/nmtui-hostname.1*
 %{_mandir}/man1/nmtui.1*
 %{_mandir}/man5/NetworkManager.conf.5*
+%{_mandir}/man5/nm-settings.5*
+%{_mandir}/man5/nm-settings-dbus.5*
 %{_mandir}/man5/nm-settings-ifcfg-rh.5*
 %{_mandir}/man5/nm-settings-keyfile.5*
-%{_mandir}/man5/nm-settings.5*
+%{_mandir}/man5/nm-settings-nmcli.5*
 %{_mandir}/man5/nm-system-settings.conf.5*
 %{_mandir}/man7/nm-openvswitch.7*
 %{_mandir}/man7/nmcli-examples.7*
