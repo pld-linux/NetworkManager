@@ -9,103 +9,101 @@
  else
  	have_systemd_logind=no
  fi
---- NetworkManager-1.8.0/src/nm-session-monitor.c.orig	2017-05-10 10:59:08.000000000 +0200
-+++ NetworkManager-1.8.0/src/nm-session-monitor.c	2017-05-27 23:07:26.988108884 +0200
-@@ -33,6 +33,7 @@
+--- NetworkManager-1.28.0/src/nm-session-monitor.c.orig	2020-11-17 22:24:23.000000000 +0100
++++ NetworkManager-1.28.0/src/nm-session-monitor.c	2020-12-07 17:27:16.046393625 +0100
+@@ -18,6 +18,7 @@
  #endif
  
  #if SESSION_TRACKING_SYSTEMD
-+#include <systemd/sd-daemon.h>
- #include <systemd/sd-login.h>
- #define LOGIND_NAME "systemd-logind"
++    #include <systemd/sd-daemon.h>
+     #include <systemd/sd-login.h>
+     #define LOGIND_NAME "systemd-logind"
  #endif
-@@ -65,13 +66,11 @@ struct _NMSessionMonitor {
- 	} sd;
+@@ -52,13 +53,11 @@ struct _NMSessionMonitor {
+     } sd;
  #endif
  
 -#if SESSION_TRACKING_CONSOLEKIT
- 	struct {
- 		GFileMonitor *monitor;
- 		GHashTable *cache;
- 		time_t timestamp;
- 	} ck;
+     struct {
+         GFileMonitor *monitor;
+         GHashTable *  cache;
+         time_t        timestamp;
+     } ck;
 -#endif
  };
  
  struct _NMSessionMonitorClass {
-@@ -144,7 +143,6 @@ st_sd_finalize (NMSessionMonitor *monito
+@@ -136,7 +135,6 @@ st_sd_finalize(NMSessionMonitor *monitor
  
  /*****************************************************************************/
  
 -#if SESSION_TRACKING_CONSOLEKIT
  typedef struct {
- 	gboolean active;
+     gboolean active;
  } CkSession;
-@@ -278,7 +276,6 @@ ck_finalize (NMSessionMonitor *monitor)
- 	g_clear_pointer (&monitor->ck.cache, g_hash_table_unref);
- 	g_clear_object (&monitor->ck.monitor);
+@@ -269,7 +267,6 @@ ck_finalize(NMSessionMonitor *monitor)
+     nm_clear_pointer(&monitor->ck.cache, g_hash_table_unref);
+     g_clear_object(&monitor->ck.monitor);
  }
 -#endif /* SESSION_TRACKING_CONSOLEKIT */
  
  /*****************************************************************************/
  
-@@ -350,13 +347,16 @@ nm_session_monitor_session_exists (NMSes
- 	g_return_val_if_fail (NM_IS_SESSION_MONITOR (self), FALSE);
+@@ -295,14 +292,15 @@ nm_session_monitor_session_exists(NMSess
+     g_return_val_if_fail(NM_IS_SESSION_MONITOR(self), FALSE);
  
  #if SESSION_TRACKING_XLOGIND
--	if (st_sd_session_exists (self, uid, active))
--		return TRUE;
-+	if (sd_booted () > 0) {
-+		if (st_sd_session_exists (self, uid, active))
-+			return TRUE;
-+	} else {
++  if (sd_booted() > 0) {
+     if (st_sd_session_exists(self, uid, active))
+         return TRUE;
++  } else
  #endif
 -
 -#if SESSION_TRACKING_CONSOLEKIT
- 	if (ck_session_exists (self, uid, active))
- 		return TRUE;
-+
-+#if SESSION_TRACKING_XLOGIND
-+	}
- #endif
++  {
+     if (ck_session_exists(self, uid, active))
+         return TRUE;
+-#endif
++  }
  
- 	return FALSE;
-@@ -368,26 +368,28 @@ static void
- nm_session_monitor_init (NMSessionMonitor *monitor)
+     return FALSE;
+ }
+@@ -313,26 +311,28 @@ static void
+ nm_session_monitor_init(NMSessionMonitor *monitor)
  {
  #if SESSION_TRACKING_XLOGIND
-+	if (sd_booted () > 0) {
- 	st_sd_init (monitor);
- 	_LOGD ("using "LOGIND_NAME" session tracking");
-+	} else
++  if (sd_booted() > 0) {
+     st_sd_init(monitor);
+     _LOGD("using " LOGIND_NAME " session tracking");
++  } else
  #endif
  
 -#if SESSION_TRACKING_CONSOLEKIT
-+	{
- 	ck_init (monitor);
- 	_LOGD ("using ConsoleKit session tracking");
++  {
+     ck_init(monitor);
+     _LOGD("using ConsoleKit session tracking");
 -#endif
-+	}
++  }
  }
  
  static void
- finalize (GObject *object)
+ finalize(GObject *object)
  {
  #if SESSION_TRACKING_XLOGIND
-+	if (sd_booted () > 0)
- 	st_sd_finalize (NM_SESSION_MONITOR (object));
-+	else
++  if (sd_booted() > 0)
+     st_sd_finalize(NM_SESSION_MONITOR(object));
++  else
  #endif
  
 -#if SESSION_TRACKING_CONSOLEKIT
- 	ck_finalize (NM_SESSION_MONITOR (object));
+     ck_finalize(NM_SESSION_MONITOR(object));
 -#endif
  
- 	G_OBJECT_CLASS (nm_session_monitor_parent_class)->finalize (object);
+     G_OBJECT_CLASS(nm_session_monitor_parent_class)->finalize(object);
  }
---- NetworkManager-1.8.0/src/nm-sleep-monitor.c.orig	2017-05-10 10:59:08.000000000 +0200
-+++ NetworkManager-1.8.0/src/nm-sleep-monitor.c	2017-05-27 23:22:47.011431711 +0200
-@@ -26,6 +26,10 @@
+--- NetworkManager-1.28.0/src/nm-sleep-monitor.c.orig	2020-11-17 22:24:23.000000000 +0100
++++ NetworkManager-1.28.0/src/nm-sleep-monitor.c	2020-12-07 21:18:39.301181579 +0100
+@@ -11,6 +11,10 @@
  #include <sys/stat.h>
  #include <gio/gunixfdlist.h>
  
@@ -116,25 +114,25 @@
  #include "nm-core-internal.h"
  #include "NetworkManagerUtils.h"
  
-@@ -40,9 +44,9 @@
+@@ -24,9 +28,9 @@
  
- #elif defined (SUSPEND_RESUME_SYSTEMD) || defined (SUSPEND_RESUME_ELOGIND)
+ #elif defined(SUSPEND_RESUME_SYSTEMD) || defined(SUSPEND_RESUME_ELOGIND)
  
--#define SUSPEND_DBUS_NAME               "org.freedesktop.login1"
--#define SUSPEND_DBUS_PATH               "/org/freedesktop/login1"
--#define SUSPEND_DBUS_INTERFACE          "org.freedesktop.login1.Manager"
-+#define SD_SUSPEND_DBUS_NAME               "org.freedesktop.login1"
-+#define SD_SUSPEND_DBUS_PATH               "/org/freedesktop/login1"
-+#define SD_SUSPEND_DBUS_INTERFACE          "org.freedesktop.login1.Manager"
- #define USE_UPOWER                      0
- #if defined (SUSPEND_RESUME_SYSTEMD)
- #define _NMLOG_PREFIX_NAME              "sleep-monitor-sd"
-@@ -52,6 +56,17 @@
+-    #define SUSPEND_DBUS_NAME      "org.freedesktop.login1"
+-    #define SUSPEND_DBUS_PATH      "/org/freedesktop/login1"
+-    #define SUSPEND_DBUS_INTERFACE "org.freedesktop.login1.Manager"
++    #define SD_SUSPEND_DBUS_NAME      "org.freedesktop.login1"
++    #define SD_SUSPEND_DBUS_PATH      "/org/freedesktop/login1"
++    #define SD_SUSPEND_DBUS_INTERFACE "org.freedesktop.login1.Manager"
+     #define USE_UPOWER             0
+     #if defined(SUSPEND_RESUME_SYSTEMD)
+         #define _NMLOG_PREFIX_NAME "sleep-monitor-sd"
+@@ -36,6 +40,17 @@
  
  #elif defined(SUSPEND_RESUME_CONSOLEKIT)
  
-+#define USE_UPOWER                      0
-+#define _NMLOG_PREFIX_NAME              "sleep-monitor-ck"
++    #define USE_UPOWER                      0
++    #define _NMLOG_PREFIX_NAME              "sleep-monitor-ck"
 +
 +#else
 +
@@ -147,34 +145,37 @@
  /* ConsoleKit2 has added the same suspend/resume DBUS API that Systemd
   * uses. http://consolekit2.github.io/ConsoleKit2/#Manager.Inhibit
   */
-@@ -59,12 +74,6 @@
- #define SUSPEND_DBUS_NAME               "org.freedesktop.ConsoleKit"
- #define SUSPEND_DBUS_PATH               "/org/freedesktop/ConsoleKit/Manager"
- #define SUSPEND_DBUS_INTERFACE          "org.freedesktop.ConsoleKit.Manager"
--#define USE_UPOWER                      0
--#define _NMLOG_PREFIX_NAME              "sleep-monitor-ck"
+@@ -43,12 +58,6 @@
+     #define SUSPEND_DBUS_NAME      "org.freedesktop.ConsoleKit"
+     #define SUSPEND_DBUS_PATH      "/org/freedesktop/ConsoleKit/Manager"
+     #define SUSPEND_DBUS_INTERFACE "org.freedesktop.ConsoleKit.Manager"
+-    #define USE_UPOWER             0
+-    #define _NMLOG_PREFIX_NAME     "sleep-monitor-ck"
 -
 -#else
 -
--#error define one of SUSPEND_RESUME_SYSTEMD, SUSPEND_RESUME_ELOGIND, SUSPEND_RESUME_CONSOLEKIT, or SUSPEND_RESUME_UPOWER
+-    #error define one of SUSPEND_RESUME_SYSTEMD, SUSPEND_RESUME_ELOGIND, SUSPEND_RESUME_CONSOLEKIT, or SUSPEND_RESUME_UPOWER
  
  #endif
  
-@@ -347,6 +356,17 @@ nm_sleep_monitor_init (NMSleepMonitor *s
+@@ -329,6 +338,20 @@ nm_sleep_monitor_init(NMSleepMonitor *se
  {
- 	self->inhibit_fd = -1;
- 	self->cancellable = g_cancellable_new ();
+     self->inhibit_fd  = -1;
+     self->cancellable = g_cancellable_new();
 +#ifdef SUSPEND_RESUME_SYSTEMD
-+	if (sd_booted () > 0)
-+		g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,
-+			                      G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START |
-+			                      G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
-+			                      NULL,
-+			                      SD_SUSPEND_DBUS_NAME, SD_SUSPEND_DBUS_PATH, SD_SUSPEND_DBUS_INTERFACE,
-+			                      self->cancellable,
-+			                      (GAsyncReadyCallback) on_proxy_acquired, self);
-+	else
++  if (sd_booted() > 0)
++    g_dbus_proxy_new_for_bus(G_BUS_TYPE_SYSTEM,
++                             G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START
++                                 | G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
++                             NULL,
++                             SD_SUSPEND_DBUS_NAME,
++                             SD_SUSPEND_DBUS_PATH,
++                             SD_SUSPEND_DBUS_INTERFACE,
++                             self->cancellable,
++                             (GAsyncReadyCallback) on_proxy_acquired,
++                             self);
++  else
 +#endif
- 	g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,
- 	                          G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START |
- 	                          G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
+     g_dbus_proxy_new_for_bus(G_BUS_TYPE_SYSTEM,
+                              G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START
+                                  | G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,

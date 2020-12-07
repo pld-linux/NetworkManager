@@ -8,13 +8,13 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.26.4
+Version:	1.28.0
 Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/1.26/%{name}-%{version}.tar.xz
-# Source0-md5:	86d74ff1ee79ddf2688348990870652d
+Source0:	https://download.gnome.org/sources/NetworkManager/1.28/%{name}-%{version}.tar.xz
+# Source0-md5:	3c4a70764ec3418a796b2c3f2a1f83e0
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
@@ -35,7 +35,7 @@ BuildRequires:	gobject-introspection-devel >= 0.10.0
 BuildRequires:	gtk-doc >= 1.0
 BuildRequires:	gtk-doc-automake >= 1.0
 BuildRequires:	intltool >= 0.40.0
-BuildRequires:	jansson-devel >= 2.5
+BuildRequires:	jansson-devel >= 2.7
 BuildRequires:	libndp-devel
 BuildRequires:	libnl-devel >= 3.2.8
 BuildRequires:	libpsl-devel >= 0.1
@@ -51,9 +51,10 @@ BuildRequires:	perl-base
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.97
 BuildRequires:	ppp-plugin-devel >= 3:2.4.6
-BuildRequires:	python-pygobject3
+BuildRequires:	python3 >= 3
+BuildRequires:	python3-pygobject3
 BuildRequires:	readline-devel
-BuildRequires:	rpmbuild(macros) >= 1.673
+BuildRequires:	rpmbuild(macros) >= 1.752
 BuildRequires:	sed >= 4.0
 %{?with_systemd:BuildRequires:	systemd-devel >= 1:209}
 BuildRequires:	tar >= 1:1.22
@@ -71,7 +72,7 @@ Requires:	ConsoleKit-x11
 Requires:	curl-libs >= 7.24.0
 Requires:	dhcp-client
 Requires:	filesystem >= 3.0-37
-Requires:	jansson >= 2.5
+Requires:	jansson >= 2.7
 Requires:	libnl >= 3.2.8
 Requires:	libpsl >= 0.1
 Requires:	libteamdctl >= 1.9
@@ -104,9 +105,7 @@ Summary:	libnm library API documentation
 Summary(pl.UTF-8):	Dokumentacja API biblioteki libnm
 Group:		Documentation
 Requires:	gtk-doc-common
-%if "%{_rpmversion}" >= "4.6"
-BuildArch:	noarch
-%endif
+%{?noarchpackage}
 
 %description apidocs
 libnm library API documentation.
@@ -162,9 +161,7 @@ Summary(pl.UTF-8):	API języka Vala do bibliotek NetworkManagera
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{epoch}:%{version}-%{release}
 Requires:	vala >= 2:0.17.1.24
-%if "%{_rpmversion}" >= "4.6"
-BuildArch:	noarch
-%endif
+%{?noarchpackage}
 
 %description -n vala-NetworkManager
 Vala API for NetworkManager libraries.
@@ -178,9 +175,7 @@ Summary(pl.UTF-8):	Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmc
 Group:		Applications/Shells
 Requires:	%{name} = %{epoch}:%{version}-%{release}
 Requires:	bash-completion >= 2.0
-%if "%{_rpmversion}" >= "4.6"
-BuildArch:	noarch
-%endif
+%{?noarchpackage}
 
 %description -n bash-completion-NetworkManager
 Bash completion for NetworkManager command (nmcli).
