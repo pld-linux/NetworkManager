@@ -1,0 +1,22 @@
+--- NetworkManager-1.28.0/shared/systemd/src/basic/missing_syscall.h.orig	2020-11-17 22:24:23.000000000 +0100
++++ NetworkManager-1.28.0/shared/systemd/src/basic/missing_syscall.h	2020-12-09 21:56:58.994594968 +0100
+@@ -646,6 +646,8 @@
+ #  endif
+ #elif defined __ia64__
+ #  define systemd_NR_pidfd_send_signal (424 + 1024)
++#elif defined(__x86_64__) && defined(__ILP32__)
++#  define systemd_NR_pidfd_send_signal (424 + 0x40000000)
+ #else
+ #  define systemd_NR_pidfd_send_signal 424
+ #endif
+@@ -690,7 +692,9 @@
+ #  endif
+ #elif defined __ia64__
+ #  define systemd_NR_pidfd_open (434 + 1024)
+-#else
++#elif defined(__x86_64__) && defined(__ILP32__)
++#  define systemd_NR_pidfd_open (434 + 0x40000000)
++#else 
+ #  define systemd_NR_pidfd_open 434
+ #endif
+ 
