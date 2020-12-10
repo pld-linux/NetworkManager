@@ -1,13 +1,13 @@
 TODO: make it configurable via dist tag in configure.ac
 
---- NetworkManager-1.6.0/src/settings/plugins/ifcfg-rh/nms-ifcfg-rh-common.h.orig	2017-01-26 19:50:33.226726682 +0100
-+++ NetworkManager-1.6.0/src/settings/plugins/ifcfg-rh/nms-ifcfg-rh-common.h	2017-01-26 19:50:44.573393224 +0100
-@@ -36,7 +36,7 @@
+--- NetworkManager-1.28.0/src/settings/plugins/ifcfg-rh/nms-ifcfg-rh-common.h.orig	2020-12-09 21:18:05.050791134 +0100
++++ NetworkManager-1.28.0/src/settings/plugins/ifcfg-rh/nms-ifcfg-rh-common.h	2020-12-09 21:18:11.494457108 +0100
+@@ -21,7 +21,7 @@
  #define AUGNEW_TAG ".augnew"
  #define AUGTMP_TAG ".augtmp"
  
 -#define IFCFG_DIR SYSCONFDIR "/sysconfig/network-scripts"
 +#define IFCFG_DIR SYSCONFDIR "/sysconfig/interfaces"
  
- #define IFCFG_PLUGIN_NAME "ifcfg-rh"
- #define IFCFG_PLUGIN_INFO "(c) 2007 - 2015 Red Hat, Inc.  To report bugs please use the NetworkManager mailing list."
+ #define TYPE_ETHERNET   "Ethernet"
+ #define TYPE_WIRELESS   "Wireless"

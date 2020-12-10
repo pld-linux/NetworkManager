@@ -9,7 +9,7 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	1.28.0
-Release:	1
+Release:	2
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
@@ -19,6 +19,7 @@ Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
 Patch0:		ifcfg-path.patch
+Patch1:		%{name}-x32.patch
 Patch2:		systemd-fallback.patch
 URL:		https://wiki.gnome.org/Projects/NetworkManager
 BuildRequires:	ModemManager-devel >= 1.0.0
@@ -186,6 +187,7 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 %{?with_systemd:%patch2 -p1}
 
 grep -rl /usr/bin/env examples | xargs sed -i -e '1{
@@ -280,12 +282,13 @@ fi
 %triggerpostun -- NetworkManager < 2:0.9.2.0-5
 %systemd_trigger NetworkManager.service NetworkManager-wait-online.service
 
-%triggerun -- NetworkManager < 0.7.0-0.svn4027.1
-%service -q NetworkManagerDispatcher stop
-/sbin/chkconfig --del NetworkManagerDispatcher
-
 %triggerun -- NetworkManager < 0.8.9997-5
-# move network interfaces description files to new location
+# < 0.7.0-0.svn4027.1: disable obsolete service
+if /sbin/chkconfig --list | grep -q NetworkManagerDispatcher ; then
+	%service -q NetworkManagerDispatcher stop
+	/sbin/chkconfig --del NetworkManagerDispatcher
+fi
+# < 0.8.9997-5: move network interfaces description files to new location
 mv -f /etc/sysconfig/network-scripts/ifcfg-* /etc/sysconfig/interfaces
 mv -f /etc/sysconfig/network-scripts/keys-* /etc/sysconfig/interfaces
 exit 0
