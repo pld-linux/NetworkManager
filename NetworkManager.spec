@@ -8,19 +8,19 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.28.0
-Release:	2
+Version:	1.30.0
+Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	https://download.gnome.org/sources/NetworkManager/1.28/%{name}-%{version}.tar.xz
-# Source0-md5:	3c4a70764ec3418a796b2c3f2a1f83e0
+Source0:	https://download.gnome.org/sources/NetworkManager/1.30/%{name}-%{version}.tar.xz
+# Source0-md5:	dce168235c2b86ebc598d0e13e078ee3
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
 Patch0:		ifcfg-path.patch
-Patch1:		%{name}-x32.patch
-Patch2:		systemd-fallback.patch
+Patch1:		systemd-fallback.patch
+Patch2:		iwd-segfault.patch
 URL:		https://wiki.gnome.org/Projects/NetworkManager
 BuildRequires:	ModemManager-devel >= 1.0.0
 BuildRequires:	audit-libs-devel
@@ -52,7 +52,7 @@ BuildRequires:	perl-base
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.97
 BuildRequires:	ppp-plugin-devel >= 3:2.4.6
-BuildRequires:	python3 >= 3
+BuildRequires:	python3 >= 1:3
 BuildRequires:	python3-pygobject3
 BuildRequires:	readline-devel
 BuildRequires:	rpmbuild(macros) >= 1.752
@@ -187,8 +187,8 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p1
-%{?with_systemd:%patch2 -p1}
+%{?with_systemd:%patch1 -p1}
+%patch2 -p1
 
 grep -rl /usr/bin/env examples | xargs sed -i -e '1{
 	s,^#!.*bin/env gjs,#!/usr/bin/gjs,
@@ -379,6 +379,7 @@ exit 0
 %{_mandir}/man7/nm-openvswitch.7*
 %{_mandir}/man7/nmcli-examples.7*
 %{_mandir}/man8/NetworkManager.8*
+%{_mandir}/man8/nm-cloud-setup.8*
 %{_mandir}/man8/nm-initrd-generator.8*
 %{_examplesdir}/%{name}-%{version}
 
