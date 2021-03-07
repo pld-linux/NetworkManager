@@ -106,7 +106,7 @@ Summary:	libnm library API documentation
 Summary(pl.UTF-8):	Dokumentacja API biblioteki libnm
 Group:		Documentation
 Requires:	gtk-doc-common
-%{?noarchpackage}
+BuildArch:	noarch
 
 %description apidocs
 libnm library API documentation.
@@ -162,7 +162,7 @@ Summary(pl.UTF-8):	API języka Vala do bibliotek NetworkManagera
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{epoch}:%{version}-%{release}
 Requires:	vala >= 2:0.17.1.24
-%{?noarchpackage}
+BuildArch:	noarch
 
 %description -n vala-NetworkManager
 Vala API for NetworkManager libraries.
@@ -176,7 +176,7 @@ Summary(pl.UTF-8):	Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmc
 Group:		Applications/Shells
 Requires:	%{name} = %{epoch}:%{version}-%{release}
 Requires:	bash-completion >= 2.0
-%{?noarchpackage}
+BuildArch:	noarch
 
 %description -n bash-completion-NetworkManager
 Bash completion for NetworkManager command (nmcli).
