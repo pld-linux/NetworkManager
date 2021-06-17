@@ -8,13 +8,13 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.30.4
+Version:	1.32.0
 Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	https://download.gnome.org/sources/NetworkManager/1.30/%{name}-%{version}.tar.xz
-# Source0-md5:	8ce53a38356864832f7f10ad46fcde27
+Source0:	https://download.gnome.org/sources/NetworkManager/1.32/%{name}-%{version}.tar.xz
+# Source0-md5:	637d790b4c4453cf04f141ed71e95957
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
@@ -217,6 +217,7 @@ grep -rl /usr/bin/env examples | xargs sed -i -e '1{
 	--with-html-dir=%{_gtkdocdir} \
 	--with-iptables=/usr/sbin/iptables \
 	--with-iwd=yes \
+	--with-nft=/usr/sbin/nft \
 	--with-nmcli \
 	--with-system-ca-path=/etc/certs \
 	--with-systemdsystemunitdir=%{systemdunitdir} \
@@ -316,6 +317,7 @@ exit 0
 %attr(755,root,root) %{distplugindir}/libnm-settings-plugin-ifcfg-rh.so
 %attr(755,root,root) %{distplugindir}/libnm-wwan.so
 %attr(755,root,root) %{_libexecdir}/nm-cloud-setup
+%attr(755,root,root) %{_libexecdir}/nm-daemon-helper
 %attr(755,root,root) %{_libexecdir}/nm-dhcp-helper
 %attr(755,root,root) %{_libexecdir}/nm-dispatcher
 %attr(755,root,root) %{_libexecdir}/nm-iface-helper
@@ -342,6 +344,9 @@ exit 0
 %{systemdunitdir}/NetworkManager.service.d/NetworkManager-ovs.conf
 %{systemdtmpfilesdir}/%{name}.conf
 %{_datadir}/dbus-1/system-services/org.freedesktop.nm_dispatcher.service
+%{_datadir}/dbus-1/system.d/nm-dispatcher.conf
+%{_datadir}/dbus-1/system.d/nm-ifcfg-rh.conf
+%{_datadir}/dbus-1/system.d/org.freedesktop.NetworkManager.conf
 %{_datadir}/polkit-1/actions/org.freedesktop.NetworkManager.policy
 /lib/udev/rules.d/84-nm-drivers.rules
 /lib/udev/rules.d/85-nm-unmanaged.rules
@@ -356,9 +361,6 @@ exit 0
 %dir %{_sysconfdir}/%{name}/dnsmasq-shared.d
 %dir %{_sysconfdir}/%{name}/system-connections
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/%{name}.conf
-%config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-dispatcher.conf
-%config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/nm-ifcfg-rh.conf
-%config(noreplace) %verify(not md5 mtime size) /etc/dbus-1/system.d/org.freedesktop.NetworkManager.conf
 %attr(711,root,root) %dir /var/run/%{name}
 %attr(700,root,root) %dir /var/lib/%{name}
 %{_mandir}/man1/nm-online.1*
@@ -377,6 +379,7 @@ exit 0
 %{_mandir}/man7/nm-openvswitch.7*
 %{_mandir}/man7/nmcli-examples.7*
 %{_mandir}/man8/NetworkManager.8*
+%{_mandir}/man8/NetworkManager-dispatcher.8*
 %{_mandir}/man8/nm-cloud-setup.8*
 %{_mandir}/man8/nm-initrd-generator.8*
 %{_examplesdir}/%{name}-%{version}
