@@ -54,6 +54,7 @@ BuildRequires:	ppp-plugin-devel >= 3:2.4.6
 BuildRequires:	python3 >= 1:3
 BuildRequires:	python3-pygobject3
 BuildRequires:	readline-devel
+BuildRequires:	rpm-build >= 4.6
 BuildRequires:	rpmbuild(macros) >= 1.752
 BuildRequires:	sed >= 4.0
 %{?with_systemd:BuildRequires:	systemd-devel >= 1:209}
