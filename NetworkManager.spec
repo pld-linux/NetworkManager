@@ -8,13 +8,13 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.32.12
+Version:	1.34.0
 Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	https://download.gnome.org/sources/NetworkManager/1.32/%{name}-%{version}.tar.xz
-# Source0-md5:	0913815a98c60d0d2bcc6e930b596906
+Source0:	https://download.gnome.org/sources/NetworkManager/1.34/%{name}-%{version}.tar.xz
+# Source0-md5:	e5cf85f8023bbfe4acbf88ff848bb268
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
@@ -325,6 +325,7 @@ exit 0
 %attr(755,root,root) %{_libexecdir}/nm-ifdown
 %attr(755,root,root) %{_libexecdir}/nm-ifup
 %attr(755,root,root) %{_libexecdir}/nm-initrd-generator
+%attr(755,root,root) %{_libexecdir}/nm-priv-helper
 %attr(755,root,root) %{_libdir}/pppd/plugins/nm-pppd-plugin.so
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
 %if "%{_lib}" != "lib"
@@ -339,14 +340,17 @@ exit 0
 %{systemdunitdir}/NetworkManager.service
 %{systemdunitdir}/NetworkManager-dispatcher.service
 %{systemdunitdir}/NetworkManager-wait-online.service
-%{systemdunitdir}/nm-cloud-setup.service
-%{systemdunitdir}/nm-cloud-setup.timer
 %dir %{systemdunitdir}/NetworkManager.service.d
 %{systemdunitdir}/NetworkManager.service.d/NetworkManager-ovs.conf
+%{systemdunitdir}/nm-cloud-setup.service
+%{systemdunitdir}/nm-cloud-setup.timer
+%{systemdunitdir}/nm-priv-helper.service
 %{systemdtmpfilesdir}/%{name}.conf
+%{_datadir}/dbus-1/system-services/org.freedesktop.nm-priv-helper.service
 %{_datadir}/dbus-1/system-services/org.freedesktop.nm_dispatcher.service
 %{_datadir}/dbus-1/system.d/nm-dispatcher.conf
 %{_datadir}/dbus-1/system.d/nm-ifcfg-rh.conf
+%{_datadir}/dbus-1/system.d/nm-priv-helper.conf
 %{_datadir}/dbus-1/system.d/org.freedesktop.NetworkManager.conf
 %{_datadir}/polkit-1/actions/org.freedesktop.NetworkManager.policy
 /lib/udev/rules.d/84-nm-drivers.rules
