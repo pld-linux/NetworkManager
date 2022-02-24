@@ -26,7 +26,7 @@
 -#if SESSION_TRACKING_CONSOLEKIT
      struct {
          GFileMonitor *monitor;
-         GHashTable *  cache;
+         GHashTable   *cache;
          time_t        timestamp;
      } ck;
 -#endif

@@ -4,17 +4,18 @@
 %bcond_without	systemd		# use systemd for session tracking instead of ConsoleKit (fallback to ConsoleKit on runtime)
 %bcond_without	vala		# Vala API
 %bcond_with	firewalld	# Firewalld zone for shared mode
+%bcond_with	default_iwd	# use IWD as deafult Wi-Fi backend instead of wpa_supplicant
 
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.34.0
+Version:	1.36.0
 Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	https://download.gnome.org/sources/NetworkManager/1.34/%{name}-%{version}.tar.xz
-# Source0-md5:	e5cf85f8023bbfe4acbf88ff848bb268
+Source0:	https://download.gnome.org/sources/NetworkManager/1.36/%{name}-%{version}.tar.xz
+# Source0-md5:	0dc41c07f00cb84001262fb3b5d95a53
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
@@ -212,6 +213,7 @@ grep -rl /usr/bin/env examples | xargs sed -i -e '1{
 	--disable-silent-rules \
 	--enable-static \
 	%{!?with_vala:--disable-vala} \
+	--with-config-wifi-backend-default=%{?with_default_iwd:iwd}%{!?with_default_iwd:wpa_supplicant} \
 	--with-dhclient=/sbin/dhclient \
 	--with-dhcpcd=/sbin/dhcpcd \
 	%{!?with_firewalld:--disable-firewalld-zone} \
@@ -321,7 +323,6 @@ exit 0
 %attr(755,root,root) %{_libexecdir}/nm-daemon-helper
 %attr(755,root,root) %{_libexecdir}/nm-dhcp-helper
 %attr(755,root,root) %{_libexecdir}/nm-dispatcher
-%attr(755,root,root) %{_libexecdir}/nm-iface-helper
 %attr(755,root,root) %{_libexecdir}/nm-ifdown
 %attr(755,root,root) %{_libexecdir}/nm-ifup
 %attr(755,root,root) %{_libexecdir}/nm-initrd-generator
@@ -346,8 +347,8 @@ exit 0
 %{systemdunitdir}/nm-cloud-setup.timer
 %{systemdunitdir}/nm-priv-helper.service
 %{systemdtmpfilesdir}/%{name}.conf
-%{_datadir}/dbus-1/system-services/org.freedesktop.nm-priv-helper.service
 %{_datadir}/dbus-1/system-services/org.freedesktop.nm_dispatcher.service
+%{_datadir}/dbus-1/system-services/org.freedesktop.nm_priv_helper.service
 %{_datadir}/dbus-1/system.d/nm-dispatcher.conf
 %{_datadir}/dbus-1/system.d/nm-ifcfg-rh.conf
 %{_datadir}/dbus-1/system.d/nm-priv-helper.conf
