@@ -9,13 +9,13 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.36.4
+Version:	1.38.0
 Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	https://download.gnome.org/sources/NetworkManager/1.36/%{name}-%{version}.tar.xz
-# Source0-md5:	cd2c2d377b4f672612b5c499a4c913e1
+Source0:	https://download.gnome.org/sources/NetworkManager/1.38/%{name}-%{version}.tar.xz
+# Source0-md5:	f56e7150bb7948c407be0e6f3b02b885
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
@@ -298,7 +298,7 @@ exit 0
 
 %files -f %{name}.lang
 %defattr(644,root,root,755)
-%doc AUTHORS ChangeLog NEWS README TODO
+%doc AUTHORS ChangeLog NEWS README.md TODO
 %attr(755,root,root) %{_bindir}/nm-online
 %attr(755,root,root) %{_bindir}/nmcli
 %attr(755,root,root) %{_bindir}/nmtui
@@ -384,6 +384,7 @@ exit 0
 %{_mandir}/man7/nmcli-examples.7*
 %{_mandir}/man8/NetworkManager.8*
 %{_mandir}/man8/NetworkManager-dispatcher.8*
+%{_mandir}/man8/NetworkManager-wait-online.service.8*
 %{_mandir}/man8/nm-cloud-setup.8*
 %{_mandir}/man8/nm-initrd-generator.8*
 %{_examplesdir}/%{name}-%{version}
