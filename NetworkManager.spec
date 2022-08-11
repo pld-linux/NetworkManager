@@ -174,7 +174,7 @@ Summary:	Bash completion for NetworkManager command (nmcli)
 Summary(pl.UTF-8):	Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli)
 Group:		Applications/Shells
 Requires:	%{name} = %{epoch}:%{version}-%{release}
-Requires:	bash-completion >= 2.0
+Requires:	bash-completion >= 1:2.0
 BuildArch:	noarch
 
 %description -n bash-completion-NetworkManager
