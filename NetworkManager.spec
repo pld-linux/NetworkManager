@@ -9,13 +9,13 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.38.4
-Release:	2
+Version:	1.40.0
+Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	https://download.gnome.org/sources/NetworkManager/1.38/%{name}-%{version}.tar.xz
-# Source0-md5:	eaaefa0da3f56c84aa1d9324cffb89ff
+Source0:	https://download.gnome.org/sources/NetworkManager/1.40/%{name}-%{version}.tar.xz
+# Source0-md5:	629a02737594f94b190fc55be9c26ac9
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
@@ -29,13 +29,12 @@ BuildRequires:	automake >= 1:1.12
 BuildRequires:	bluez-libs-devel >= 5.0
 BuildRequires:	curl-devel >= 7.24.0
 BuildRequires:	dbus-devel >= 1.1.0
-BuildRequires:	gettext-tools >= 0.17
+BuildRequires:	gettext-tools >= 0.19.8
 BuildRequires:	glib2-devel >= 1:2.38.0
 BuildRequires:	gnome-common
 BuildRequires:	gobject-introspection-devel >= 0.10.0
 BuildRequires:	gtk-doc >= 1.0
 BuildRequires:	gtk-doc-automake >= 1.0
-BuildRequires:	intltool >= 0.40.0
 BuildRequires:	jansson-devel >= 2.7
 BuildRequires:	libndp-devel
 BuildRequires:	libnl-devel >= 3.2.8
@@ -198,7 +197,7 @@ grep -rl /usr/bin/env examples | xargs sed -i -e '1{
 
 %build
 %{__gtkdocize}
-%{__intltoolize}
+%{__gettextize}
 %{__libtoolize}
 %{__aclocal} -I m4
 %{__autoconf}
