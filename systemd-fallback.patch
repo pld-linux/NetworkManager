@@ -111,9 +111,9 @@
 +# include <systemd/sd-daemon.h>
 +#endif
 +
+ #include "libnm-glib-aux/nm-dbus-aux.h"
  #include "libnm-core-intern/nm-core-internal.h"
  #include "NetworkManagerUtils.h"
- 
 @@ -24,9 +28,9 @@
  
  #elif defined(SUSPEND_RESUME_SYSTEMD) || defined(SUSPEND_RESUME_ELOGIND)
