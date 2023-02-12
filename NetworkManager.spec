@@ -29,6 +29,7 @@ BuildRequires:	automake >= 1:1.12
 BuildRequires:	bluez-libs-devel >= 5.0
 BuildRequires:	curl-devel >= 7.24.0
 BuildRequires:	dbus-devel >= 1.1.0
+BuildRequires:	docbook-dtd412-xml
 BuildRequires:	gettext-tools >= 0.19.8
 BuildRequires:	glib2-devel >= 1:2.38.0
 BuildRequires:	gnome-common
