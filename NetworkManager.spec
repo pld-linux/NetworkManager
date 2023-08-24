@@ -336,6 +336,8 @@ exit 0
 %{_prefix}/lib/NetworkManager/dispatcher.d/90-nm-cloud-setup.sh
 %dir %{_prefix}/lib/NetworkManager/dispatcher.d/no-wait.d
 %attr(755,root,root) %{_prefix}/lib/NetworkManager/dispatcher.d/no-wait.d/90-nm-cloud-setup.sh
+%dir %{_prefix}/lib/NetworkManager/dispatcher.d/pre-up.d
+%attr(755,root,root) %{_prefix}/lib/NetworkManager/dispatcher.d/pre-up.d/90-nm-cloud-setup.sh
 %{systemdunitdir}/NetworkManager.service
 %{systemdunitdir}/NetworkManager-dispatcher.service
 %{systemdunitdir}/NetworkManager-wait-online.service
