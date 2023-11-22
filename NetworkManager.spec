@@ -83,10 +83,11 @@ Requires:	polkit >= 0.97
 Requires:	rc-scripts >= 0.4.3.0
 Requires:	systemd-units >= 38
 Suggests:	ModemManager >= 1.0.0
+%{?with_default_iwd:Suggests:	iwd}
 Suggests:	mobile-broadband-provider-info
 Suggests:	resolvconf
 Suggests:	teamd >= 1.9
-Suggests:	wpa_supplicant >= 0.7.3-4
+%{!?with_default_iwd:Suggests:	wpa_supplicant >= 0.7.3-4}
 Obsoletes:	NetworkManager-systemd < 2:0.9.2.0-5
 Obsoletes:	dhcdbd < 3.0-1
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
