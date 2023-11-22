@@ -10,7 +10,7 @@ Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	1.44.2
-Release:	1
+Release:	2
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
@@ -82,11 +82,11 @@ Requires:	newt >= 0.52.15
 Requires:	polkit >= 0.97
 Requires:	rc-scripts >= 0.4.3.0
 Requires:	systemd-units >= 38
-Requires:	wpa_supplicant >= 0.7.3-4
 Suggests:	ModemManager >= 1.0.0
 Suggests:	mobile-broadband-provider-info
 Suggests:	resolvconf
 Suggests:	teamd >= 1.9
+Suggests:	wpa_supplicant >= 0.7.3-4
 Obsoletes:	NetworkManager-systemd < 2:0.9.2.0-5
 Obsoletes:	dhcdbd < 3.0-1
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
