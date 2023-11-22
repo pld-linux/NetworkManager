@@ -1,6 +1,7 @@
 # TODO: package /usr/lib/firewalld/zones/nm-shared.xml for firewalld support
 #
 # Conditional build
+%bcond_without	static_libs	# static library
 %bcond_without	systemd		# use systemd for session tracking instead of ConsoleKit (fallback to ConsoleKit on runtime)
 %bcond_without	vala		# Vala API
 %bcond_with	firewalld	# Firewalld zone for shared mode
@@ -210,7 +211,7 @@ grep -rl /usr/bin/env examples | xargs sed -i -e '1{
 	--enable-ifcfg-rh \
 	--enable-more-warnings \
 	--disable-silent-rules \
-	--enable-static \
+	%{__enable_disable static_libs static} \
 	%{!?with_vala:--disable-vala} \
 	--with-config-wifi-backend-default=%{?with_default_iwd:iwd}%{!?with_default_iwd:wpa_supplicant} \
 	--with-dhclient=/sbin/dhclient \
@@ -251,8 +252,12 @@ cp -p %{SOURCE3} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
 
 # Cleanup
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/*.la
-%{__rm} $RPM_BUILD_ROOT%{distplugindir}/*.{a,la}
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/pppd/plugins/*.{a,la}
+%{__rm} $RPM_BUILD_ROOT%{distplugindir}/*.la
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/pppd/plugins/*.la
+%if %{with static_libs}
+%{__rm} $RPM_BUILD_ROOT%{distplugindir}/*.a
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/pppd/plugins/*.a
+%endif
 
 %find_lang %{name}
 
@@ -412,9 +417,11 @@ exit 0
 %{_datadir}/dbus-1/interfaces/org.freedesktop.NetworkManager.*.xml
 %{_datadir}/gir-1.0/NM-1.0.gir
 
+%if %{with static_libs}
 %files static
 %defattr(644,root,root,755)
 %{_libdir}/libnm.a
+%endif
 
 %if %{with vala}
 %files -n vala-NetworkManager
