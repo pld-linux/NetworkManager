@@ -10,13 +10,13 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.44.2
-Release:	2
+Version:	1.46.0
+Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	https://download.gnome.org/sources/NetworkManager/1.44/%{name}-%{version}.tar.xz
-# Source0-md5:	bd6c9cb0ecd0fb7f516cde7bf4dee3fb
+Source0:	https://download.gnome.org/sources/NetworkManager/1.46/%{name}-%{version}.tar.xz
+# Source0-md5:	0594a237e7182341dd39cf465b1b60fe
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
@@ -32,7 +32,7 @@ BuildRequires:	curl-devel >= 7.24.0
 BuildRequires:	dbus-devel >= 1.1.0
 BuildRequires:	docbook-dtd412-xml
 BuildRequires:	gettext-tools >= 0.19.8
-BuildRequires:	glib2-devel >= 1:2.38.0
+BuildRequires:	glib2-devel >= 1:2.42
 BuildRequires:	gnome-common
 BuildRequires:	gobject-introspection-devel >= 0.10.0
 BuildRequires:	gtk-doc >= 1.0
@@ -52,7 +52,7 @@ BuildRequires:	nss-devel >= 3.11
 BuildRequires:	perl-base
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.97
-BuildRequires:	ppp-plugin-devel >= 3:2.4.6
+BuildRequires:	ppp-plugin-devel >= 3:2.4.9
 BuildRequires:	python3 >= 1:3
 BuildRequires:	python3-pygobject3
 BuildRequires:	readline-devel
@@ -119,7 +119,7 @@ Dokumentacja API biblioteki libnm.
 Summary:	Network Manager shared libraries
 Summary(pl.UTF-8):	Biblioteki dzielone Network Managera
 Group:		Libraries
-Requires:	glib2 >= 1:2.38.0
+Requires:	glib2 >= 1:2.42
 Requires:	nss >= 3.11
 Requires:	udev-libs >= 1:175
 Conflicts:	NetworkManager < 0.6.4-0.2
@@ -135,7 +135,7 @@ Summary:	Network Manager includes and more
 Summary(pl.UTF-8):	Pliki nagłówkowe Network Managera
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{epoch}:%{version}-%{release}
-Requires:	glib2-devel >= 1:2.38.0
+Requires:	glib2-devel >= 1:2.42
 Requires:	libuuid-devel
 Requires:	nss-devel >= 3.11
 
@@ -193,7 +193,7 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 grep -rl /usr/bin/env examples | xargs sed -i -e '1{
 	s,^#!.*bin/env gjs,#!/usr/bin/gjs,
 	s,^#!.*bin/env lua,#!%{__lua},
-	s,^#!.*bin/env python,#!%{__python},
+	s,^#!.*bin/env python,#!%{__python3},
 	s,^#!.*bin/env ruby,#!%{__ruby},
 }'
 
