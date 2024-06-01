@@ -10,13 +10,13 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.46.0
+Version:	1.48.0
 Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	https://download.gnome.org/sources/NetworkManager/1.46/%{name}-%{version}.tar.xz
-# Source0-md5:	0594a237e7182341dd39cf465b1b60fe
+Source0:	https://download.gnome.org/sources/NetworkManager/1.48/%{name}-%{version}.tar.xz
+# Source0-md5:	ba52091831d0d68122933a494507986a
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
@@ -197,6 +197,7 @@ grep -rl /usr/bin/env examples | xargs sed -i -e '1{
 	s,^#!.*bin/env ruby,#!%{__ruby},
 }'
 
+%{__sed} -i -e '/^po\/Makefile\.in/d' configure.ac
 
 %build
 %{__gtkdocize}
@@ -207,6 +208,7 @@ grep -rl /usr/bin/env examples | xargs sed -i -e '1{
 %{__autoheader}
 %{__automake}
 %configure \
+	--disable-autotools-deprecation \
 	--enable-gtk-doc \
 	--enable-ifcfg-rh \
 	--enable-more-warnings \

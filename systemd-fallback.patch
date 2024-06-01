@@ -101,9 +101,9 @@
  
      G_OBJECT_CLASS(nm_session_monitor_parent_class)->finalize(object);
  }
---- NetworkManager-1.34.0/src/core/nm-sleep-monitor.c.orig	2022-01-13 15:49:26.000000000 +0100
-+++ NetworkManager-1.34.0/src/core/nm-sleep-monitor.c	2022-01-13 21:09:37.908589909 +0100
-@@ -11,6 +11,10 @@
+--- NetworkManager-1.48.0/src/core/nm-power-monitor.c.orig	2024-05-31 13:23:57.000000000 +0200
++++ NetworkManager-1.48.0/src/core/nm-power-monitor.c	2024-06-01 08:21:35.884268446 +0200
+@@ -11,15 +11,19 @@
  #include <sys/stat.h>
  #include <gio/gunixfdlist.h>
  
@@ -114,9 +114,8 @@
  #include "libnm-glib-aux/nm-dbus-aux.h"
  #include "libnm-core-intern/nm-core-internal.h"
  #include "NetworkManagerUtils.h"
-@@ -24,9 +28,9 @@
  
- #elif defined(SUSPEND_RESUME_SYSTEMD) || defined(SUSPEND_RESUME_ELOGIND)
+ #if defined(SUSPEND_RESUME_SYSTEMD) || defined(SUSPEND_RESUME_ELOGIND)
  
 -#define SUSPEND_DBUS_NAME      "org.freedesktop.login1"
 -#define SUSPEND_DBUS_PATH      "/org/freedesktop/login1"
@@ -124,41 +123,21 @@
 +#define SD_SUSPEND_DBUS_NAME      "org.freedesktop.login1"
 +#define SD_SUSPEND_DBUS_PATH      "/org/freedesktop/login1"
 +#define SD_SUSPEND_DBUS_INTERFACE "org.freedesktop.login1.Manager"
- #define USE_UPOWER             0
  #if defined(SUSPEND_RESUME_SYSTEMD)
- #define _NMLOG_PREFIX_NAME "sleep-monitor-sd"
-@@ -36,6 +40,17 @@
+ #define _NMLOG_PREFIX_NAME "power-monitor-sd"
+ #else
+@@ -28,6 +32,10 @@
  
  #elif defined(SUSPEND_RESUME_CONSOLEKIT)
  
-+#define USE_UPOWER                      0
-+#define _NMLOG_PREFIX_NAME              "sleep-monitor-ck"
-+
-+#else
-+
-+#error define one of SUSPEND_RESUME_SYSTEMD, SUSPEND_RESUME_ELOGIND, SUSPEND_RESUME_CONSOLEKIT, or SUSPEND_RESUME_UPOWER
-+
 +#endif
 +
-+#if defined (SUSPEND_RESUME_SYSTEMD) || defined(SUSPEND_RESUME_CONSOLEKIT)
++#if defined (SUSPEND_RESUME_SYSTEMD) || defined (SUSPEND_RESUME_ELOGIND) || defined(SUSPEND_RESUME_CONSOLEKIT)
 + 
  /* ConsoleKit2 has added the same suspend/resume DBUS API that Systemd
   * uses. http://consolekit2.github.io/ConsoleKit2/#Manager.Inhibit
   */
-@@ -43,12 +58,6 @@
- #define SUSPEND_DBUS_NAME      "org.freedesktop.ConsoleKit"
- #define SUSPEND_DBUS_PATH      "/org/freedesktop/ConsoleKit/Manager"
- #define SUSPEND_DBUS_INTERFACE "org.freedesktop.ConsoleKit.Manager"
--#define USE_UPOWER             0
--#define _NMLOG_PREFIX_NAME     "sleep-monitor-ck"
--
--#else
--
--#error define one of SUSPEND_RESUME_SYSTEMD, SUSPEND_RESUME_ELOGIND, SUSPEND_RESUME_CONSOLEKIT, or SUSPEND_RESUME_UPOWER
- 
- #endif
- 
-@@ -329,6 +338,20 @@ nm_sleep_monitor_init(NMSleepMonitor *se
+@@ -292,6 +300,20 @@ nm_power_monitor_init(NMPowerMonitor *se
  {
      self->inhibit_fd  = -1;
      self->cancellable = g_cancellable_new();
