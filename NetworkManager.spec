@@ -10,19 +10,22 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.50.0
+Version:	1.50.1
 Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
-Source0:	https://download.gnome.org/sources/NetworkManager/1.50/%{name}-%{version}.tar.xz
-# Source0-md5:	3a95e6ddade18d9a1abb0b86d2b14a36
+# until 1.50.0
+#Source0:	https://download.gnome.org/sources/NetworkManager/1.50/%{name}-%{version}.tar.xz
+#Source0Download: https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/releases
+Source0:	https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/releases/%{version}/downloads/%{name}-%{version}.tar.xz
+# Source0-md5:	664aa137694ddacfb51e9fae716916d2
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
 Patch0:		ifcfg-path.patch
 Patch1:		systemd-fallback.patch
-URL:		https://wiki.gnome.org/Projects/NetworkManager
+URL:		https://gitlab.freedesktop.org/NetworkManager/NetworkManager/
 BuildRequires:	ModemManager-devel >= 1.0.0
 BuildRequires:	audit-libs-devel
 BuildRequires:	autoconf >= 2.63
@@ -187,8 +190,8 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 
 %prep
 %setup -q
-%patch0 -p1
-%{?with_systemd:%patch1 -p1}
+%patch -P0 -p1
+%{?with_systemd:%patch -P1 -p1}
 
 grep -rl /usr/bin/env examples | xargs sed -i -e '1{
 	s,^#!.*bin/env gjs,#!/usr/bin/gjs,
