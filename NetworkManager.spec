@@ -46,6 +46,7 @@ BuildRequires:	libteamdctl-devel >= 1.9
 BuildRequires:	libuuid-devel
 BuildRequires:	libxslt-progs
 BuildRequires:	meson >= 0.51.0
+BuildRequires:	mobile-broadband-provider-info-devel
 BuildRequires:	newt-devel >= 0.52.15
 BuildRequires:	ninja >= 1.5
 # also gnutls (>= 2.12) possible (--with-crypto=gnutls)
