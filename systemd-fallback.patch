@@ -1,14 +1,3 @@
---- NetworkManager-1.8.0/configure.ac.orig	2017-05-27 22:30:22.001467624 +0200
-+++ NetworkManager-1.8.0/configure.ac	2017-05-27 22:57:15.061449204 +0200
-@@ -447,7 +447,7 @@
- # output
- session_tracking=
- if test "$use_systemd_logind" = "yes" -o "$use_systemd_logind" = "auto"; then
--	PKG_CHECK_MODULES(SYSTEMD_LOGIN, [libsystemd], [have_systemd_logind=yes], [PKG_CHECK_MODULES(SYSTEMD_LOGIN, [libsystemd-login], [have_systemd_logind=yes], [have_systemd_logind=no])])
-+	PKG_CHECK_MODULES(SYSTEMD_LOGIN, [libsystemd], [have_systemd_logind=yes], [PKG_CHECK_MODULES(SYSTEMD_LOGIN, [libsystemd-daemon libsystemd-login], [have_systemd_logind=yes], [have_systemd_logind=no])])
- else
- 	have_systemd_logind=no
- fi
 --- NetworkManager-1.34.0/src/core/nm-session-monitor.c.orig	2022-01-13 15:49:26.000000000 +0100
 +++ NetworkManager-1.34.0/src/core/nm-session-monitor.c	2022-01-13 20:47:31.545775434 +0100
 @@ -18,6 +18,7 @@

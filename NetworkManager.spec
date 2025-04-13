@@ -10,7 +10,7 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.50.1
+Version:	1.52.0
 Release:	1
 Epoch:		2
 License:	GPL v2+
@@ -19,37 +19,35 @@ Group:		Networking/Admin
 #Source0:	https://download.gnome.org/sources/NetworkManager/1.50/%{name}-%{version}.tar.xz
 #Source0Download: https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/releases
 Source0:	https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/releases/%{version}/downloads/%{name}-%{version}.tar.xz
-# Source0-md5:	664aa137694ddacfb51e9fae716916d2
+# Source0-md5:	a41314bafb43239c5813b1160e54b0dd
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
 Patch0:		ifcfg-path.patch
 Patch1:		systemd-fallback.patch
+Patch2:		%{name}-gir3.patch
 URL:		https://gitlab.freedesktop.org/NetworkManager/NetworkManager/
 BuildRequires:	ModemManager-devel >= 1.0.0
 BuildRequires:	audit-libs-devel
-BuildRequires:	autoconf >= 2.63
-BuildRequires:	automake >= 1:1.12
 BuildRequires:	bluez-libs-devel >= 5.0
 BuildRequires:	curl-devel >= 7.24.0
 BuildRequires:	dbus-devel >= 1.1.0
 BuildRequires:	docbook-dtd412-xml
 BuildRequires:	gettext-tools >= 0.19.8
 BuildRequires:	glib2-devel >= 1:2.42
-BuildRequires:	gnome-common
 BuildRequires:	gobject-introspection-devel >= 0.10.0
 BuildRequires:	gtk-doc >= 1.0
-BuildRequires:	gtk-doc-automake >= 1.0
 BuildRequires:	jansson-devel >= 2.7
 BuildRequires:	libndp-devel
 BuildRequires:	libnl-devel >= 3.2.8
 BuildRequires:	libpsl-devel >= 0.1
 BuildRequires:	libselinux-devel
 BuildRequires:	libteamdctl-devel >= 1.9
-BuildRequires:	libtool >= 2:2.2
 BuildRequires:	libuuid-devel
 BuildRequires:	libxslt-progs
+BuildRequires:	meson >= 0.51.0
 BuildRequires:	newt-devel >= 0.52.15
+BuildRequires:	ninja >= 1.5
 # also gnutls (>= 2.12) possible (--with-crypto=gnutls)
 BuildRequires:	nss-devel >= 3.11
 BuildRequires:	perl-base
@@ -60,7 +58,7 @@ BuildRequires:	python3 >= 1:3
 BuildRequires:	python3-pygobject3
 BuildRequires:	readline-devel
 BuildRequires:	rpm-build >= 4.6
-BuildRequires:	rpmbuild(macros) >= 1.752
+BuildRequires:	rpmbuild(macros) >= 2.042
 BuildRequires:	sed >= 4.0
 %{?with_systemd:BuildRequires:	systemd-devel >= 1:209}
 BuildRequires:	tar >= 1:1.22
@@ -192,6 +190,7 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 %setup -q
 %patch -P0 -p1
 %{?with_systemd:%patch -P1 -p1}
+%patch -P2 -p1
 
 grep -rl /usr/bin/env examples | xargs sed -i -e '1{
 	s,^#!.*bin/env gjs,#!/usr/bin/gjs,
@@ -200,44 +199,41 @@ grep -rl /usr/bin/env examples | xargs sed -i -e '1{
 	s,^#!.*bin/env ruby,#!%{__ruby},
 }'
 
-%{__sed} -i -e '/^po\/Makefile\.in/d' configure.ac
+%if %{with static_libs}
+%{__sed} -i -e '/^libnm = / s/shared_library/library/' src/libnm-client-impl/meson.build
+%endif
 
 %build
-%{__gtkdocize}
-%{__gettextize}
-%{__libtoolize}
-%{__aclocal} -I m4
-%{__autoconf}
-%{__autoheader}
-%{__automake}
-%configure \
-	--disable-autotools-deprecation \
-	--enable-gtk-doc \
-	--enable-ifcfg-rh \
-	--enable-more-warnings \
-	--disable-silent-rules \
-	%{__enable_disable static_libs static} \
-	%{!?with_vala:--disable-vala} \
-	--with-config-wifi-backend-default=%{?with_default_iwd:iwd}%{!?with_default_iwd:wpa_supplicant} \
-	--with-dhclient=/sbin/dhclient \
-	--with-dhcpcd=/sbin/dhcpcd \
-	%{!?with_firewalld:--disable-firewalld-zone} \
-	--with-html-dir=%{_gtkdocdir} \
-	--with-iptables=/usr/sbin/iptables \
-	--with-iwd=yes \
-	--with-nft=/usr/sbin/nft \
-	--with-nmcli \
-	--with-system-ca-path=/etc/certs \
-	--with-systemdsystemunitdir=%{systemdunitdir} \
-	--with-session-tracking=%{?with_systemd:systemd}%{!?with_systemd:ck} \
-	--with-suspend-resume=%{?with_systemd:systemd}%{!?with_systemd:upower} \
-	--with-pppd=/usr/sbin/pppd \
-	--with-pppd-plugin-dir=%{_libdir}/pppd/plugins \
-	--with-resolvconf=/sbin/resolvconf \
-	--with-udev-dir=/lib/udev \
-	--with-dist-version=%{version}-%{release}
+%meson \
+	-Dbluez5_dun=true \
+	-Dconfig_wifi_backend_default=%{?with_default_iwd:iwd}%{!?with_default_iwd:wpa_supplicant} \
+	-Ddhclient=/sbin/dhclient \
+	-Ddhcpcd=/sbin/dhcpcd \
+	-Ddist_version=%{version}-%{release} \
+	-Ddnsmasq=/usr/sbin/dnsmasq \
+	-Ddocs=true \
+	-Debpf=true \
+	-Difcfg_rh=true \
+	-Diptables=/usr/sbin/iptables \
+	-Diwd=true \
+	-Dmodprobe=/sbin/modprobe \
+	-Dnft=/usr/sbin/nft \
+	-Dpppd=/usr/sbin/pppd \
+	-Dpppd_plugin_dir=%{_libdir}/pppd/plugins \
+	-Dqt=false \
+	-Dreadline=libreadline \
+	-Dresolvconf=/sbin/resolvconf \
+	-Dsession_tracking=%{?with_systemd:systemd}%{!?with_systemd:no} \
+	-Dsession_tracking_consolekit=true \
+	-Dsuspend_resume=%{?with_systemd:systemd}%{!?with_systemd:consolekit} \
+	-Dsystem_ca_path=/etc/certs \
+	-Dsystemdsystemunitdir=%{systemdunitdir} \
+	-Dteamdctl=true \
+	-Dtests=no \
+	-Dudev_dir=/lib/udev \
+	-Dvapi=true
 
-%{__make}
+%meson_build
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -246,8 +242,7 @@ install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,/var/run/%{name},%{systemdtmpfilesdi
 	$RPM_BUILD_ROOT%{_sysconfdir}/%{name}/dispatcher.d/{pre-down.d,pre-up.d,no-wait.d} \
 	$RPM_BUILD_ROOT%{_prefix}/lib/%{name}/{VPN,conf.d}
 
-%{__make} install \
-	DESTDIR=$RPM_BUILD_ROOT
+%meson_install
 
 install -p %{SOURCE4} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 
@@ -255,19 +250,7 @@ cp -p %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 
 cp -p %{SOURCE3} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
 
-# Cleanup
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/*.la
-%{__rm} $RPM_BUILD_ROOT%{distplugindir}/*.la
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/pppd/plugins/*.la
-%if %{with static_libs}
-%{__rm} $RPM_BUILD_ROOT%{distplugindir}/*.a
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/pppd/plugins/*.a
-%endif
-
 %find_lang %{name}
-
-# examples
-%{__make} clean-checkPROGRAMS
 
 install -d $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 cp -a examples/* $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
