@@ -6,12 +6,13 @@
 %bcond_without	vala		# Vala API
 %bcond_with	firewalld	# Firewalld zone for shared mode
 %bcond_with	default_iwd	# use IWD as deafult Wi-Fi backend instead of wpa_supplicant
+%bcond_with	ebpf		# eBPF support
 
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
 Version:	1.52.0
-Release:	1
+Release:	2
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
@@ -213,7 +214,7 @@ grep -rl /usr/bin/env examples | xargs sed -i -e '1{
 	-Ddist_version=%{version}-%{release} \
 	-Ddnsmasq=/usr/sbin/dnsmasq \
 	-Ddocs=true \
-	-Debpf=true \
+	%{?with_ebpf:-Debpf=true} \
 	-Difcfg_rh=true \
 	-Diptables=/usr/sbin/iptables \
 	-Diwd=true \
