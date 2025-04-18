@@ -27,6 +27,7 @@ Source4:	%{name}.init
 Patch0:		ifcfg-path.patch
 Patch1:		systemd-fallback.patch
 Patch2:		%{name}-gir3.patch
+Patch3:		systemd-bpf-cap.patch
 URL:		https://gitlab.freedesktop.org/NetworkManager/NetworkManager/
 BuildRequires:	ModemManager-devel >= 1.0.0
 BuildRequires:	audit-libs-devel
@@ -193,6 +194,7 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 %patch -P0 -p1
 %{?with_systemd:%patch -P1 -p1}
 %patch -P2 -p1
+%patch -P3 -p1
 
 grep -rl /usr/bin/env examples | xargs sed -i -e '1{
 	s,^#!.*bin/env gjs,#!/usr/bin/gjs,

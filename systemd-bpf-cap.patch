@@ -1,0 +1,26 @@
+--- NetworkManager-1.52.0/data/NetworkManager.service.in.orig	2025-02-28 14:55:33.000000000 +0100
++++ NetworkManager-1.52.0/data/NetworkManager.service.in	2025-04-18 19:28:35.790756030 +0200
+@@ -19,7 +19,7 @@
+ # With a huge number of interfaces, starting can take a long time.
+ TimeoutStartSec=600
+ 
+-CapabilityBoundingSet=CAP_NET_ADMIN CAP_DAC_OVERRIDE CAP_NET_RAW CAP_NET_BIND_SERVICE CAP_SETGID CAP_SETUID CAP_SYS_MODULE CAP_AUDIT_WRITE CAP_KILL CAP_SYS_CHROOT
++CapabilityBoundingSet=CAP_NET_ADMIN CAP_DAC_OVERRIDE CAP_NET_RAW CAP_NET_BIND_SERVICE CAP_SETGID CAP_SETUID CAP_SYS_MODULE CAP_AUDIT_WRITE CAP_KILL CAP_SYS_CHROOT @CAP_BPF@
+ 
+ ProtectSystem=true
+ ProtectHome=read-only
+--- NetworkManager-1.52.0/meson.build.orig	2025-02-28 14:55:33.000000000 +0100
++++ NetworkManager-1.52.0/meson.build	2025-04-18 19:26:56.983572502 +0200
+@@ -951,6 +951,12 @@
+ data_conf.set('nmstatedir',                              nm_pkgstatedir)
+ data_conf.set('sbindir',                                 nm_sbindir)
+ data_conf.set('sysconfdir',                              nm_sysconfdir)
++if enable_ebpf
++  data_conf.set('CAP_BPF',                               'CAP_BPF')
++else
++  data_conf.set('CAP_BPF',                               '')
++endif
++
+ 
+ # check if we can build setting property documentation
+ '''
