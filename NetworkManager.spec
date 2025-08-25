@@ -33,7 +33,7 @@ BuildRequires:	audit-libs-devel
 BuildRequires:	bluez-libs-devel >= 5.0
 BuildRequires:	curl-devel >= 7.24.0
 BuildRequires:	dbus-devel >= 1.1.0
-BuildRequires:	docbook-dtd412-xml
+BuildRequires:	docbook-dtd45-xml
 BuildRequires:	gettext-tools >= 0.19.8
 BuildRequires:	glib2-devel >= 1:2.42
 BuildRequires:	gobject-introspection-devel >= 0.10.0
