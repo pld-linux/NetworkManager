@@ -11,8 +11,8 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.52.0
-Release:	2
+Version:	1.54.0
+Release:	1
 Epoch:		2
 License:	GPL v2+
 Group:		Networking/Admin
@@ -20,13 +20,12 @@ Group:		Networking/Admin
 #Source0:	https://download.gnome.org/sources/NetworkManager/1.50/%{name}-%{version}.tar.xz
 #Source0Download: https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/releases
 Source0:	https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/releases/%{version}/downloads/%{name}-%{version}.tar.xz
-# Source0-md5:	a41314bafb43239c5813b1160e54b0dd
+# Source0-md5:	300509d31ac641bba24240d708916083
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
 Patch0:		ifcfg-path.patch
 Patch1:		systemd-fallback.patch
-Patch2:		%{name}-gir3.patch
 Patch3:		systemd-bpf-cap.patch
 URL:		https://gitlab.freedesktop.org/NetworkManager/NetworkManager/
 BuildRequires:	ModemManager-devel >= 1.0.0
@@ -42,6 +41,7 @@ BuildRequires:	gtk-doc >= 1.0
 BuildRequires:	jansson-devel >= 2.7
 BuildRequires:	libndp-devel
 BuildRequires:	libnl-devel >= 3.2.8
+BuildRequires:	libnvme-devel >= 1.5
 BuildRequires:	libpsl-devel >= 0.1
 BuildRequires:	libselinux-devel
 BuildRequires:	libteamdctl-devel >= 1.9
@@ -81,6 +81,7 @@ Requires:	dhcp-client
 Requires:	filesystem >= 3.0-37
 Requires:	jansson >= 2.7
 Requires:	libnl >= 3.2.8
+Requires:	libnvme >= 1.5
 Requires:	libpsl >= 0.1
 Requires:	libteamdctl >= 1.9
 Requires:	newt >= 0.52.15
@@ -193,7 +194,6 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 %setup -q
 %patch -P0 -p1
 %{?with_systemd:%patch -P1 -p1}
-%patch -P2 -p1
 %patch -P3 -p1
 
 grep -rl /usr/bin/env examples | xargs sed -i -e '1{
@@ -210,17 +210,20 @@ grep -rl /usr/bin/env examples | xargs sed -i -e '1{
 %build
 %meson \
 	-Dbluez5_dun=true \
+	-Dconfig_dns_rc_manager_default=resolvconf \
 	-Dconfig_wifi_backend_default=%{?with_default_iwd:iwd}%{!?with_default_iwd:wpa_supplicant} \
 	-Ddhclient=/sbin/dhclient \
 	-Ddhcpcd=/sbin/dhcpcd \
 	-Ddist_version=%{version}-%{release} \
 	-Ddnsmasq=/usr/sbin/dnsmasq \
 	-Ddocs=true \
-	%{?with_ebpf:-Debpf=true} \
+	-Debpf=%{__true_false ebpf} \
 	-Difcfg_rh=true \
+	-Difupdown=false \
 	-Diptables=/usr/sbin/iptables \
 	-Diwd=true \
 	-Dmodprobe=/sbin/modprobe \
+	-Dmore_asserts=0 \
 	-Dnft=/usr/sbin/nft \
 	-Dpppd=/usr/sbin/pppd \
 	-Dpppd_plugin_dir=%{_libdir}/pppd/plugins \
@@ -337,8 +340,11 @@ exit 0
 %dir %{_prefix}/lib/NetworkManager/dispatcher.d/pre-up.d
 %attr(755,root,root) %{_prefix}/lib/NetworkManager/dispatcher.d/pre-up.d/90-nm-cloud-setup.sh
 %{systemdunitdir}/NetworkManager.service
+%{systemdunitdir}/NetworkManager-config-initrd.service
 %{systemdunitdir}/NetworkManager-dispatcher.service
+%{systemdunitdir}/NetworkManager-initrd.service
 %{systemdunitdir}/NetworkManager-wait-online.service
+%{systemdunitdir}/NetworkManager-wait-online-initrd.service
 %dir %{systemdunitdir}/NetworkManager.service.d
 %{systemdunitdir}/NetworkManager.service.d/NetworkManager-ovs.conf
 %{systemdunitdir}/nm-cloud-setup.service
