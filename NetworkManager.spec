@@ -11,7 +11,7 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.54.0
+Version:	1.54.3
 Release:	1
 Epoch:		2
 License:	GPL v2+
@@ -20,7 +20,7 @@ Group:		Networking/Admin
 #Source0:	https://download.gnome.org/sources/NetworkManager/1.50/%{name}-%{version}.tar.xz
 #Source0Download: https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/releases
 Source0:	https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/releases/%{version}/downloads/%{name}-%{version}.tar.xz
-# Source0-md5:	300509d31ac641bba24240d708916083
+# Source0-md5:	876d789eaa4ac0598cc75f01c0194d69
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
@@ -123,6 +123,7 @@ Dokumentacja API biblioteki libnm.
 %package libs
 Summary:	Network Manager shared libraries
 Summary(pl.UTF-8):	Biblioteki dzielone Network Managera
+License:	LGPL v2.1+
 Group:		Libraries
 Requires:	glib2 >= 1:2.42
 Requires:	nss >= 3.11
@@ -138,6 +139,7 @@ Biblioteki dzielone Network Managera.
 %package devel
 Summary:	Network Manager includes and more
 Summary(pl.UTF-8):	Pliki nagłówkowe Network Managera
+License:	LGPL v2.1+
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{epoch}:%{version}-%{release}
 Requires:	glib2-devel >= 1:2.42
@@ -153,6 +155,7 @@ Pliki nagłówkowe Network Manager.
 %package static
 Summary:	Network Manager static libraries
 Summary(pl.UTF-8):	Statyczne biblioteki Network Managera
+License:	LGPL v2.1+
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{epoch}:%{version}-%{release}
 
@@ -325,6 +328,7 @@ exit 0
 %attr(755,root,root) %{_libexecdir}/nm-ifdown
 %attr(755,root,root) %{_libexecdir}/nm-ifup
 %attr(755,root,root) %{_libexecdir}/nm-initrd-generator
+%attr(755,root,root) %{_libexecdir}/nm-libnm-helper
 %attr(755,root,root) %{_libexecdir}/nm-priv-helper
 %attr(755,root,root) %{_libdir}/pppd/plugins/nm-pppd-plugin.so
 %attr(754,root,root) /etc/rc.d/init.d/NetworkManager
