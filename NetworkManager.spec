@@ -6,12 +6,11 @@
 %bcond_without	vala		# Vala API
 %bcond_with	firewalld	# Firewalld zone for shared mode
 %bcond_with	default_iwd	# use IWD as deafult Wi-Fi backend instead of wpa_supplicant
-%bcond_with	ebpf		# eBPF support
 
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.54.3
+Version:	1.56.0
 Release:	1
 Epoch:		2
 License:	GPL v2+
@@ -20,13 +19,12 @@ Group:		Networking/Admin
 #Source0:	https://download.gnome.org/sources/NetworkManager/1.50/%{name}-%{version}.tar.xz
 #Source0Download: https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/releases
 Source0:	https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/releases/%{version}/downloads/%{name}-%{version}.tar.xz
-# Source0-md5:	876d789eaa4ac0598cc75f01c0194d69
+# Source0-md5:	013a68fb9a58748d5838bac19e570136
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
 Patch0:		ifcfg-path.patch
 Patch1:		systemd-fallback.patch
-Patch3:		systemd-bpf-cap.patch
 URL:		https://gitlab.freedesktop.org/NetworkManager/NetworkManager/
 BuildRequires:	ModemManager-devel >= 1.0.0
 BuildRequires:	audit-libs-devel
@@ -47,7 +45,7 @@ BuildRequires:	libselinux-devel
 BuildRequires:	libteamdctl-devel >= 1.9
 BuildRequires:	libuuid-devel
 BuildRequires:	libxslt-progs
-BuildRequires:	meson >= 0.51.0
+BuildRequires:	meson >= 0.56.0
 BuildRequires:	mobile-broadband-provider-info-devel
 BuildRequires:	newt-devel >= 0.52.15
 BuildRequires:	ninja >= 1.5
@@ -197,7 +195,6 @@ Bashowe uzupełnianie nazw dla polecenia NetworkManagera (nmcli).
 %setup -q
 %patch -P0 -p1
 %{?with_systemd:%patch -P1 -p1}
-%patch -P3 -p1
 
 grep -rl /usr/bin/env examples | xargs sed -i -e '1{
 	s,^#!.*bin/env gjs,#!/usr/bin/gjs,
@@ -220,7 +217,6 @@ grep -rl /usr/bin/env examples | xargs sed -i -e '1{
 	-Ddist_version=%{version}-%{release} \
 	-Ddnsmasq=/usr/sbin/dnsmasq \
 	-Ddocs=true \
-	-Debpf=%{__true_false ebpf} \
 	-Difcfg_rh=true \
 	-Difupdown=false \
 	-Diptables=/usr/sbin/iptables \
