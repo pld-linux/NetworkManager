@@ -1,6 +1,7 @@
 # TODO: package /usr/lib/firewalld/zones/nm-shared.xml for firewalld support
 #
 # Conditional build
+%bcond_without	clat		# CLAT support
 %bcond_without	static_libs	# static library
 %bcond_without	systemd		# use systemd for session tracking instead of ConsoleKit (fallback to ConsoleKit on runtime)
 %bcond_without	vala		# Vala API
@@ -10,7 +11,7 @@
 Summary:	Network Manager for GNOME
 Summary(pl.UTF-8):	Zarządca sieci dla GNOME
 Name:		NetworkManager
-Version:	1.56.1
+Version:	1.58.0
 Release:	1
 Epoch:		2
 License:	GPL v2+
@@ -19,7 +20,7 @@ Group:		Networking/Admin
 #Source0:	https://download.gnome.org/sources/NetworkManager/1.50/%{name}-%{version}.tar.xz
 #Source0Download: https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/releases
 Source0:	https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/releases/%{version}/downloads/%{name}-%{version}.tar.xz
-# Source0-md5:	e21ec74b24f72a044e75c0ae92a9bb62
+# Source0-md5:	897723f25e84233eb6e54b46947e7e1b
 Source1:	%{name}.conf
 Source3:	%{name}.tmpfiles
 Source4:	%{name}.init
@@ -29,6 +30,7 @@ URL:		https://gitlab.freedesktop.org/NetworkManager/NetworkManager/
 BuildRequires:	ModemManager-devel >= 1.0.0
 BuildRequires:	audit-libs-devel
 BuildRequires:	bluez-libs-devel >= 5.0
+%{?with_clat:BuildRequires:	clang >= 10.0.0}
 BuildRequires:	curl-devel >= 7.24.0
 BuildRequires:	dbus-devel >= 1.1.0
 BuildRequires:	docbook-dtd45-xml
@@ -37,7 +39,9 @@ BuildRequires:	glib2-devel >= 1:2.42
 BuildRequires:	gobject-introspection-devel >= 0.10.0
 BuildRequires:	gtk-doc >= 1.0
 BuildRequires:	jansson-devel >= 2.7
-BuildRequires:	libndp-devel
+%{?with_clat:BuildRequires:	kernel-tools >= 5.6.0}
+%{?with_clat:BuildRequires:	libbpf-devel >= 1.3.0}
+BuildRequires:	libndp-devel >= 1.9
 BuildRequires:	libnl-devel >= 3.2.8
 BuildRequires:	libnvme-devel >= 1.5
 BuildRequires:	libpsl-devel >= 0.1
@@ -61,6 +65,7 @@ BuildRequires:	readline-devel
 BuildRequires:	rpm-build >= 4.6
 BuildRequires:	rpmbuild(macros) >= 2.042
 BuildRequires:	sed >= 4.0
+BuildRequires:	slang-devel
 %{?with_systemd:BuildRequires:	systemd-devel >= 1:209}
 BuildRequires:	tar >= 1:1.22
 BuildRequires:	udev-devel >= 1:175
@@ -78,6 +83,8 @@ Requires:	curl-libs >= 7.24.0
 Requires:	dhcp-client
 Requires:	filesystem >= 3.0-37
 Requires:	jansson >= 2.7
+%{?with_clat:Requires:	libbpf >= 1.3.0}
+Requires:	libndp >= 1.9
 Requires:	libnl >= 3.2.8
 Requires:	libnvme >= 1.5
 Requires:	libpsl >= 0.1
@@ -210,9 +217,10 @@ grep -rl /usr/bin/env examples | xargs sed -i -e '1{
 %build
 %meson \
 	-Dbluez5_dun=true \
+	%{?with_clat:-Dbpf-compiler=clang} \
+	-Dclat=%{__true_false clat} \
 	-Dconfig_dns_rc_manager_default=resolvconf \
 	-Dconfig_wifi_backend_default=%{?with_default_iwd:iwd}%{!?with_default_iwd:wpa_supplicant} \
-	-Ddhclient=/sbin/dhclient \
 	-Ddhcpcd=/sbin/dhcpcd \
 	-Ddist_version=%{version}-%{release} \
 	-Ddnsmasq=/usr/sbin/dnsmasq \
@@ -233,6 +241,7 @@ grep -rl /usr/bin/env examples | xargs sed -i -e '1{
 	-Dsession_tracking_consolekit=true \
 	-Dsuspend_resume=%{?with_systemd:systemd}%{!?with_systemd:consolekit} \
 	-Dsystem_ca_path=/etc/certs \
+	%{!?with_systemd:-Dsystemdsystemgeneratordir=no} \
 	-Dsystemdsystemunitdir=%{systemdunitdir} \
 	-Dteamdctl=true \
 	-Dtests=no \
@@ -339,6 +348,7 @@ exit 0
 %attr(755,root,root) %{_prefix}/lib/NetworkManager/dispatcher.d/no-wait.d/90-nm-cloud-setup.sh
 %dir %{_prefix}/lib/NetworkManager/dispatcher.d/pre-up.d
 %attr(755,root,root) %{_prefix}/lib/NetworkManager/dispatcher.d/pre-up.d/90-nm-cloud-setup.sh
+%attr(755,root,root) /lib/systemd/system-generators/nm-initrd-generator.sh
 %{systemdunitdir}/NetworkManager.service
 %{systemdunitdir}/NetworkManager-config-initrd.service
 %{systemdunitdir}/NetworkManager-dispatcher.service
