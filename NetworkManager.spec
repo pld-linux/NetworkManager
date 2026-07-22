@@ -73,23 +73,23 @@ BuildRequires:	udev-devel >= 1:175
 BuildRequires:	xz
 Requires(post,preun):	/sbin/chkconfig
 Requires(post,preun,postun):	systemd-units >= 38
-Requires:	%{name}-libs = %{epoch}:%{version}-%{release}
+Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 %if %{with systemd}
-Suggests:	ConsoleKit-x11
+Suggests:	ConsoleKit-x11%{?_isa}
 %else
-Requires:	ConsoleKit-x11
+Requires:	ConsoleKit-x11%{?_isa}
 %endif
-Requires:	curl-libs >= 7.24.0
+Requires:	curl-libs%{?_isa} >= 7.24.0
 Requires:	dhcp-client
 Requires:	filesystem >= 3.0-37
-Requires:	jansson >= 2.7
-%{?with_clat:Requires:	libbpf >= 1.3.0}
-Requires:	libndp >= 1.9
-Requires:	libnl >= 3.2.8
-Requires:	libnvme >= 1.5
-Requires:	libpsl >= 0.1
-Requires:	libteamdctl >= 1.9
-Requires:	newt >= 0.52.15
+Requires:	jansson%{?_isa} >= 2.7
+%{?with_clat:Requires:	libbpf%{?_isa} >= 1.3.0}
+Requires:	libndp%{?_isa} >= 1.9
+Requires:	libnl%{?_isa} >= 3.2.8
+Requires:	libnvme%{?_isa} >= 1.5
+Requires:	libpsl%{?_isa} >= 0.1
+Requires:	libteamdctl%{?_isa} >= 1.9
+Requires:	newt%{?_isa} >= 0.52.15
 Requires:	polkit >= 0.97
 Requires:	rc-scripts >= 0.4.3.0
 Requires:	systemd-units >= 38
@@ -130,9 +130,9 @@ Summary:	Network Manager shared libraries
 Summary(pl.UTF-8):	Biblioteki dzielone Network Managera
 License:	LGPL v2.1+
 Group:		Libraries
-Requires:	glib2 >= 1:2.42
-Requires:	nss >= 3.11
-Requires:	udev-libs >= 1:175
+Requires:	glib2%{?_isa} >= 1:2.42
+Requires:	nss%{?_isa} >= 3.11
+Requires:	udev-libs%{?_isa} >= 1:175
 Conflicts:	NetworkManager < 0.6.4-0.2
 
 %description libs
@@ -146,10 +146,10 @@ Summary:	Network Manager includes and more
 Summary(pl.UTF-8):	Pliki nagłówkowe Network Managera
 License:	LGPL v2.1+
 Group:		Development/Libraries
-Requires:	%{name}-libs = %{epoch}:%{version}-%{release}
-Requires:	glib2-devel >= 1:2.42
-Requires:	libuuid-devel
-Requires:	nss-devel >= 3.11
+Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
+Requires:	glib2-devel%{?_isa} >= 1:2.42
+Requires:	libuuid-devel%{?_isa}
+Requires:	nss-devel%{?_isa} >= 3.11
 
 %description devel
 Network Manager includes and more.
@@ -162,7 +162,7 @@ Summary:	Network Manager static libraries
 Summary(pl.UTF-8):	Statyczne biblioteki Network Managera
 License:	LGPL v2.1+
 Group:		Development/Libraries
-Requires:	%{name}-devel = %{epoch}:%{version}-%{release}
+Requires:	%{name}-devel%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description static
 Network Manager static libraries.
